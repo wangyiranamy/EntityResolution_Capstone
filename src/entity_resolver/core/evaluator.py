@@ -5,3 +5,6 @@ class Evaluator:
 
     def evaluate(self, resolved_mapping, ground_truth):
         pass
+
+    def _pmi_score(self):
+        pass
