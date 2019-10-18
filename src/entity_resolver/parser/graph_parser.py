@@ -2,13 +2,13 @@ import pandas as pd
 import numpy as np
 import json
 from collections import defaultdict
-from ..core.graph import Attribute, Node,Edge,Graph
+from ..core.graph import Attribute, Node, Edge, Graph
 
 class GraphParser:
 
     def __init__(self, attr_types):
         """
-        :param attr_types: e.g {'title': 'string', 'name': 'string'}
+        :param attr_types: e.g {'title': 'text', 'name': 'person_entity'}
         """
         self.attr_types = attr_types
         pass
@@ -35,6 +35,6 @@ class GraphParser:
             if edge_id not in edge_dict:
                 edge_dict[edge_id] = Edge(edge_id)
             edge_dict[edge_id].add_node(node)
-        return Graph(node_list, edge_dict.values())
+        return Graph(node_list, edge_dict.values(), self.attr_types)
 
         pass

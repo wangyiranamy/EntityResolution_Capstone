@@ -22,5 +22,5 @@ setup(
         ]
     },
     python_requires='>=3.6',
-    install_requires=['']
+    install_requires=['pandas>=0.25.1', 'numpy>=1.17.2', 'nltk>=3.4.5']
 )
