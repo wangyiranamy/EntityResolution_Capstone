@@ -41,7 +41,6 @@ def _norm_arxiv(input_path, output_path):
     ('output', 'The output file path of the transformed citeseer data')
 )
 def _norm_citeseer(input_path, output_path):
-
     parse_data(input_path,output_path)
 
 

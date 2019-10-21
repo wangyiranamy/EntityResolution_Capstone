@@ -15,6 +15,7 @@ class TestScripts:
         assert test_dict[0]['attr_dict']['name'] == '  A. Aamodt '
         assert test_dict[0]['node_id'] == 0
         assert test_dict[0]['edge_id'] == 1019
+        os.remove(output_path)
 
     def test_arxiv(self):
         file_path = 'data/arxiv/arxiv-mrdm05.dat'
@@ -25,3 +26,4 @@ class TestScripts:
         assert test_dict[0]['attr_dict']['name'] == ' c.itzykson '
         assert test_dict[0]['node_id'] == 0
         assert test_dict[0]['edge_id'] == 2
+        os.remove(output_path)
