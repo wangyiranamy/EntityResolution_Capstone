@@ -4,3 +4,5 @@ __pycache__
 .pytest_cache
 entity_resolver.egg-info
 .idea
+.DS_Store
+*.icloud

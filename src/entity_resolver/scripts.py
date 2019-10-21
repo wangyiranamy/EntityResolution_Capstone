@@ -1,7 +1,6 @@
 import argparse
-from functools import wraps
 import json
-
+from functools import wraps
 
 
 def _subparser(subcommand, subcommand_help, *args):
@@ -32,9 +31,7 @@ def _subparser(subcommand, subcommand_help, *args):
     ('output', 'The path of the transformed arxiv data')
 )
 def _norm_arxiv(input_path, output_path):
-    with open(output_path, 'w') as f:
-        f.write('arxiv')
-    pass
+    parse_data(input_path,output_path)
 
 
 @_subparser(
@@ -44,20 +41,22 @@ def _norm_arxiv(input_path, output_path):
     ('output', 'The output file path of the transformed citeseer data')
 )
 def _norm_citeseer(input_path, output_path):
+
+    parse_data(input_path,output_path)
+
+
+def parse_data(input_path,output_path):
     with open(input_path) as dat_file:
         data = []
         for line in dat_file:
             row = [field for field in line.split('|')]
             if (len(row) == 8):
                 attr = {'title': row[7], 'name': row[3]}
-                row_dic = {'node_id': row[0], 'edge_id': row[5], 'attr_dict': attr}
+                row_dic = {'node_id': int(row[0]), 'edge_id': int(row[5]), 'attr_dict': attr}
                 data.append(row_dic)
 
     with open(output_path, 'w') as f:
         json.dump(data, f)
-
-    # with open(output_path, 'w') as f:
-    #     f.write('citeseer')
 
 
 def run(args=None):
