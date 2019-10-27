@@ -11,6 +11,7 @@ class TestGraphParser:
         print(graph.nodes[0].attrs)
         print(graph.get_attr_names())
         print(graph.get_attr_val())
+        print(graph.get_ambiguity_adar())
         # assert len(graph.nodes) == 4
         # assert len(graph.edges) == 2
         # assert len(graph.get_neighbors(graph.nodes[0])) == 3
