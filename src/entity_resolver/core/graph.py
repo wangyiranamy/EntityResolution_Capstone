@@ -9,7 +9,7 @@ class Attribute:
     def __init__(self, name, attr_type, value, deep_clean=True):
         self.name = name
         self.type = attr_type
-        self.adar_amb = None
+        # self.adar_amb = None
         if self.type == 'text':
             self._tokenize(value)
             self.raw_value = ' '.join(self.value)
