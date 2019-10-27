@@ -11,7 +11,7 @@ class TestEvaluator:
 class TestGraph:
 
     def test_dummy(self):
-        graph = Graph([], [])
+        graph = Graph([], [], [])
         assert 'get_neighbors' in dir(graph)
 
 

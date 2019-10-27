@@ -9,7 +9,7 @@ class Attribute:
     def __init__(self, name, attr_type, value, deep_clean=True):
         self.name = name
         self.type = attr_type
-
+        self.adar_amb = None
         if self.type == 'text':
             self._tokenize(value)
             self.raw_value = ' '.join(self.value)
@@ -190,19 +190,18 @@ class Graph:
 
         return attr_vals
 
-    def _get_attr_count(self):
-        attr_vals = self.get_attr_val(get_raw=True)
-        attr_counts = {}
-        for name, attr_val in attr_vals.items:
-            attr_counts[name] = collections.Counter(attr_val)
-        self.attr_counts = attr_counts
-
-
     def get_ambiguity_adar(self):
         """
-        :return:
+        :return: dictionary with attribute names as key; value: counter of count of distinct attribute values
         """
-        pass
+        attr_vals = self.get_attr_val(get_raw=True)
+        attr_adar_ambiguity = {}
+        for attr_name, attr_val in attr_vals.items():
+            attr_adar_ambiguity[attr_name] = collections.Counter(attr_val)
+        return attr_adar_ambiguity
+
+
+
 
 
 
