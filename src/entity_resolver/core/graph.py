@@ -119,11 +119,10 @@ class Graph:
     def __init__(self, nodes, edges, attr_types):
         """
         :param nodes: iterables (list) of Node()
-        :param edges: dictionary of edges with key edge_id and value Edge()
+        :param edges: iterables (list) of Edge()
         """
         self.nodes = list(nodes)
         self.edges = list(edges.values())
-        self.edge_dict = edges
         self.attr_types = attr_types
         self.id2node = {}
         self.id2edge = {}
@@ -153,7 +152,7 @@ class Graph:
         :param node object
         :return: list of Node() that are neighbors of node_id
         """
-        return self.edge_dict[node.edge].nodes
+        return node.edge.nodes
 
     def get_attr_names(self):
         """
