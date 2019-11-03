@@ -129,16 +129,12 @@ class Graph:
         """
         :param new_nodes:  iterables (list) of Node()
         """
-        for node in new_nodes:
-            self.id2node[node.id] = node
         self.nodes.extend(new_nodes)
 
     def add_edges(self, new_edges):
         """
         :param new_edges:  iterables (list) of Edge()
         """
-        for edge in new_edges:
-            self.id2edge[edge.id] = edge
         self.nodes.extend(new_edges)
 
     def get_neighbors(self, node):
