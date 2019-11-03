@@ -9,7 +9,6 @@ class TestGraphParser:
         output_path = 'testdata.json'
         run(['norm-citeseer', file_path, output_path])
         graph_parser = GraphParser({'title': 'text', 'name': 'person_entity'})
-        assert 'parse' in dir(graph_parser)
         graph = graph_parser.parse(output_path)
         assert len(graph.get_neighbors(graph.nodes[0]))==2
         assert len(graph.nodes) == 2884

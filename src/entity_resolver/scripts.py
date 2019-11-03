@@ -31,7 +31,6 @@ def _subparser(subcommand, subcommand_help, *args):
     ('output_graph', 'The path of the transformed arxiv graph data'),
     ('output_ground_truth', 'The path of the transformed arxiv ground truth')
 )
-
 def _norm_arxiv(input_path, output_path):
     parse_data(input_path, output_path)
 
