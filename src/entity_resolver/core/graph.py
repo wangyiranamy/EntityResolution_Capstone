@@ -45,7 +45,6 @@ class Attribute:
         :return: list of first name and last name parts e.g. ['whitehead', 's.d.']
         """
         value = value.lower()
-        cleaned_ordered_name = []  # [first name, last names]
         if ',' in value:
             first, last = value.split(',', 1)
             first = first.strip()
@@ -76,7 +75,6 @@ class Node:
         self.attrs = {}
         for attr in attrs:
             self.attrs[attr.name] = attr
-        pass
 
     def __hash__(self):
         return self.id
@@ -89,7 +87,6 @@ class Node:
         :return: list of attribute names
         '''
         return list(self.attrs.keys())
-        pass
 
     def get_attr(self, name):
         '''
@@ -109,14 +106,12 @@ class Edge:
         self.id = edge_id
         self.nodes = []
         self.attrs = attrs
-        pass
 
     def add_node(self, node):
         """
         :param node: Node() object
         """
         self.nodes.append(node)
-        pass
 
 
 class Graph:
@@ -132,12 +127,10 @@ class Graph:
         self.attr_types = attr_types
         self.id2node = {}
         self.id2edge = {}
-        # self.attr_vals = self.get_attr_val()
         for node in self.nodes:
             self.id2node[node.id] = node
         for edge in self.edges:
             self.id2edge[edge.id] = edge
-        pass
 
     def add_nodes(self, new_nodes):
         """
@@ -146,7 +139,6 @@ class Graph:
         for node in new_nodes:
             self.id2node[node.id] = node
         self.nodes.extend(new_nodes)
-        pass
 
     def add_edges(self, new_edges):
         """
@@ -155,15 +147,12 @@ class Graph:
         for edge in new_edges:
             self.id2edge[edge.id] = edge
         self.nodes.extend(new_edges)
-        pass
 
     def get_neighbors(self, node):
         """
         :param node object
         :return: list of Node() that are neighbors of node_id
         """
-        # edge_id = self.id2node[node_id].edge
-        # return self.get_nodes(edge_id)
         return self.edge_dict[node.edge].nodes
 
     def get_attr_names(self):
@@ -179,7 +168,6 @@ class Graph:
         attr_vals = {}
         for name in self.get_attr_names():
             attr_vals[name] = []
-
         for node in self.nodes:
             for name, node_attr in node.attrs.items():
                 if get_raw:
@@ -198,10 +186,3 @@ class Graph:
         for attr_name, attr_val in attr_vals.items():
             attr_adar_ambiguity[attr_name] = collections.Counter(attr_val)
         return attr_adar_ambiguity
-
-
-
-
-
-
-
