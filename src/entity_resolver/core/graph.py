@@ -9,16 +9,15 @@ class Attribute:
     def __init__(self, name, attr_type, value, deep_clean=True):
         self.name = name
         self.type = attr_type
-        # self.adar_amb = None
         if self.type == 'text':
-            self._tokenize(value)
-            self.raw_value = ' '.join(self.value)
+            self.value = self._tokenize(value)
+            self.raw_value = value
         elif self.type == 'person_entity' and deep_clean:
-            self._clean_person_name(value)
+            self.value = self._clean_person_name(value)
             self.raw_value = ' '.join(self.value)
         else:
             self.value = value
-            self.raw_value
+            self.raw_value = value
 
     def _tokenize(self, doc, to_stem=False):
         """
@@ -36,9 +35,9 @@ class Attribute:
             ps_stems = []
             for word in doc:
                 ps_stems.append(ps.stem(word))
-            self.value = ps_stems
+            return ps_stems
         else:
-            self.value = doc
+            return doc
 
     def _clean_person_name(self, value):
         """
@@ -48,10 +47,10 @@ class Attribute:
         value = value.lower()
         cleaned_ordered_name = []  # [first name, last names]
         if ',' in value:
-            first, last = value.split(',')
-            cleaned_ordered_name.append(first.strip())
+            first, last = value.split(',', 1)
+            first = first.strip()
             last = ''.join(''.join(last.split('.')).split())
-            cleaned_ordered_name.extend(last)
+            return [first, last]
         else:
             names = value.split()
             first = names[-1]
@@ -59,8 +58,8 @@ class Attribute:
                 last = ''
             else:
                 last = ''.join(names[:-1]).strip()
-            cleaned_ordered_name.extend([first, last])
-        self.value = cleaned_ordered_name
+            return [first, last]
+
 
 
 
@@ -89,7 +88,7 @@ class Node:
         '''
         :return: list of attribute names
         '''
-        return self.attrs.keys()
+        return list(self.attrs.keys())
         pass
 
     def get_attr(self, name):
@@ -125,10 +124,11 @@ class Graph:
     def __init__(self, nodes, edges, attr_types):
         """
         :param nodes: iterables (list) of Node()
-        :param edges: iterables (list) of Edge()
+        :param edges: dictionary of edges with key edge_id and value Edge()
         """
         self.nodes = list(nodes)
-        self.edges = list(edges)
+        self.edges = list(edges.values())
+        self.edge_dict = edges
         self.attr_types = attr_types
         self.id2node = {}
         self.id2edge = {}
@@ -164,8 +164,7 @@ class Graph:
         """
         # edge_id = self.id2node[node_id].edge
         # return self.get_nodes(edge_id)
-
-        return node.edge.nodes
+        return self.edge_dict[node.edge].nodes
 
     def get_attr_names(self):
         """
