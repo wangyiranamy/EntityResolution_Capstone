@@ -124,12 +124,6 @@ class Graph:
         self.nodes = list(nodes)
         self.edges = list(edges.values())
         self.attr_types = attr_types
-        self.id2node = {}
-        self.id2edge = {}
-        for node in self.nodes:
-            self.id2node[node.id] = node
-        for edge in self.edges:
-            self.id2edge[edge.id] = edge
 
     def add_nodes(self, new_nodes):
         """
