@@ -79,7 +79,9 @@ class Node:
         return self.id
 
     def __eq__(self, other):
-        return self.id == other.id
+        if isinstance(other, Node):
+            return self.id == other.id
+        return self == other
 
     def get_attr_names(self):
         '''
@@ -149,7 +151,7 @@ class Graph:
         """
         return self.nodes[0].get_attr_names()
 
-    def get_attr_val(self, get_raw=False):
+    def get_attr_vals(self, get_raw=False):
         """
         :return: for text data only dictionary key: name values: list of list
             of tokenized attr with 'name'
@@ -171,7 +173,7 @@ class Graph:
         :return: dictionary with attribute names as key; value: counter of
             count of distinct attribute values
         """
-        attr_vals = self.get_attr_val(get_raw=True)
+        attr_vals = self.get_attr_vals(get_raw=True)
         attr_adar_ambiguity = {}
         for attr_name, attr_val in attr_vals.items():
             attr_adar_ambiguity[attr_name] = collections.Counter(attr_val)
