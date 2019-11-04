@@ -28,8 +28,6 @@ class Attribute:
         doc = doc.strip()
         doc = re.sub("[^a-zA-Z]", " ", doc)
         doc = doc.lower().split()
-        eng_stopwords = stopwords.words("english")
-        doc = [w for w in doc if w not in eng_stopwords]
         if to_stem:
             ps = PorterStemmer()
             ps_stems = []
@@ -81,7 +79,7 @@ class Node:
     def __eq__(self, other):
         if isinstance(other, Node):
             return self.id == other.id
-        return self == other
+        return self is other
 
     def get_attr_names(self):
         '''

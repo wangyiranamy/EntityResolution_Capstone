@@ -16,7 +16,8 @@ class TestGraphParser:
         assert len(graph.edges) == 1499
         assert len(graph.edges[0].nodes) == 2
         assert graph.nodes[2].get_attr('title') == [
-            'knowledge', 'intensive', 'case', 'based', 'reasoning', 'learning'
+            'knowledge', 'intensive', 'case', 'based',
+            'reasoning', 'and', 'learning'
         ]
         assert graph.get_attr_names() == ['title', 'name']
         assert graph.get_ambiguity_adar()['name']['mahadevan s'] == 18 / 2884
