@@ -170,11 +170,14 @@ class Graph:
 
     def get_ambiguity_adar(self):
         """
-        :return: dictionary with attribute names as key; value: counter of
+        :return: dictionary with attribute names as key; value: ratio of
             count of distinct attribute values
         """
         attr_vals = self.get_attr_vals(get_raw=True)
         attr_adar_ambiguity = {}
         for attr_name, attr_val in attr_vals.items():
-            attr_adar_ambiguity[attr_name] = collections.Counter(attr_val)
+            counter = collections.Counter(attr_val)
+            for key in counter:
+                counter[key] /= len(attr_val)
+            attr_adar_ambiguity[attr_name] = counter
         return attr_adar_ambiguity

@@ -19,7 +19,7 @@ class TestGraphParser:
             'knowledge', 'intensive', 'case', 'based', 'reasoning', 'learning'
         ]
         assert graph.get_attr_names() == ['title', 'name']
-        assert graph.get_ambiguity_adar()['name']['mahadevan s'] == 18
+        assert graph.get_ambiguity_adar()['name']['mahadevan s'] == 18 / 2884
         os.remove(output_path)
 
 
