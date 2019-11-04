@@ -75,12 +75,6 @@ class Node:
         for attr in attrs:
             self.attrs[attr.name] = attr
 
-    def get_attr_names(self):
-        pass
-
-    def get_attr(self, name):
-        pass
-
     def __hash__(self):
         return self.id
 
