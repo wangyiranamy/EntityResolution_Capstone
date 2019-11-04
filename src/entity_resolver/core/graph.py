@@ -89,12 +89,14 @@ class Node:
         '''
         return list(self.attrs.keys())
 
-    def get_attr(self, name):
+    def get_attr(self, name, get_raw=False):
         '''
         :param name: name of attribute
         :return: list of tokenized words if atttribute type is string
         '''
         attr = self.attrs[name]
+        if get_raw:
+            return attr.raw_value
         return attr.value
 
 
