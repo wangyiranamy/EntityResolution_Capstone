@@ -42,7 +42,8 @@ class Attribute:
     def _clean_person_name(self, value):
         """
         :param value: name string e.g. 'S.D. Whitehead' or 'Whitehead, S.D.'
-        :return: list of first name and last name parts e.g. ['whitehead', 's.d.']
+        :return: list of first name and last name parts
+            e.g. ['whitehead', 's.d.']
         """
         value = value.lower()
         if ',' in value:
@@ -58,8 +59,6 @@ class Attribute:
             else:
                 last = ''.join(names[:-1]).strip()
             return [first, last]
-
-
 
 
 class Node:
@@ -152,7 +151,8 @@ class Graph:
 
     def get_attr_val(self, get_raw=False):
         """
-        :return: for text data only dictionary key: name values: list of list of tokenized attr with 'name'
+        :return: for text data only dictionary key: name values: list of list
+            of tokenized attr with 'name'
         """
         attr_vals = {}
         for name in self.get_attr_names():
@@ -168,7 +168,8 @@ class Graph:
 
     def get_ambiguity_adar(self):
         """
-        :return: dictionary with attribute names as key; value: counter of count of distinct attribute values
+        :return: dictionary with attribute names as key; value: counter of
+            count of distinct attribute values
         """
         attr_vals = self.get_attr_val(get_raw=True)
         attr_adar_ambiguity = {}

@@ -4,6 +4,7 @@ import json
 from collections import defaultdict
 from ..core.graph import Attribute, Node, Edge, Graph
 
+
 class GraphParser:
 
     def __init__(self, attr_types):
@@ -14,7 +15,8 @@ class GraphParser:
 
     def parse(self, graph_data_path):
         """
-        :param graph_data_path: table with three columns: node_id, edge_id, attr_dict
+        :param graph_data_path: table with three columns:
+            node_id, edge_id, attr_dict
         :return: Graph object
         """
         with open(graph_data_path, 'r') as f:
@@ -24,7 +26,8 @@ class GraphParser:
         for row in graph_df:
             node_attrs = []
             for attr_name, attr_val in row['attr_dict'].items():
-                node_attr = Attribute(attr_name, self.attr_types[attr_name], attr_val)
+                attr_type = self.attr_types[attr_name]
+                node_attr = Attribute(attr_name, attr_type, attr_val)
                 node_attrs.append(node_attr)
             edge_id = row['edge_id']
             if edge_id not in edge_dict:
