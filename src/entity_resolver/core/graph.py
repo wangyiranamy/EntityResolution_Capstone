@@ -28,8 +28,6 @@ class Attribute:
         doc = doc.strip()
         doc = re.sub("[^a-zA-Z]", " ", doc)
         doc = doc.lower().split()
-        eng_stopwords = stopwords.words("english")
-        doc = [w for w in doc if w not in eng_stopwords]
         if to_stem:
             ps = PorterStemmer()
             ps_stems = []
@@ -79,7 +77,9 @@ class Node:
         return self.id
 
     def __eq__(self, other):
-        return self.id == other.id
+        if isinstance(other, Node):
+            return self.id == other.id
+        return self is other
 
     def get_attr_names(self):
         '''
@@ -87,12 +87,14 @@ class Node:
         '''
         return list(self.attrs.keys())
 
-    def get_attr(self, name):
+    def get_attr(self, name, get_raw=False):
         '''
         :param name: name of attribute
         :return: list of tokenized words if atttribute type is string
         '''
         attr = self.attrs[name]
+        if get_raw:
+            return attr.raw_value
         return attr.value
 
 
@@ -149,7 +151,7 @@ class Graph:
         """
         return self.nodes[0].get_attr_names()
 
-    def get_attr_val(self, get_raw=False):
+    def get_attr_vals(self, get_raw=False):
         """
         :return: for text data only dictionary key: name values: list of list
             of tokenized attr with 'name'
@@ -168,11 +170,14 @@ class Graph:
 
     def get_ambiguity_adar(self):
         """
-        :return: dictionary with attribute names as key; value: counter of
+        :return: dictionary with attribute names as key; value: ratio of
             count of distinct attribute values
         """
-        attr_vals = self.get_attr_val(get_raw=True)
+        attr_vals = self.get_attr_vals(get_raw=True)
         attr_adar_ambiguity = {}
         for attr_name, attr_val in attr_vals.items():
-            attr_adar_ambiguity[attr_name] = collections.Counter(attr_val)
+            counter = collections.Counter(attr_val)
+            for key in counter:
+                counter[key] /= len(attr_val)
+            attr_adar_ambiguity[attr_name] = counter
         return attr_adar_ambiguity
