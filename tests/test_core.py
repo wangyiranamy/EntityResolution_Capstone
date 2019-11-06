@@ -7,9 +7,25 @@ from entity_resolver.parser import GraphParser
 
 class TestEvaluator:
 
-    def test_dummy(self):
-        evaluator = Evaluator()
-        assert 'evaluate' in dir(evaluator)
+    @pytest.fixture
+    def ground_truth(self):
+        return {1: 1, 2: 1, 3: 2, 4: 3, 5: 3}
+
+    @pytest.fixture
+    def resolved_mapping(self):
+        return {1: 1000, 2: 1000, 3: 1000, 4: 1001, 5: 1010}
+
+    def test_ami(self, ground_truth, resolved_mapping):
+        ami_evaluator = Evaluator(strategy='ami')
+        ami_score = ami_evaluator.evaluate(ground_truth, resolved_mapping)
+        assert round(ami_score, 2) == 0.23
+
+    def test_v_measure(self, ground_truth, resolved_mapping):
+        v_measure_evaluator = Evaluator(strategy='v-measure')
+        v_measure_score = v_measure_evaluator.evaluate(
+            ground_truth, resolved_mapping
+        )
+        assert round(v_measure_score, 2) == 0.67
 
 
 class TestGraph:

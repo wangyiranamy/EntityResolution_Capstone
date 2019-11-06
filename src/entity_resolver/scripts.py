@@ -7,10 +7,10 @@ def _subparser(subcommand, subcommand_help, *args):
     def subparser_dec(f):
         def gen_args(parsed_args):
             for *names, arg_help in args:
-                cannon_name = names[-1]
-                if cannon_name[:2] == '--':
-                    cannon_name = cannon_name[2:]
-                yield getattr(parsed_args, cannon_name)
+                canon_name = names[-1]
+                if canon_name[:2] == '--':
+                    canon_name = canon_name[2:]
+                yield getattr(parsed_args, canon_name)
 
         @wraps(f)
         def create_subparser(subparsers):
@@ -28,38 +28,57 @@ def _subparser(subcommand, subcommand_help, *args):
     'norm-arxiv',
     'Transform the arxiv data into the format expected by EntityResolver',
     ('input', 'The path of the arxiv data to be transformed'),
-    ('output', 'The path of the transformed arxiv data')
+    ('graph_path', 'The path of the transformed arxiv graph data'),
+    (
+        'ground_truth_path',
+        'The path of the transformed arxiv ground truth data'
+    )
 )
-def _norm_arxiv(input_path, output_path):
-    parse_data(input_path, output_path)
+def _norm_arxiv(input_path, graph_path, ground_truth_path):
+    parse_data(input_path, graph_path, ground_truth_path, 'arxiv')
 
 
 @_subparser(
     'norm-citeseer',
     'Transform the citeseer data into the format expected by EntityResolver',
     ('input', 'The input file path of the citeseer data to be transformed'),
-    ('output', 'The output file path of the transformed citeseer data')
+    ('graph_path', 'The path of the transformed citeseer graph data'),
+    (
+        'ground_truth_path',
+        'The path of the transformed citeseer ground truth data'
+    )
 )
-def _norm_citeseer(input_path, output_path):
-    parse_data(input_path, output_path)
+def _norm_citeseer(input_path, graph_path, ground_truth_path):
+    parse_data(input_path, graph_path, ground_truth_path, 'citeseer')
 
 
-def parse_data(input_path, output_path):
+def parse_data(input_path, graph_path, ground_truth_path, name):
+    graph, ground_truth = list(), list()
     with open(input_path) as dat_file:
-        data = []
         for line in dat_file:
-            row = [field for field in line.split('|')]
-            if (len(row) == 8):
+            row = [field for field in line.split('|', 7)]
+            # Multiple different rows with id 2716 are present
+            if name == 'citeseer' and row[0] != '2716 ':
+                node_id = int(row[0])
                 attr = {'title': row[7], 'name': row[3]}
-                row_dic = {
-                    'node_id': int(row[0]),
-                    'edge_id': int(row[5]),
+                cluster_id = int(row[1])
+                edge_id = int(row[5])
+                graph_row = {
+                    'node_id': node_id,
+                    'edge_id': edge_id,
                     'attr_dict': attr
                 }
-                data.append(row_dic)
+                ground_truth_row = {
+                    'node_id': node_id,
+                    'cluster_id': cluster_id
+                }
+                graph.append(graph_row)
+                ground_truth.append(ground_truth_row)
 
-    with open(output_path, 'w') as f:
-        json.dump(data, f)
+    with open(graph_path, 'w') as f:
+        json.dump(graph, f)
+    with open(ground_truth_path, 'w') as f:
+        json.dump(ground_truth, f)
 
 
 def run(args=None):
