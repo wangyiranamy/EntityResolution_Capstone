@@ -2,7 +2,8 @@ import itertools
 import collections
 import numpy as np
 from py_stringmatching.similarity_measure import soft_tfidf, jaro_winkler
-
+import random
+import heapq
 
 class Resolver:
 
@@ -28,15 +29,198 @@ class Resolver:
             'relation': 'jaccard_coef'
         }
         pass
+    def _pq_add(self,q,c1,c2):
+        cluster_sim = self._calc_similarity(c1,c2)
+        #adjust priority queue order by using negative sim score
+        heapq.heappush(q,(-cluster_sim,(c1,c2)))
+        #update entries tracking
+        self.tracking_pq_index[c1].append((-cluster_sim,(c1,c2)))
+        self.tracking_pq_index[c2].append((-cluster_sim,(c1,c2)))
 
-    def resolve(self, graph):
+    def resolve(self, graph,threshold1,threshold2,simlarity_thresh):
         self._init_cache(graph)
-        pass
+        buckets = self.blocking(graph,threshold1,threshold2)
+        self.relational_boostrapping(buckets)
+        q = []
+        new_cluster_number = len(graph.nodes)
+        #keep track of pq entries involve cluster
+        self.tracking_pq_index = {cluster: [] for cluster in self.clusters.keys()}
+        #keep track of merged clusters
+        self._merged_clusters = set()
+        for c1,c2 in self._sim_clusters_pool:
+            self._pq_add(q,c1,c2)
+        while q:
+            sim_score,(c1,c2) = heapq.heappop(q)
+            if -sim_score<simlarity_thresh:
+                break
+            #merge clusters into
+            self._clusters[new_cluster_number]=self._clusters[c1]+self._clusters[c2]
+            del self._clusters[c1]
+            del self._clusters[c2]
+            self._merged_clusters.add(c1)
+            self._merged_clusters.add(c2)
+            #update inv cluster
+            for node in self._clusters[new_cluster_number]:
+                self._inv_clusters[node] = new_cluster_number
+
+            #remove other entries from pq
+            for entries in self.tracking_pq_index[c1]:
+                if entries in q:
+                    q.remove(entries)
+            for entries in self.tracking_pq_index[c2]:
+                if entries in q:
+                    q.remove(entries)
+            heapq.heapify(q)
+            del self.tracking_pq_index[c1]
+            del self.tracking_pq_index[c2]
+            #update sim_cluster
+            self._sim_clusters[new_cluster_number] = self._sim_clusters[c1].union(self._sim_clusters[c2])
+            del self._sim_clusters[c1]
+            del self._sim_clusters[c2]
+            #remove old clusters in sim clusters
+            for merged_c in self._merged_clusters:
+                self._sim_clusters[new_cluster_number].remove(merged_c)
+
+            for c in self._sim_clusters[new_cluster_number]:
+                self._pq_add(q,c,new_cluster_number)
+
+            #update neighbor_cluster
+            # self._neighbor_clusters[new_cluster_number] = self._neighbor_clusters[c1].union(self._neighbor_clusters[c2])
+            # del self._neighbor_clusters[c1]
+            # del self._neighbor_clusters[c2]
+            neighbors = self._get_cluster_neighbors(new_cluster_number)
+            for c in neighbors:
+                entries = self.tracking_pq_index(c)
+                for entry in entries:
+                    c1,c2 = entry[1]
+                    q.remove(entry)
+                    heapq.heapify(q)
+                    self._pq_add(q,c1,c2)
+
+            #increment new cluster number
+            new_cluster_number+=1
+
+
+    def blocking(self,graph,threshold1=0.8,threshold2=0.5):
+        '''
+        Initialize possible reference pairs using Blocking techniques
+        :param graph: reference graph
+        :return:list of buckets contains similar references
+        '''
+        buckets = list()
+        candidates= graph.nodes #list of nodes
+        similarity_matrix = self._attr_sim_matrix
+        '''
+        random select noda A and find nodes that > threshold2 put in same bucket 
+        and remove nodes >threshold1 from candidate
+        then random select nodes B until buckets cover all the data
+        '''
+        while candidates:
+            sample_node = random.sample(candidates,1)
+            sim = similarity_matrix[sample_node]
+            bucket = [i for i,x in enumerate(sim) if x>=threshold2]
+            buckets.append(bucket)
+            nodes_to_remove = [i for i,x in enumerate(sim) if x>=threshold1]
+            for x in nodes_to_remove:
+                candidates.remove(x)
+        return buckets
+
+    def relational_boostrapping(self,buckets,k=1):
+        #initialize clusters here
+
+        candidates_pair = []
+        nodes = self._graph.nodes
+        clusters = dict()
+        inv_clusters = {node: 0 for node in nodes}
+        data = [i for i in range(len(nodes))]
+        for bucket in buckets:
+            for node1, node2 in itertools.combinations(bucket, 2):
+                #todo check if rendandent
+                match = self.check_exact_match(node1,node2)
+                if match:
+                    if not self.check_ambig(node1) and not self.check_ambig(node2):
+                        candidates_pair.append((nodes.index(node1),nodes.index(node2)))
+                    else:
+                        edge1 = node1.edge
+                        edge2 = node2.edge
+                        if self.check_edge_match(edge1,edge2,k):
+                            candidates_pair.append((nodes.index(node1),nodes.index(node2)))
+        for node1,node2 in candidates_pair:
+            #build cluster union find
+            self.union(data,node1,node2)
+        for i,cluster in enumerate(data):
+            if cluster in clusters:
+                clusters[cluster].append(nodes[i])
+                inv_clusters[nodes[i]] = cluster
+            else:
+                clusters[cluster]=[nodes[i]]
+        self._clusters = clusters
+        self._inv_clusters = inv_clusters
+        #store similar clusters
+        sim_c = {cluster: set() for cluster in clusters.keys()}
+        sim_c_pool = set()
+        for bucket in buckets:
+            cluster_set = set()
+            for node in bucket:
+                cluster_set.add(inv_clusters[node])
+            for x in itertools.combinations(cluster_set,2):
+                sim_c_pool.add(x)
+            for c in cluster_set:
+                sim_c[c].union(cluster_set-{c})
+        #store neighbors
+        #todo delete these
+        neighbor_c = {cluster: set() for cluster in clusters.keys()}
+        for node in nodes:
+            neighbors = self._graph.get_neighbors(node)
+            for neighbor in neighbors:
+                neighbor_c[inv_clusters[node]].add(inv_clusters[neighbor])
+
+
+        self._sim_clusters = sim_c
+        self._neighbor_clusters = neighbor_c
+        self._sim_clusters_pool = sim_c_pool
+
+    def find(self,data, i):
+        if i != data[i]:
+            data[i] = self.find(data, data[i])
+        return data[i]
+
+    def union(self,data, i, j):
+        pi, pj = self.find(data, i), self.find(data, j)
+        if pi != pj:
+            data[pi] = pj
+
+    def check_exact_match(self,node1,node2):
+        for name in set(node1.get_attr_names()) & set(node2.get_attr_names()):
+            value1 = node1.get_attr(name)
+            value2 = node2.get_attr(name)
+            if value1 != value2:
+                return False
+        return True
+
+    def check_ambig(self,node,threshold=0.8):
+        ambig = self._ambiguities
+        if ambig[node] <threshold:
+            return False
+        else:
+            return True
+
+    def check_edge_match(self,edge1,edge2,k):
+        nodes1 = edge1.nodes
+        nodes2 = edge2.nodes
+        combinations = list(itertools.product(nodes1,nodes2))
+        count = 0
+        for combo in combinations:
+            #todo not calulate this every time
+            if self.check_exact_match(combo[0],combo[1]):
+                count+=1
+            if count>=k:
+                return True
+        return False
 
     def _init_cache(self, graph):
         self._graph = graph
-        self._clusters = {node.id: set([node]) for node in graph.nodes}
-        self._inv_clusters = {node: node.id for node in graph.nodes}
+
         parsed_result = self._parse_strategy()
         self._attr_weights, self._attr_funcs, self._rel_func = parsed_result
         self._init_attr_sims()
