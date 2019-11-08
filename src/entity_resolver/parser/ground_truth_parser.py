@@ -1,7 +1,10 @@
+import json
+
+
 class GroundTruthParser:
 
-    def __init__(self):
-        pass
-
     def parse(self, data_path):
-        pass
+        with open(data_path, 'r') as f:
+            data = json.load(f)
+            ground_truth = {row['node_id']: row['cluster_id'] for row in data}
+        return ground_truth

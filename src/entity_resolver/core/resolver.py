@@ -226,7 +226,6 @@ class Resolver:
         self._attr_weights, self._attr_funcs, self._rel_func = parsed_result
         self._init_attr_sims()
         self._ambiguities = graph.get_ambiguity_adar()
-        pass
 
     def _parse_strategy(self):
         attr_vals = self._graph.get_attr_vals()
