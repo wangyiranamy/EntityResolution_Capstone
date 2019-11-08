@@ -37,7 +37,7 @@ class Resolver:
         self.tracking_pq_index[c1].append((-cluster_sim,(c1,c2)))
         self.tracking_pq_index[c2].append((-cluster_sim,(c1,c2)))
 
-    def resolve(self, graph,threshold1,threshold2,simlarity_thresh):
+    def resolve(self, graph,threshold1=0.8,threshold2=0.5,simlarity_thresh=0.5):
         self._init_cache(graph)
         buckets = self.blocking(graph,threshold1,threshold2)
         self.relational_boostrapping(buckets)
@@ -91,7 +91,7 @@ class Resolver:
             neighbors = self._get_cluster_neighbors(new_cluster_number)
             for c in set(neighbors):
                 if c != new_cluster_number:
-                    entries = self.tracking_pq_index(c)
+                    entries = self.tracking_pq_index[c]
                     for entry in entries:
                         c1,c2 = entry[1]
                         q.remove(entry)
@@ -102,7 +102,7 @@ class Resolver:
             new_cluster_number+=1
 
 
-    def blocking(self,graph,threshold1=0.8,threshold2=0.5):
+    def blocking(self,graph,threshold1,threshold2):
         '''
         Initialize possible reference pairs using Blocking techniques
         :param graph: reference graph
