@@ -89,13 +89,14 @@ class Resolver:
             # del self._neighbor_clusters[c1]
             # del self._neighbor_clusters[c2]
             neighbors = self._get_cluster_neighbors(new_cluster_number)
-            for c in neighbors:
-                entries = self.tracking_pq_index(c)
-                for entry in entries:
-                    c1,c2 = entry[1]
-                    q.remove(entry)
-                    heapq.heapify(q)
-                    self._pq_add(q,c1,c2)
+            for c in set(neighbors):
+                if c != new_cluster_number:
+                    entries = self.tracking_pq_index(c)
+                    for entry in entries:
+                        c1,c2 = entry[1]
+                        q.remove(entry)
+                        heapq.heapify(q)
+                        self._pq_add(q,c1,c2)
 
             #increment new cluster number
             new_cluster_number+=1
