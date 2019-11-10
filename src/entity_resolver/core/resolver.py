@@ -221,10 +221,8 @@ class Resolver:
 
     def _init_cache(self, graph):
         self._graph = graph
-
         parsed_result = self._parse_strategy()
         self._attr_weights, self._attr_funcs, self._rel_func = parsed_result
-        self._init_attr_sims()
         self._ambiguities = graph.get_ambiguity_adar()
 
     def _parse_strategy(self):
@@ -265,17 +263,6 @@ class Resolver:
         rel_sim_producer = self._sim_func_producers[rel_strategy]
         return rel_sim_producer()
 
-    def _init_attr_sims(self):
-        def missing_factory():
-            return collections.defaultdict(float)
-
-        attr_sim_matrix = collections.defaultdict(missing_factory)
-        for node1, node2 in itertools.combinations(self._graph.nodes, 2):
-            similarity = self._calc_node_attr_sim(node1, node2)
-            attr_sim_matrix[node1][node2] = similarity
-            attr_sim_matrix[node2][node1] = similarity
-        self._attr_sim_matrix = attr_sim_matrix
-
     def _calc_node_attr_sim(self, node1, node2):
         attr_score = 0
         for name in set(node1.get_attr_names()) & set(node2.get_attr_names()):
@@ -296,7 +283,7 @@ class Resolver:
         total_score = 0
         for node1 in nodes1:
             for node2 in nodes2:
-                total_score += self._attr_sim_matrix[node1][node2]
+                total_score += self._calc_node_attr_sim(node1, node2)
         return total_score / (len(nodes1)*len(nodes2))
 
     def _calc_rel_sim(self, cluster1, cluster2):
