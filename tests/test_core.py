@@ -131,7 +131,8 @@ class TestResolver:
         node1 = [node for node in graph.nodes if node.id == 1][0]
         node2 = [node for node in graph.nodes if node.id == 2][0]
         assert resolver._calc_node_attr_sim(node1, node2) == 0.5
-        assert type(resolver._ambiguities) is dict
+        assert resolver._ambiguities[node1] == 0.5
+        assert resolver._ambiguities[node2] == 0.5
         cleanup()
 
     def test_attr_sim(self, complex_attr_graph_suite):
