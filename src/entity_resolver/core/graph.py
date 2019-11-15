@@ -77,9 +77,9 @@ class Node:
         return self.id
 
     def __eq__(self, other):
-        if isinstance(other, Node):
+        if type(self) is type(other):
             return self.id == other.id
-        return self is other
+        return NotImplemented
 
     def get_attr_names(self):
         '''
