@@ -1,7 +1,8 @@
 import itertools
+import functools
 import collections
 import random
-import heapq
+import multiprocessing
 import numpy as np
 from py_stringmatching.similarity_measure import jaro_winkler, soft_tfidf
 
@@ -9,13 +10,20 @@ from py_stringmatching.similarity_measure import jaro_winkler, soft_tfidf
 class Resolver:
 
     def __init__(
-        self, alpha=0.5, weights=None,
-        attr_strategy=dict(), rel_strategy=None
+        self, alpha=0.9, weights=None,
+        attr_strategy=dict(), rel_strategy=None, hard_threshold=0.9,
+        soft_threshold=0.8, edge_match_threshold=1,
+        similarity_threshold=0.9, ambiguity_threshold=0.1
     ):
         self.alpha = alpha
         self.weights = weights
         self.attr_strategy = attr_strategy
         self.rel_strategy = rel_strategy
+        self.hard_threshold = hard_threshold
+        self.soft_threshold = soft_threshold
+        self.edge_match_threshold = edge_match_threshold
+        self.similarity_threshold = similarity_threshold
+        self.ambiguity_threshold = ambiguity_threshold
         self._sim_func_producers = {
             'jaro_winkler': SimFuncFactory.produce_jaro_winkler,
             'jaccard_coef': SimFuncFactory.produce_jaccard_coef,
@@ -30,188 +38,84 @@ class Resolver:
             'relation': 'jaccard_coef'
         }
 
-    def _pq_add(self, q, c1, c2):
-        cluster_sim = self._calc_similarity(c1, c2)
-        # adjust priority queue order by using negative sim score
-        tmp = [-cluster_sim, (c1, c2)]
-        heapq.heappush(q, tmp)
-        # update entries tracking
-        self.tracking_pq_index[c1].append(tmp)
-        self.tracking_pq_index[c2].append(tmp)
+    def _missing_factory(self):
+        return collections.defaultdict(float)
 
-    def resolve(
-        self, graph, threshold1=0.85,
-        threshold2=0.7, similarity_thresh=0.8
-    ):
+    def resolve(self, graph):
         self._init_cache(graph)
-        print('blocking')
-        buckets = self.blocking(graph, threshold1, threshold2)
-        print(len(buckets))
-        print('boostrapping')
-        self.relational_boostrapping(buckets)
-        print('done')
-        q = []
-        new_cluster_number = len(graph.nodes)
-        # keep track of pq entries involve cluster
-        self.tracking_pq_index = {
-            cluster: [] for cluster in self._clusters.keys()
-        }
-        # keep track of merged clusters
-        self._merged_clusters = set()
-        for c1, c2 in self._sim_clusters_pool:
-            self._pq_add(q, c1, c2)
-        i = 1
-        while q:
-            print(i)
-            print(q[0])
-            sim_score, tmp_c = heapq.heappop(q)
-            if tmp_c != (-1, -1):
-                c1, c2 = tmp_c
-            else:
-                i += 1
-                continue
-            if -sim_score < similarity_thresh:
-                break
-            # merge clusters into
-            new_cluster = self._clusters.pop(c1)+self._clusters.pop(c2)
-            self._clusters[new_cluster_number] = new_cluster
-            self._merged_clusters.add(c1)
-            self._merged_clusters.add(c2)
-            # update inv cluster
-            for node in self._clusters[new_cluster_number]:
-                self._inv_clusters[node] = new_cluster_number
-
-            # remove other entries from pq
-            for entries in self.tracking_pq_index[c1]:
-                entries[-1] = (-1, -1)
-            for entries in self.tracking_pq_index[c2]:
-                entries[-1] = (-1, -1)
-            # del self.tracking_pq_index[c1]
-            # del self.tracking_pq_index[c2]
-            # update sim_cluster
-            new_cluster = self._sim_clusters.pop(c1).union(
-                self._sim_clusters.pop(c2)
-            )
-            self._sim_clusters[new_cluster_number] = new_cluster
-            # remove old clusters in sim clusters
-            self._sim_clusters[new_cluster_number] -= self._merged_clusters
-            for c in self._sim_clusters[new_cluster_number]:
-                self._pq_add(q, c, new_cluster_number)
-
-            # update neighbor_cluster
-            # new_cluster = self._neighbor_clusters[c1].union(
-            #     self._neighbor_clusters[c2]
-            # )
-            # self._neighbor_clusters[new_cluster_number] = new_cluster
-            # del self._neighbor_clusters[c1]
-            # del self._neighbor_clusters[c2]
-            neighbors = self._get_cluster_neighbors(new_cluster_number)
-            print('length of neighbors', len(set(neighbors)))
-            for c in set(neighbors):
-                if c != new_cluster_number:
-                    entries = self.tracking_pq_index[c]
-                    for entry in entries:
-                        if entry[-1] != (-1, -1):
-                            c1, c2 = entry[-1]
-                            entry[0] = self._calc_similarity(c1, c2)
-                            # entry[-1] = (-1,-1)
-                            # self._pq_add(q,c1,c2)
-            heapq.heapify(q)
-            # increment new cluster number
-            new_cluster_number += 1
-            i += 1
+        buckets = self._blocking(
+            graph, self.hard_threshold, self.soft_threshold
+        )
+        self._relational_boostrapping(buckets)
+        self._cluster_nodes()
         return self._clusters, self._inv_clusters
 
-    def blocking(self, graph, threshold1, threshold2):
+    def _blocking(self, graph, hard_threshold, soft_threshold):
         '''
         Initialize possible reference pairs using Blocking techniques
         :param graph: reference graph
         :return:list of buckets contains similar references
         '''
         buckets = list()
-        candidates = set(graph.nodes)  # list of nodes
+        candidates = set(graph.nodes)
         similarity_matrix = self._attr_sim_matrix
         '''
-        random select noda A and find nodes that > threshold2 put in same
-        bucket and remove nodes >threshold1 from candidate
+        random select noda A and find nodes that > soft_threshold put in same
+        bucket and remove nodes > hard_threshold from candidate
         then random select nodes B until buckets cover all the data
         '''
         while candidates:
             sample_node = random.sample(candidates, 1)[0]
-            sim = similarity_matrix[sample_node]
-            bucket = [i for i, x in sim.items() if x >= threshold2]
+            sim_dict = similarity_matrix[sample_node]
+            bucket = [i for i, x in sim_dict.items() if x >= soft_threshold]
             buckets.append(bucket)
-            nodes_to_remove = set(
-                [i for i, x in sim.items() if x >= threshold1] +
-                [sample_node]
-            )
-            candidates = candidates-nodes_to_remove
+            for node, similarity in sim_dict.items():
+                if similarity >= hard_threshold:
+                    candidates.discard(node)
+            candidates.remove(sample_node)
         return buckets
 
-    def relational_boostrapping(self, buckets, k=1):
-        # initialize clusters here
-        candidates_pair = []
+    def _relational_boostrapping(self, buckets):
+        self._init_clusters(buckets, self.edge_match_threshold)
+        self._init_sim_clusters_pool(buckets)
+
+    def _init_clusters(self, buckets, edge_match_threshold):
         nodes = self._graph.nodes
-        clusters = dict()
-        inv_clusters = {node: 0 for node in nodes}
-        data = [i for i in range(len(nodes))]
+        id_to_node = {node.id: node for node in nodes}
+        clusters = collections.defaultdict(set)
+        inv_clusters = dict()
+        dsu = DSU(nodes)
         for bucket in buckets:
             for node1, node2 in itertools.combinations(bucket, 2):
-                # todo check if rendandent
-                match = self.check_exact_match(node1, node2)
-                if match:
-                    if (
-                        not self.check_ambig(node1) and
-                        not self.check_ambig(node2)
-                    ):
-                        candidates_pair.append((
-                            nodes.index(node1),
-                            nodes.index(node2)
-                        ))
-                    else:
-                        edge1 = node1.edge
-                        edge2 = node2.edge
-                        if self.check_edge_match(edge1, edge2, k):
-                            candidates_pair.append((
-                                nodes.index(node1),
-                                nodes.index(node2)
-                            ))
-        for node1, node2 in candidates_pair:
-            # build cluster union find
-            self.union(data, node1, node2)
-        for i, cluster in enumerate(data):
-            if cluster in clusters:
-                clusters[cluster].append(nodes[i])
-                inv_clusters[nodes[i]] = cluster
-            else:
-                clusters[cluster] = [nodes[i]]
+                # todo check if redundant
+                match = self._check_exact_match(node1, node2)
+                node_check_passed = (
+                    self._check_ambig(node1)
+                    and self._check_ambig(node2)
+                )
+                edge_check_passed = self._check_edge_match(
+                    node1.edge, node2.edge, edge_match_threshold
+                )
+                if match and (node_check_passed or edge_check_passed):
+                    dsu.union(node1, node2)
+        for node in dsu.items:
+            parent = dsu.find(node)
+            clusters[parent.id].add(node)
+            inv_clusters[node] = parent.id
         self._clusters = clusters
         self._inv_clusters = inv_clusters
-        # store similar clusters
-        sim_c = {cluster: set() for cluster in clusters.keys()}
-        sim_c_pool = set()
+
+    def _init_sim_clusters_pool(self, buckets):
+        sim_clusters_pool = set()
         for bucket in buckets:
-            cluster_set = set()
-            for node in bucket:
-                cluster_set.add(inv_clusters[node])
-            for x in itertools.combinations(cluster_set, 2):
-                sim_c_pool.add(x)
-            for c in cluster_set:
-                sim_c[c].union(cluster_set-{c})
-        self._sim_clusters = sim_c
-        self._sim_clusters_pool = sim_c_pool
+            for node1, node2 in itertools.combinations(bucket, 2):
+                cluster1 = self._inv_clusters[node1]
+                cluster2 = self._inv_clusters[node2]
+                if cluster1 != cluster2:
+                    sim_clusters_pool.add((cluster1, cluster2))
+        self._sim_clusters_pool = sim_clusters_pool
 
-    def find(self, data, i):
-        if i != data[i]:
-            data[i] = self.find(data, data[i])
-        return data[i]
-
-    def union(self, data, i, j):
-        pi, pj = self.find(data, i), self.find(data, j)
-        if pi != pj:
-            data[pi] = pj
-
-    def check_exact_match(self, node1, node2):
+    def _check_exact_match(self, node1, node2):
         for name in set(node1.get_attr_names()) & set(node2.get_attr_names()):
             value1 = node1.get_attr(name)
             value2 = node2.get_attr(name)
@@ -219,25 +123,150 @@ class Resolver:
                 return False
         return True
 
-    def check_ambig(self, node, threshold=0.8):
+    def _check_ambig(self, node):
         ambig = self._ambiguities
-        if ambig[node] < threshold:
-            return False
-        else:
+        if ambig[node] < self.ambiguity_threshold:
             return True
+        else:
+            return False
 
-    def check_edge_match(self, edge1, edge2, k):
+    def _check_edge_match(self, edge1, edge2, edge_match_threshold):
         nodes1 = edge1.nodes
         nodes2 = edge2.nodes
-        combinations = list(itertools.product(nodes1, nodes2))
         count = 0
-        for combo in combinations:
+        for node1, node2 in itertools.product(nodes1, nodes2):
             # todo not calulate this every time
-            if self.check_exact_match(combo[0], combo[1]):
+            if self._check_exact_match(node1, node2):
                 count += 1
-            if count >= k:
+            if count >= edge_match_threshold:
                 return True
         return False
+
+    def _cluster_nodes(self):
+        pqueue = PriorityQueue()
+        sim_clusters = collections.defaultdict(set)
+        cluster_entries = collections.defaultdict(dict)
+        cluster_neighbors = {
+            cluster: set(self._get_cluster_neighbors(cluster))
+            for cluster in self._clusters
+        }
+        self._init_queue_entries(
+            pqueue, cluster_entries,
+            sim_clusters, cluster_neighbors
+        )
+        while pqueue:
+            entry = pqueue.pop()
+            if entry.similarity < self.similarity_threshold:
+                break
+            cluster1, cluster2 = entry.clusters
+            if cluster1 in cluster_neighbors[cluster2]:
+                continue
+            self._merge_clusters(
+                cluster1, cluster2,
+                sim_clusters, cluster_neighbors
+            )
+            self._update_pqueue(
+                cluster1, cluster2, pqueue, cluster_entries,
+                sim_clusters, cluster_neighbors
+            )
+
+    def _init_queue_entries(
+        self, pqueue, cluster_entries,
+        sim_clusters, cluster_neighbors,
+    ):
+        sim_clusters_pool = self._sim_clusters_pool
+        while sim_clusters_pool:
+            cluster1, cluster2 = sim_clusters_pool.pop()
+            similarity = self._calc_similarity(
+                cluster1, cluster2, cluster_neighbors
+            )
+            entry = SimilarityEntry(cluster1, cluster2, similarity)
+            sim_clusters[cluster1].add(cluster2)
+            sim_clusters[cluster2].add(cluster1)
+            cluster_entries[cluster1][cluster2] = entry
+            cluster_entries[cluster2][cluster1] = entry
+            pqueue.push(entry)
+
+    def _merge_clusters(
+        self, cluster1, cluster2,
+        sim_clusters, cluster_neighbors
+    ):
+        # merge to cluster with smaller id
+        if cluster2 < cluster1:
+            cluster1, cluster2 = cluster2, cluster1
+        self._clusters[cluster1] |= self._clusters[cluster2]
+        self._clusters.pop(cluster2)
+        for node in self._clusters[cluster1]:
+            self._inv_clusters[node] = cluster1
+        self._update_adj_set(cluster1, cluster2, sim_clusters, True)
+        self._update_adj_set(cluster1, cluster2, cluster_neighbors, False)
+
+    def _update_adj_set(self, cluster1, cluster2, adjacency_set, remove_self):
+        for item_set in adjacency_set[cluster2].values():
+            item_set.remove(cluster2)
+            item_set.add(cluster1)
+        adjacency_set[cluster1] |= adjacency_set[cluster2]
+        if remove_self:
+            adjacency_set[cluster1].remove(cluster1)
+        adjacency_set.pop(cluster2)
+
+    def _update_pqueue(
+        self, cluster1, cluster2, pqueue,
+        cluster_entries, sim_clusters, cluster_neighbors
+    ):
+        for entry in cluster_entries[cluster1].values():
+            pqueue.discard(entry)
+        for entry in cluster_entries[cluster2].values():
+            pqueue.discard(entry)
+        cluster_entries[cluster1].clear()
+        cluster_entries.pop(cluster2)
+        added_pairs = set()
+        self._add_sim_entries(
+            cluster1, pqueue, cluster_entries,
+            sim_clusters, cluster_neighbors, added_pairs
+        )
+        self._update_nbr_entries(
+            cluster1, pqueue, cluster_entries,
+            sim_clusters, cluster_neighbors, added_pairs
+        )
+
+    def _add_sim_entries(
+        self, cluster, pqueue, cluster_entries,
+        sim_clusters, cluster_neighbors, added_pairs
+    ):
+        for sim_cluster in sim_clusters[cluster]:
+            similarity = self._calc_similarity(
+                cluster, sim_cluster, cluster_neighbors
+            )
+            entry = SimilarityEntry(cluster, sim_cluster, similarity)
+            pqueue.push(entry)
+            cluster_entries[cluster1][sim_cluster] = entry
+            cluster_entries[sim_cluster][cluster1] = entry
+            added_pairs.update(set([
+                (cluster, sim_cluster),
+                (sim_cluster, cluster)
+            ]))
+
+    def _update_nbr_entries(
+        self, cluster, pqueue, cluster_entries,
+        sim_clusters, cluster_neighbors, added_pairs
+    ):
+        for cluster_nbr in cluster_neighbors[cluster]:
+            for sim_cluster in sim_clusters[cluster_nbr]:
+                if (cluster_nbr, sim_cluster) in added_pairs:
+                    continue
+                similarity = self._calc_similarity(
+                    cluster_nbr, sim_cluster, cluster_neighbors
+                )
+                entry = SimilarityEntry(cluster_nbr, sim_cluster, similarity)
+                old_entry = cluster_entries[cluster_nbr][sim_cluster]
+                pqueue.update(old_entry, entry)
+                cluster_entries[cluster_nbr][sim_cluster] = entry
+                cluster_entries[sim_cluster][cluster_nbr] = entry
+                added_pairs.update(set([
+                    (cluster_nbr, sim_cluster),
+                    (sim_cluster, cluster_nbr)
+                ]))
 
     def _init_cache(self, graph):
         self._graph = graph
@@ -292,9 +321,9 @@ class Resolver:
             attr_score += attr_sim_func(value1, value2)
         return attr_score
 
-    def _calc_similarity(self, cluster1, cluster2):
+    def _calc_similarity(self, cluster1, cluster2, cluster_neighbors=None):
         attr_score = self._calc_attr_sim(cluster1, cluster2)
-        rel_score = self._calc_rel_sim(cluster1, cluster2)
+        rel_score = self._calc_rel_sim(cluster1, cluster2, cluster_neighbors)
         return (1-self.alpha)*attr_score + self.alpha*rel_score
 
     def _calc_attr_sim(self, cluster1, cluster2):
@@ -306,11 +335,15 @@ class Resolver:
                 total_score += self._calc_node_attr_sim(node1, node2)
         return total_score / (len(nodes1)*len(nodes2))
 
-    def _calc_rel_sim(self, cluster1, cluster2):
+    def _calc_rel_sim(self, cluster1, cluster2, cluster_neighbors):
         ambiguities = self._calc_cluster_amb()
-        neighbors1 = self._get_cluster_neighbors(cluster1)
-        neighbors2 = self._get_cluster_neighbors(cluster2)
-        rel_score = self._rel_func(neighbors1, neighbors2, ambiguities)
+        if cluster_neighbors is None:
+            nbrs1 = self._get_cluster_neighbors(cluster1)
+            nbrs2 = self._get_cluster_neighbors(cluster2)
+        else:
+            nbrs1 = cluster_neighbors[cluster1]
+            nbrs2 = cluster_neighbors[cluster2]
+        rel_score = self._rel_func(nbrs1, nbrs2, ambiguities)
         return rel_score
 
     def _init_ambiguities(self):
@@ -444,3 +477,139 @@ class SimFuncFactory:
             union = accumulator(union, union_count, key)
             intersect = accumulator(intersect, intersect_count, key)
         return union, intersect
+
+class DSU:
+
+    def __init__(self, items):
+        self.items = {item: item for item in items}
+        self.rank = {item: 1 for item in items}
+
+    def union(self, item1, item2):
+        parent1, parent2 = self.find(item1), self.find(item2)
+        if self.rank[parent1] < self.rank[parent2]:
+            self.items[parent1] = parent2
+            self.rank[parent2] += self.rank[parent1]
+        else:
+            self.items[parent2] = parent1
+            self.rank[parent1] += self.rank[parent2]
+
+    def find(self, item):
+        parent = self.items[item]
+        if parent == item:
+            return item
+        res = self.find(parent)
+        self.items[item] = res
+        return res
+
+
+class PriorityQueue:
+
+    def __init__(self, items=[]):
+        self._queue = list(items)
+        self._indicies = {item: index for index, item in enumerate(items)}
+        self._heapify()
+
+    def __len__(self):
+        return len(self._queue)
+
+    def __contains__(self, item):
+        return item in self._indicies
+
+    def _heapify(self):
+        for i in range(len(self._queue) - 1, 0, -1):
+            self._shiftdown(i)
+
+    def _shiftup(self, pos):
+        while pos > 0:
+            parent_pos = ((pos+1) >> 1)-1
+            if self._queue[pos] < self._queue[parent_pos]:
+                self._swap(pos, parent_pos)
+                pos = parent_pos
+            else:
+                break
+
+    def _shiftdown(self, pos):
+        while pos < len(self._queue):
+            left_pos = ((pos+1) << 1) - 1
+            right_pos = ((pos+1) << 1)
+            curr = self._queue[pos]
+            left, right = None, None
+            if left_pos < len(self._queue):
+                left = self._queue[left_pos]
+            if right_pos < len(self._queue):
+                right = self._queue[right_pos]
+            if left is None:
+                break
+            if right is None and left >= curr:
+                break
+            if (
+                (right is None and left < curr)
+                or (left < curr and left < right)
+            ):
+                self._swap(pos, left_pos)
+                pos = left_pos
+            elif right < curr and right < left:
+                self._swap(pos, right_pos)
+                pos = right_pos
+            else:
+                break
+
+    def _swap(self, pos1, pos2):
+        item1, item2 = self._queue[pos1], self._queue[pos2]
+        self._queue[pos1] = item2
+        self._queue[pos2] = item1
+        self._indicies[item1] = pos2
+        self._indicies[item2] = pos1
+
+    def push(self, item):
+        self._queue.append(item)
+        index = len(self._queue) - 1
+        self._indicies[item] = index
+        self._shiftup(index)
+
+    def pop(self):
+        return self.remove(self._queue[0])
+
+    def remove(self, item):
+        item_index = self._indicies[item]
+        self._swap(item_index, len(self._queue) - 1)
+        removed_item = self._queue.pop()
+        self._indicies.pop(removed_item)
+        self._shiftdown(item_index)
+        self._shiftup(item_index)
+        return removed_item
+
+    def discard(self, item):
+        if item in self._indicies:
+            self.remove(item)
+
+    def update(self, item, new_item):
+        item_index = self._indicies[item]
+        self._queue[item_index] = new_item
+        self._shiftdown(item_index)
+        self._shiftup(item_index)
+
+
+@functools.total_ordering
+class SimilarityEntry:
+
+    def __init__(self, cluster1, cluster2, similarity):
+        self.similarity = similarity
+        self.clusters = (cluster1, cluster2)
+
+    def __hash__(self):
+        return hash(self.clusters)
+
+    def __eq__(self, other):
+        if type(self) is type(other):
+            return self.clusters == other.clusters
+        return NotImplemented
+
+    def __lt__(self, other):
+        if type(self) is type(other):
+            return self.similarity > other.similarity
+        return NotImplemented
+
+    def swap(self):
+        cluster1, cluster2 = self.clusters
+        self.clusters = (cluster2, cluster1)
