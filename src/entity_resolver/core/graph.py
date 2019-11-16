@@ -14,7 +14,7 @@ class Attribute:
             self.raw_value = value
         elif self.type == 'person_entity' and deep_clean:
             self.value = self._clean_person_name(value)
-            self.raw_value = ' '.join(self.value)
+            self.raw_value = value
         else:
             self.value = value
             self.raw_value = value
@@ -41,21 +41,21 @@ class Attribute:
         """
         :param value: name string e.g. 'S.D. Whitehead' or 'Whitehead, S.D.'
         :return: list of first name and last name parts
-            e.g. ['whitehead', 's.d.']
+            e.g. ['s.d.', 'whitehead']
         """
         value = value.lower()
         if ',' in value:
-            first, last = value.split(',', 1)
-            first = first.strip()
-            last = ''.join(''.join(last.split('.')).split())
+            last, first = value.split(',', 1)
+            last = last.strip()
+            first = ''.join(''.join(first.split('.')).split())
             return [first, last]
         else:
             names = value.split()
-            first = names[-1]
+            last = names[-1]
             if len(names) == 1:
-                last = ''
+                first = ''
             else:
-                last = ''.join(names[:-1]).strip()
+                first = ''.join(names[:-1]).strip()
             return [first, last]
 
 
@@ -69,9 +69,12 @@ class Node:
         """
         self.id = node_id
         self.edge = edge
-        self.attrs = {}
+        attr_vals, raw_attr_vals = dict(), dict()
         for attr in attrs:
-            self.attrs[attr.name] = attr
+            attr_vals[attr.name] = attr.value
+            raw_attr_vals[attr.name] = attr.raw_value
+        self.attr_vals = attr_vals
+        self.raw_attr_vals = raw_attr_vals
 
     def __hash__(self):
         return self.id
@@ -80,22 +83,6 @@ class Node:
         if type(self) is type(other):
             return self.id == other.id
         return NotImplemented
-
-    def get_attr_names(self):
-        '''
-        :return: list of attribute names
-        '''
-        return list(self.attrs.keys())
-
-    def get_attr(self, name, get_raw=False):
-        '''
-        :param name: name of attribute
-        :return: list of tokenized words if atttribute type is string
-        '''
-        attr = self.attrs[name]
-        if get_raw:
-            return attr.raw_value
-        return attr.value
 
 
 class Edge:
@@ -125,6 +112,17 @@ class Graph:
         self.nodes = list(nodes)
         self.edges = list(edges.values())
         self.attr_types = attr_types
+        attr_vals = collections.defaultdict(list)
+        raw_attr_vals = collections.defaultdict(list)
+        for name in attr_types:
+            attr_vals[name] = []
+        for node in self.nodes:
+            for name, value in node.attr_vals.items():
+                attr_vals[name].append(value)
+            for name, raw_value in node.raw_attr_vals.items():
+                raw_attr_vals[name].append(raw_value)
+        self.attr_vals = attr_vals
+        self.raw_attr_vals = raw_attr_vals
 
     def add_nodes(self, new_nodes):
         """
@@ -145,35 +143,12 @@ class Graph:
         """
         return node.edge.nodes
 
-    def get_attr_names(self):
-        """
-        :return: list of attribute names for each node in the graph
-        """
-        return self.nodes[0].get_attr_names()
-
-    def get_attr_vals(self, get_raw=False):
-        """
-        :return: for text data only dictionary key: name values: list of list
-            of tokenized attr with 'name'
-        """
-        attr_vals = {}
-        for name in self.get_attr_names():
-            attr_vals[name] = []
-        for node in self.nodes:
-            for name, node_attr in node.attrs.items():
-                if get_raw:
-                    attr_vals[name].append(node_attr.raw_value)
-                else:
-                    attr_vals[name].append(node_attr.value)
-
-        return attr_vals
-
     def get_ambiguity_adar(self):
         """
         :return: dictionary with attribute names as key; value: ratio of
             count of distinct attribute values
         """
-        attr_vals = self.get_attr_vals(get_raw=True)
+        attr_vals = self.raw_attr_vals
         attr_adar_ambiguity = {}
         for attr_name, attr_val in attr_vals.items():
             counter = collections.Counter(attr_val)
