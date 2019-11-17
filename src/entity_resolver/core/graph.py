@@ -127,5 +127,34 @@ class Graph:
         """
         return node.edge.nodes
 
-    def get_ambiguity_adar(self):
-        pass
+    def get_ambiguity_adar(self, f1, f2, is_raw1,  is_raw2):
+        """
+        :param f1: the function that takes in the attribute dict of one node and output its first_attr_val
+        :param f2: the function that takes in the attribute dict of one node and output its second_attr_val
+        :param is_raw1: boolean, whether the first attribute value is raw or not
+        :param is_raw2: boolean, whether the second  attribute value is raw or not
+        :return: dictionary of node's ambiguous val
+        """
+        first_attrs, second_attrs = dict(), dict()
+        first_attr2node = collections.defaultdict(list)
+        cal_amb_a1_a2 = collections.defaultdict()
+        for node in self.nodes:
+            if is_raw1:
+                a1_val = f1(node.raw_attr_vals)
+                a2_val = f2(node.raw_attr_vals)
+
+            else:
+                a1_val = f1(node.attr_vals)
+                a2_val = f2(node.attr_vals)
+            first_attrs[node] = a1_val
+            second_attrs[node] = a2_val
+            first_attr2node[a1_val].append(node)
+        for a1_val, nodes in first_attr2node.items():
+            a2_vals = set()
+            for node in nodes:
+                a2_vals.add(second_attrs[node])
+            cal_amb_a1_a2[a1_val] = len(a2_vals)/len(self.nodes)
+        node_ambiguity = collections.defaultdict()
+        for node, a1_val in first_attrs.items():
+            node_ambiguity[node] = cal_amb_a1_a2[a1_val]
+        return node_ambiguity
