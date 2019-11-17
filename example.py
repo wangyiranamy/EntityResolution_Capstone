@@ -5,6 +5,12 @@ from entity_resolver import EntityResolver
 
 
 def edit_distance(attrs1, attrs2):
+    try:
+        f_initial1, f_initial2 = attrs1['name'][1][0], attrs2['name'][1][0]
+    except IndexError:
+        f_initial1, f_initial2 = '', ''
+    if f_initial1 != f_initial2:
+        return float('inf')
     levenshtein = Levenshtein()
     last_name1 = attrs1['name'][0]
     last_name2 = attrs2['name'][0]
@@ -27,9 +33,9 @@ subprocess.call(cmd_args)
 entity_resolver = EntityResolver(
     attr_types={'name': 'person_entity'}, blocking_strategy=edit_distance,
     bootstrap_strategy=exact_match, raw_blocking=False, raw_bootstrap=False,
-    alpha=0, similarity_threshold=0.935,
+    alpha=0, similarity_threshold=0.88,
     attr_strategy={'name': 'jaro_winkler'},
-    jw_prefix_weight=0.15, soft_tfidf_threshold=0.5
+    jw_prefix_weight=0.1, soft_tfidf_threshold=0.5
 )
 res = entity_resolver.resolve_and_eval(graph_path, ground_truth_path)
 os.remove(graph_path)
