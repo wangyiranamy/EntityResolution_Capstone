@@ -9,14 +9,14 @@ from .utils import SimFuncFactory, DSU, PriorityQueue, SimilarityEntry
 class Resolver:
 
     def __init__(
-        self, blocking_strategy, raw_blocking=False, alpha=0.5, weights=None,
+        self, blocking_strategy, raw_blocking=False, alpha=0, weights=None,
         attr_strategy=dict(), rel_strategy=None,
         blocking_threshold=3, bootstrap_strategy=None, raw_bootstrap=False,
-        edge_match_threshold=1, similarity_threshold=0.8, **kwargs
+        edge_match_threshold=1, similarity_threshold=0.935, **kwargs
     ):
-        self.alpha = alpha
         self.blocking_strategy = blocking_strategy
         self.raw_blocking = raw_blocking
+        self.alpha = alpha
         self.weights = weights
         self.attr_strategy = attr_strategy
         self.rel_strategy = rel_strategy
@@ -34,8 +34,9 @@ class Resolver:
             'jaccard_coef_fr': SimFuncFactory.produce_jaccard_coef_fr,
             'adar_neighbor': SimFuncFactory.produce_adar_neighbor,
             'adar_neighbor_fr': SimFuncFactory.produce_adar_neighbor_fr,
-            'adar_attr': SimFuncFactory.produce_adar_attr,
-            'adar_attr_fr': SimFuncFactory.produce_adar_attr_fr
+            # These two methods below is not supported yet
+            # 'adar_attr': SimFuncFactory.produce_adar_attr,
+            # 'adar_attr_fr': SimFuncFactory.produce_adar_attr_fr
         }
         self._default_strategies = {
             'text': 'stfidf_jaro_winkler',
@@ -54,7 +55,11 @@ class Resolver:
         buckets = self._blocking(graph)
         self._relational_boostrapping(buckets)
         self._cluster_nodes()
-        return self._clusters, self._inv_clusters
+        resolved_mapping = {
+            node.id: cluster
+            for node, cluster in self._inv_clusters.items()
+        }
+        return resolved_mapping
 
     def _blocking(self, graph):
         '''
@@ -102,7 +107,7 @@ class Resolver:
             parent = dsu.find(node)
             clusters[parent.id].add(node)
             inv_clusters[node] = parent.id
-        print(f'number of clusters: {len(clusters)}')
+        print(f'number of initial clusters: {len(clusters)}')
         self._clusters = clusters
         self._inv_clusters = inv_clusters
         cluster_neighbors = {
@@ -124,7 +129,7 @@ class Resolver:
                     and (cluster2, cluster1) not in sim_clusters_pool
                 ):
                     sim_clusters_pool.add((cluster1, cluster2))
-        print(f'number of similar pairs: {len(sim_clusters_pool)}')
+        print(f'number of initial similar pairs: {len(sim_clusters_pool)}')
         self._sim_clusters_pool = sim_clusters_pool
 
     def _check_exact_match(self, node1, node2):
@@ -305,13 +310,9 @@ class Resolver:
             except KeyError:
                 attr_strategy = self._default_strategies[attr_type]
             attr_sim_producer = self._sim_func_producers[attr_strategy]
-            if attr_type == 'text':
+            if attr_type == 'text' or attr_type == 'person_entity':
                 attr_sim_funcs[name] = attr_sim_producer(
                     weight, self._graph.attr_vals[name], **self._kwargs
-                )
-            elif attr_type == 'person_entity':
-                attr_sim_funcs[name] = attr_sim_producer(
-                    weight, **self._kwargs
                 )
         return attr_sim_funcs
 
@@ -321,6 +322,10 @@ class Resolver:
         else:
             rel_strategy = self.rel_strategy
         rel_sim_producer = self._sim_func_producers[rel_strategy]
+        if rel_strategy[-2:] != 'fr':
+            self._use_nbr_cache = True
+        else:
+            self._use_nbr_cache = False
         return rel_sim_producer(**self._kwargs)
 
     def _calc_node_attr_sim(self, node1, node2):
@@ -341,15 +346,23 @@ class Resolver:
         attr_score = self._calc_attr_sim(cluster1, cluster2)
         rel_score = self._calc_rel_sim(cluster1, cluster2)
         return (1-self.alpha)*attr_score + self.alpha*rel_score
-        return attr_score
 
     def _calc_attr_sim(self, cluster1, cluster2):
         nodes1 = self._clusters[cluster1]
         nodes2 = self._clusters[cluster2]
+        # the block below uses average similarity
         # total_score = 0
         # for node1, node2 in itertools.product(nodes1, nodes2):
         #     total_score += self._calc_node_attr_sim(node1, node2)
         # return total_score / (len(nodes1)*len(nodes2))
+
+        # the block below uses min similarity
+        # return min(
+        #     self._calc_node_attr_sim(node1, node2)
+        #     for node1, node2 in itertools.product(nodes1, nodes2)
+        # )
+
+        # the block below uses max similarity
         return max(
             self._calc_node_attr_sim(node1, node2)
             for node1, node2 in itertools.product(nodes1, nodes2)
@@ -358,7 +371,7 @@ class Resolver:
     def _calc_rel_sim(self, cluster1, cluster2):
         ambiguities = self._calc_cluster_amb()
         cluster_neighbors = getattr(self, '_cluster_neighbors', None)
-        if cluster_neighbors is None:
+        if not self._use_nbr_cache or cluster_neighbors is None:
             nbrs1 = self._get_cluster_neighbors(cluster1)
             nbrs2 = self._get_cluster_neighbors(cluster2)
         else:
@@ -368,15 +381,9 @@ class Resolver:
         return rel_score
 
     def _init_ambiguities(self):
-        ambiguities_raw = self._graph.get_ambiguity_adar()
-        ambiguities = dict()
-        for node in self._graph.nodes:
-            # Tentatively use minimum ambiguity among all attributes
-            ambiguities[node] = min(
-                ambiguities_raw[name][node.raw_attr_vals[name]]
-                for name in ambiguities_raw
-            )
-        self._ambiguities = ambiguities
+        # use dummy ambiguities for now. to implement later
+        self._ambiguities = {node: 1 for node in self._graph.nodes}
+        pass
 
     def _calc_cluster_amb(self):
         neighbor_amb, attr_amb = dict(), dict()
