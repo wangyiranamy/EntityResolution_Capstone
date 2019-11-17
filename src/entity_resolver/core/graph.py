@@ -38,25 +38,9 @@ class Attribute:
             return doc
 
     def _clean_person_name(self, value):
-        """
-        :param value: name string e.g. 'S.D. Whitehead' or 'Whitehead, S.D.'
-        :return: list of first name and last name parts
-            e.g. ['s.d.', 'whitehead']
-        """
-        value = value.lower()
-        if ',' in value:
-            last, first = value.split(',', 1)
-            last = last.strip()
-            first = ''.join(''.join(first.split('.')).split())
-            return [first, last]
-        else:
-            names = value.split()
-            last = names[-1]
-            if len(names) == 1:
-                first = ''
-            else:
-                first = ''.join(names[:-1]).strip()
-            return [first, last]
+        last, *first = value.split('_')
+        first = ' '.join(first).strip()
+        return last, first
 
 
 class Node:
@@ -144,15 +128,4 @@ class Graph:
         return node.edge.nodes
 
     def get_ambiguity_adar(self):
-        """
-        :return: dictionary with attribute names as key; value: ratio of
-            count of distinct attribute values
-        """
-        attr_vals = self.raw_attr_vals
-        attr_adar_ambiguity = {}
-        for attr_name, attr_val in attr_vals.items():
-            counter = collections.Counter(attr_val)
-            for key in counter:
-                counter[key] /= len(attr_val)
-            attr_adar_ambiguity[attr_name] = counter
-        return attr_adar_ambiguity
+        pass
