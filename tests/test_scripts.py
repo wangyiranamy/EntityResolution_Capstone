@@ -18,7 +18,7 @@ class TestScripts:
         with open(ground_truth_path, 'r') as f:
             ground_truth = json.load(f)
 
-        assert graph[0]['attr_dict']['name'] == '  A. Aamodt '
+        assert graph[0]['attr_dict']['name'] == 'aamodt_a'
         assert graph[0]['node_id'] == 0
         assert graph[0]['edge_id'] == 1019
         assert ground_truth[0]['node_id'] == 0
@@ -39,7 +39,7 @@ class TestScripts:
         with open(ground_truth_path, 'r') as f:
             ground_truth = json.load(f)
 
-        assert graph[0]['attr_dict']['name'] == ' c.itzykson '
+        assert graph[0]['attr_dict']['name'] == 'itzykson_c_'
         assert graph[0]['node_id'] == 0
         assert graph[0]['edge_id'] == 2
         assert ground_truth[0]['node_id'] == 0

@@ -28,12 +28,14 @@ class TestEvaluator:
         )
         assert round(v_measure_score, 2) == 0.67
 
-
-class TestGraph:
-
-    def test_dummy(self):
-        graph = Graph([], {}, [])
-        assert 'get_neighbors' in dir(graph)
+    def test_precision_recall(self, ground_truth, resolved_mapping):
+        precision_recall_evaluator = Evaluator(strategy='precision-recall')
+        precision_recall_score = precision_recall_evaluator.evaluate(
+            ground_truth, resolved_mapping
+        )
+        assert round(precision_recall_score[0], 2) == 0.33
+        assert round(precision_recall_score[1], 2) == 0.5
+        assert round(precision_recall_score[2], 2) == 0.4
 
 
 class TestResolver:
@@ -56,6 +58,12 @@ class TestResolver:
             nodes[6]: 4,
             nodes[7]: 2,
             nodes[8]: 4
+        }
+        resolver._cluster_neighbors = {
+            1: [1, 2, 1, 3],
+            2: [2, 1, 2, 4, 2, 4],
+            3: [4, 1],
+            4: [4, 2, 4, 2]
         }
 
     @pytest.fixture
@@ -103,14 +111,14 @@ class TestResolver:
         parser = GraphParser({'text': 'text'})
         tmp_path = 'complex_rel_graph.json'
         graph_dict = [
-            {'node_id': 1, 'edge_id': 'a', 'attr_dict': {'text': 'd'}},
-            {'node_id': 2, 'edge_id': 'a', 'attr_dict': {'text': 'b'}},
-            {'node_id': 3, 'edge_id': 'b', 'attr_dict': {'text': 'b'}},
-            {'node_id': 4, 'edge_id': 'b', 'attr_dict': {'text': 'c'}},
-            {'node_id': 5, 'edge_id': 'c', 'attr_dict': {'text': 'a'}},
-            {'node_id': 6, 'edge_id': 'c', 'attr_dict': {'text': 'd'}},
-            {'node_id': 7, 'edge_id': 'd', 'attr_dict': {'text': 'b'}},
-            {'node_id': 8, 'edge_id': 'd', 'attr_dict': {'text': 'a'}},
+            {'node_id': 1, 'edge_id': 100, 'attr_dict': {'text': 'd'}},
+            {'node_id': 2, 'edge_id': 100, 'attr_dict': {'text': 'b'}},
+            {'node_id': 3, 'edge_id': 101, 'attr_dict': {'text': 'b'}},
+            {'node_id': 4, 'edge_id': 101, 'attr_dict': {'text': 'c'}},
+            {'node_id': 5, 'edge_id': 110, 'attr_dict': {'text': 'a'}},
+            {'node_id': 6, 'edge_id': 110, 'attr_dict': {'text': 'd'}},
+            {'node_id': 7, 'edge_id': 111, 'attr_dict': {'text': 'b'}},
+            {'node_id': 8, 'edge_id': 111, 'attr_dict': {'text': 'a'}},
         ]
         with open(tmp_path, 'w') as f:
             json.dump(graph_dict, f)
@@ -121,7 +129,7 @@ class TestResolver:
 
     def test_cache(self, simple_graph_suite):
         graph, cleanup = simple_graph_suite
-        resolver = Resolver()
+        resolver = Resolver(None, alpha=0.5)
         assert resolver.alpha == 0.5
         assert len(resolver.attr_strategy) == 0
         resolver._init_cache(graph)
@@ -131,13 +139,13 @@ class TestResolver:
         node1 = [node for node in graph.nodes if node.id == 1][0]
         node2 = [node for node in graph.nodes if node.id == 2][0]
         assert resolver._calc_node_attr_sim(node1, node2) == 0.5
-        assert resolver._ambiguities[node1] == 0.5
-        assert resolver._ambiguities[node2] == 0.5
         cleanup()
 
     def test_attr_sim(self, complex_attr_graph_suite):
         graph, cleanup = complex_attr_graph_suite
-        resolver = Resolver(attr_strategy={'text': 'jaro_winkler'})
+        resolver = Resolver(
+            None, attr_strategy={'text': 'stfidf_jaro_winkler'}
+        )
         resolver._init_cache(graph)
         node1 = [node for node in graph.nodes if node.id == 1][0]
         node2 = [node for node in graph.nodes if node.id == 2][0]
@@ -153,22 +161,20 @@ class TestResolver:
 
     def test_rel_sim(self, complex_rel_graph_suite):
         graph, cleanup = complex_rel_graph_suite
-        jaccard_coef_resolver = Resolver(rel_strategy='jaccard_coef')
-        jaccard_coef_fr_resolver = Resolver(rel_strategy='jaccard_coef_fr')
-        adar_neighbor_resolver = Resolver(rel_strategy='adar_neighbor')
-        adar_neighbor_fr_resolver = Resolver(rel_strategy='adar_neighbor_fr')
-        adar_attr_resolver = Resolver(rel_strategy='adar_attr')
-        adar_attr_fr_resolver = Resolver(rel_strategy='adar_attr_fr')
+        jaccard_coef_resolver = Resolver(None, rel_strategy='jaccard_coef')
+        jaccard_coef_fr_resolver = Resolver(
+            None, rel_strategy='jaccard_coef_fr'
+        )
+        adar_neighbor_resolver = Resolver(None, rel_strategy='adar_neighbor')
+        adar_neighbor_fr_resolver = Resolver(
+            None, rel_strategy='adar_neighbor_fr'
+        )
         self._init_resolver(jaccard_coef_resolver, graph)
         self._init_resolver(jaccard_coef_fr_resolver, graph)
         self._init_resolver(adar_neighbor_resolver, graph)
         self._init_resolver(adar_neighbor_fr_resolver, graph)
-        self._init_resolver(adar_attr_resolver, graph)
-        self._init_resolver(adar_attr_fr_resolver, graph)
         assert jaccard_coef_resolver._calc_rel_sim(1, 2) == 0.5
         assert jaccard_coef_fr_resolver._calc_rel_sim(1, 2) == 0.25
         assert round(adar_neighbor_resolver._calc_rel_sim(1, 2), 2) == 0.45
         assert round(adar_neighbor_fr_resolver._calc_rel_sim(1, 2), 2) == 0.23
-        assert round(adar_attr_resolver._calc_rel_sim(1, 2), 2) == 0.34
-        assert round(adar_attr_fr_resolver._calc_rel_sim(1, 2), 2) == 0.20
         cleanup()
