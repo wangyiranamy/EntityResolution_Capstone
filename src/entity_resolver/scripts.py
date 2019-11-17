@@ -60,7 +60,7 @@ def parse_data(input_path, graph_path, ground_truth_path, name):
             # Multiple different rows with id 2716 are present
             if name == 'citeseer' and row[0] != '2716 ':
                 node_id = int(row[0])
-                attr = {'title': row[7], 'name': row[3]}
+                attr = {'name': row[2].strip()}
                 cluster_id = int(row[1])
                 edge_id = int(row[5])
                 graph_row = {
