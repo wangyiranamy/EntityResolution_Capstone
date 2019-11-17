@@ -7,8 +7,8 @@ class SimFuncFactory:
 
     @classmethod
     def produce_stfidf_jaro_winkler(
-        cls, weight, corpus_list,
-        soft_tfidf_threshold=0.9, **kwargs
+        cls, weight, corpus_list, soft_tfidf_threshold=0.5,
+        jw_prefix_weight=0.15, **kwargs
     ):
         sim_func = jaro_winkler.JaroWinkler().get_sim_score
         soft_tfidf_obj = soft_tfidf.SoftTfIdf(
@@ -23,14 +23,17 @@ class SimFuncFactory:
         return stfidf_jaro_winkler_sim
 
     @classmethod
-    def produce_jaro_winkler(cls, weight, **kwargs):
+    def produce_jaro_winkler(
+        cls, weight, corpus_list,
+        jw_prefix_weight=0.15, **kwargs
+    ):
         def jaro_winkler_sim(value1, value2):
-            jaro_winkler_obj = jaro_winkler.JaroWinkler()
+            jaro_winkler_obj = jaro_winkler.JaroWinkler(jw_prefix_weight)
             return weight * jaro_winkler_obj.get_sim_score(value1, value2)
         return jaro_winkler_sim
 
     @classmethod
-    def produce_jaro(cls, weight, **kwargs):
+    def produce_jaro(cls, weight, corpus_list, **kwargs):
         def jaro_sim(value1, value2):
             jaro_obj = jaro.Jaro()
             return weight * jaro_obj.get_sim_score(value1, value2)
@@ -39,8 +42,11 @@ class SimFuncFactory:
     @classmethod
     def produce_jaccard_coef(cls, **kwargs):
         def jaccard_coef(neighbors1, neighbors2, ambiguities):
-            set1 = set(neighbors1)
-            set2 = set(neighbors2)
+            set1, set2 = neighbors1, neighbors2
+            if type(neighbors1) is not set:
+                set1 = set(neighbors1)
+            if type(neighbors2) is not set:
+                set2 = set(neighbors2)
             intersect = len(set1 & set2)
             union = len(set1 | set2)
             return intersect / union
@@ -62,8 +68,11 @@ class SimFuncFactory:
     def produce_adar_neighbor(cls, **kwargs):
         def adar_neighbor(neighbors1, neighbors2, ambiguities):
             ambiguities = ambiguities['neighbor']
-            set1 = set(neighbors1)
-            set2 = set(neighbors2)
+            set1, set2 = neighbors1, neighbors2
+            if type(neighbors1) is not set:
+                set1 = set(neighbors1)
+            if type(neighbors2) is not set:
+                set2 = set(neighbors2)
             union = set1 | set2
             intersect = set1 & set2
             union_amb = sum(ambiguities[cluster] for cluster in union)
@@ -88,8 +97,11 @@ class SimFuncFactory:
     def produce_adar_attr(cls, **kwargs):
         def adar_attr(neighbors1, neighbors2, ambiguities):
             ambiguities = ambiguities['attr']
-            set1 = set(neighbors1)
-            set2 = set(neighbors2)
+            set1, set2 = neighbors1, neighbors2
+            if type(neighbors1) is not set:
+                set1 = set(neighbors1)
+            if type(neighbors2) is not set:
+                set2 = set(neighbors2)
             union = set1 | set2
             intersect = set1 & set2
             union_amb = sum(ambiguities[cluster] for cluster in union)
