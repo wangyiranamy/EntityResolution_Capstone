@@ -3,7 +3,7 @@ import collections
 import random
 import multiprocessing
 import numpy as np
-from .utils import SimFuncFactory, DSU, PriorityQueue, SimilarityEntry
+from .utils import SimFuncFactory, DSU, PriorityQueue, SimilarityEntry, timeit
 
 
 class Resolver:
@@ -48,6 +48,7 @@ class Resolver:
             'person_entity': 'jaro_winkler',
             'relation': 'jaccard_coef'
         }
+        self._time_dict = collections.defaultdict(lambda: [0, 0])
 
     def __getattr__(self, name):
         try:
@@ -66,6 +67,7 @@ class Resolver:
         }
         return resolved_mapping
 
+    @timeit
     def _blocking(self, graph):
         '''
         Initialize possible reference pairs using Blocking techniques
@@ -92,10 +94,12 @@ class Resolver:
         print(f'number of buckets: {len(buckets)}')
         return buckets
 
+    @timeit
     def _relational_boostrapping(self, buckets):
         self._init_clusters(buckets, self.edge_match_threshold)
         self._init_sim_clusters_pool(buckets)
 
+    @timeit
     def _init_clusters(self, buckets, edge_match_threshold):
         nodes = self._graph.nodes
         clusters = collections.defaultdict(set)
@@ -121,6 +125,7 @@ class Resolver:
         }
         self._cluster_neighbors = cluster_neighbors
 
+    @timeit
     def _init_sim_clusters_pool(self, buckets):
         sim_clusters_pool = set()
         for bucket in buckets:
@@ -137,6 +142,7 @@ class Resolver:
         print(f'number of initial similar pairs: {len(sim_clusters_pool)}')
         self._sim_clusters_pool = sim_clusters_pool
 
+    @timeit
     def _check_exact_match(self, node1, node2):
         if self.bootstrap_strategy is not None:
             return self.bootstrap_strategy(node1.attr_vals, node2.attr_vals)
@@ -151,6 +157,7 @@ class Resolver:
                 return False
         return True
 
+    @timeit
     def _check_edge_match(self, node1, node2):
         nbr_nodes1 = self._graph.get_neighbors(node1)
         nbr_nodes2 = self._graph.get_neighbors(node2)
@@ -171,6 +178,7 @@ class Resolver:
                 return True
         return False
 
+    @timeit
     def _cluster_nodes(self):
         sim_clusters = collections.defaultdict(set)
         cluster_entries = collections.defaultdict(dict)
@@ -195,6 +203,7 @@ class Resolver:
                 cluster_entries, sim_clusters
             )
 
+    @timeit
     def _init_queue_entries(self, cluster_entries, sim_clusters):
         sim_clusters_pool = self._sim_clusters_pool
         entries = list()
@@ -209,6 +218,7 @@ class Resolver:
             entries.append(entry)
         return PriorityQueue(entries)
 
+    @timeit
     def _merge_clusters(self, cluster1, cluster2, sim_clusters):
         self._clusters[cluster1] |= self._clusters[cluster2]
         self._clusters.pop(cluster2)
@@ -230,6 +240,7 @@ class Resolver:
             adjacency_set[cluster1].remove(cluster2)
         adjacency_set.pop(cluster2)
 
+    @timeit
     def _update_pqueue(
         self, cluster1, cluster2, pqueue,
         cluster_entries, sim_clusters
@@ -250,6 +261,7 @@ class Resolver:
             sim_clusters, added_pairs
         )
 
+    @timeit
     def _add_sim_entries(
         self, cluster, pqueue, cluster_entries,
         sim_clusters, added_pairs
@@ -265,6 +277,7 @@ class Resolver:
                 (sim_cluster, cluster)
             ]))
 
+    @timeit
     def _update_nbr_entries(
         self, cluster, pqueue, cluster_entries,
         sim_clusters, added_pairs
@@ -342,6 +355,7 @@ class Resolver:
             self._use_ambiguities = False
         return rel_sim_producer(**self._kwargs)
 
+    @timeit
     def _calc_node_attr_sim(self, node1, node2):
         attr_score = 0
         attr_types = self._graph.attr_types
@@ -356,6 +370,7 @@ class Resolver:
             attr_score += attr_sim_func(value1, value2)
         return attr_score
 
+    @timeit
     def _calc_similarity(self, cluster1, cluster2):
         attr_score = self._calc_attr_sim(cluster1, cluster2)
         rel_score = self._calc_rel_sim(cluster1, cluster2)
@@ -382,6 +397,7 @@ class Resolver:
             for node1, node2 in itertools.product(nodes1, nodes2)
         )
 
+    @timeit
     def _calc_rel_sim(self, cluster1, cluster2):
         get_uniqueness = self._calc_cluster_uniq()
         nbrs1 = self._get_cluster_neighbors(cluster1)
@@ -434,3 +450,9 @@ class Resolver:
         else:
             result = cluster_neighbors[cluster]
         return result
+
+    def print_time(self):
+        for f_name, [total, count] in self._time_dict.items():
+            print(f'total time taken by {f_name}: {total}s')
+            print(f'total number of calls to {f_name}: {count}')
+            print(f'average time taken by {f_name}: {total / count}s')
