@@ -127,12 +127,14 @@ class Graph:
         """
         return node.edge.nodes
 
-    def get_ambiguity_adar(self, f1, f2, is_raw1,  is_raw2):
+    def get_ambiguity_adar(self, f1, is_raw1, f2, is_raw2):
         """
-        :param f1: the function that takes in the attribute dict of one node and output its first_attr_val
-        :param f2: the function that takes in the attribute dict of one node and output its second_attr_val
-        :param is_raw1: boolean, whether the first attribute value is raw or not
-        :param is_raw2: boolean, whether the second  attribute value is raw or not
+        :param f1: the function that takes in the attribute dict of one node
+            and output its first_attr_val
+        :param f2: the function that takes in the attribute dict of one node
+            and output its second_attr_val
+        :param is_raw1: boolean, whether the first attribute value is raw
+        :param is_raw2: boolean, whether the second  attribute value is raw
         :return: dictionary of node's ambiguous val
         """
         first_attrs, second_attrs = dict(), dict()

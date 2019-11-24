@@ -41,7 +41,7 @@ class SimFuncFactory:
 
     @classmethod
     def produce_jaccard_coef(cls, **kwargs):
-        def jaccard_coef(neighbors1, neighbors2, ambiguities):
+        def jaccard_coef(neighbors1, neighbors2, get_uniqueness):
             set1, set2 = neighbors1, neighbors2
             if type(neighbors1) is not set:
                 set1 = set(neighbors1)
@@ -54,7 +54,7 @@ class SimFuncFactory:
 
     @classmethod
     def produce_jaccard_coef_fr(cls, **kwargs):
-        def jaccard_coef_fr(neighbors1, neighbors2, ambiguities):
+        def jaccard_coef_fr(neighbors1, neighbors2, get_uniqueness):
             counter1 = collections.Counter(neighbors1)
             counter2 = collections.Counter(neighbors2)
             union, intersect = cls._union_intersect_counter(
@@ -66,60 +66,56 @@ class SimFuncFactory:
 
     @classmethod
     def produce_adar_neighbor(cls, **kwargs):
-        def adar_neighbor(neighbors1, neighbors2, ambiguities):
-            ambiguities = ambiguities['neighbor']
+        def adar_neighbor(neighbors1, neighbors2, get_uniqueness):
             set1, set2 = neighbors1, neighbors2
             if type(neighbors1) is not set:
                 set1 = set(neighbors1)
             if type(neighbors2) is not set:
                 set2 = set(neighbors2)
             union = set1 | set2
-            intersect = set1 & set2
-            union_amb = sum(ambiguities[cluster] for cluster in union)
-            intersect_amb = sum(ambiguities[cluster] for cluster in intersect)
-            return intersect_amb / union_amb
+            inters = set1 & set2
+            union_uniq = sum(get_uniqueness(cluster) for cluster in union)
+            intersect_uniq = sum(get_uniqueness(cluster) for cluster in inters)
+            return intersect_uniq / union_uniq
         return adar_neighbor
 
     @classmethod
     def produce_adar_neighbor_fr(cls, **kwargs):
-        def adar_neighbor_fr(neighbors1, neighbors2, ambiguities):
-            ambiguities = ambiguities['neighbor']
+        def adar_neighbor_fr(neighbors1, neighbors2, get_uniqueness):
             counter1 = collections.Counter(neighbors1)
             counter2 = collections.Counter(neighbors2)
-            union_amb, intersect_amb = cls._union_intersect_counter(
+            union_uniq, intersect_uniq = cls._union_intersect_counter(
                 counter1, counter2,
-                lambda curr, count, key: curr + count*ambiguities[key]
+                lambda curr, count, key: curr + count*get_uniqueness(key)
             )
-            return intersect_amb / union_amb
+            return intersect_uniq / union_uniq
         return adar_neighbor_fr
 
     @classmethod
     def produce_adar_attr(cls, **kwargs):
-        def adar_attr(neighbors1, neighbors2, ambiguities):
-            ambiguities = ambiguities['attr']
+        def adar_attr(neighbors1, neighbors2, get_uniqueness):
             set1, set2 = neighbors1, neighbors2
             if type(neighbors1) is not set:
                 set1 = set(neighbors1)
             if type(neighbors2) is not set:
                 set2 = set(neighbors2)
             union = set1 | set2
-            intersect = set1 & set2
-            union_amb = sum(ambiguities[cluster] for cluster in union)
-            intersect_amb = sum(ambiguities[cluster] for cluster in intersect)
-            return intersect_amb / union_amb
+            inters = set1 & set2
+            union_uniq = sum(get_uniqueness(cluster) for cluster in union)
+            intersect_uniq = sum(get_uniqueness(cluster) for cluster in inters)
+            return intersect_uniq / union_uniq
         return adar_attr
 
     @classmethod
     def produce_adar_attr_fr(cls, **kwargs):
-        def adar_attr_fr(neighbors1, neighbors2, ambiguities):
-            ambiguities = ambiguities['attr']
+        def adar_attr_fr(neighbors1, neighbors2, get_uniqueness):
             counter1 = collections.Counter(neighbors1)
             counter2 = collections.Counter(neighbors2)
-            union_amb, intersect_amb = cls._union_intersect_counter(
+            union_uniq, intersect_uniq = cls._union_intersect_counter(
                 counter1, counter2,
-                lambda curr, count, key: curr + count*ambiguities[key]
+                lambda curr, count, key: curr + count*get_uniqueness(key)
             )
-            return intersect_amb / union_amb
+            return intersect_uniq / union_uniq
         return adar_attr_fr
 
     @staticmethod

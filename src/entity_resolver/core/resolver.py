@@ -12,7 +12,9 @@ class Resolver:
         self, blocking_strategy, raw_blocking=False, alpha=0, weights=None,
         attr_strategy=dict(), rel_strategy=None,
         blocking_threshold=3, bootstrap_strategy=None, raw_bootstrap=False,
-        edge_match_threshold=1, similarity_threshold=0.935, **kwargs
+        edge_match_threshold=1, first_attr_func=None, first_attr_raw=False,
+        second_attr_func=None, second_attr_raw=False,
+        similarity_threshold=0.935, **kwargs
     ):
         self.blocking_strategy = blocking_strategy
         self.raw_blocking = raw_blocking
@@ -24,6 +26,10 @@ class Resolver:
         self.bootstrap_strategy = bootstrap_strategy
         self.raw_bootstrap = raw_bootstrap
         self.edge_match_threshold = edge_match_threshold
+        self.first_attr_func = first_attr_func
+        self.first_attr_raw = first_attr_raw
+        self.second_attr_func = second_attr_func
+        self.second_attr_raw = second_attr_raw
         self.similarity_threshold = similarity_threshold
         self._kwargs = kwargs
         self._sim_func_producers = {
@@ -34,9 +40,8 @@ class Resolver:
             'jaccard_coef_fr': SimFuncFactory.produce_jaccard_coef_fr,
             'adar_neighbor': SimFuncFactory.produce_adar_neighbor,
             'adar_neighbor_fr': SimFuncFactory.produce_adar_neighbor_fr,
-            # These two methods below is not supported yet
-            # 'adar_attr': SimFuncFactory.produce_adar_attr,
-            # 'adar_attr_fr': SimFuncFactory.produce_adar_attr_fr
+            'adar_attr': SimFuncFactory.produce_adar_attr,
+            'adar_attr_fr': SimFuncFactory.produce_adar_attr_fr
         }
         self._default_strategies = {
             'text': 'stfidf_jaro_winkler',
@@ -322,10 +327,19 @@ class Resolver:
         else:
             rel_strategy = self.rel_strategy
         rel_sim_producer = self._sim_func_producers[rel_strategy]
-        if rel_strategy[-2:] != 'fr':
+        if rel_strategy.endswith('fr'):
             self._use_nbr_cache = True
         else:
             self._use_nbr_cache = False
+        if rel_strategy.startswith('adar_neighbor'):
+            self._use_amb_type = 'neighbor'
+            self._use_ambiguities = False
+        elif rel_strategy.startswith('adar_attr'):
+            self._use_amb_type = 'attr'
+            self._use_ambiguities = True
+        else:
+            self._use_amb_type = None
+            self._use_ambiguities = False
         return rel_sim_producer(**self._kwargs)
 
     def _calc_node_attr_sim(self, node1, node2):
@@ -369,39 +383,54 @@ class Resolver:
         )
 
     def _calc_rel_sim(self, cluster1, cluster2):
-        ambiguities = self._calc_cluster_amb()
-        cluster_neighbors = getattr(self, '_cluster_neighbors', None)
-        if not self._use_nbr_cache or cluster_neighbors is None:
-            nbrs1 = self._get_cluster_neighbors(cluster1)
-            nbrs2 = self._get_cluster_neighbors(cluster2)
-        else:
-            nbrs1 = cluster_neighbors[cluster1]
-            nbrs2 = cluster_neighbors[cluster2]
-        rel_score = self._rel_func(nbrs1, nbrs2, ambiguities)
+        get_uniqueness = self._calc_cluster_uniq()
+        nbrs1 = self._get_cluster_neighbors(cluster1)
+        nbrs2 = self._get_cluster_neighbors(cluster2)
+        rel_score = self._rel_func(nbrs1, nbrs2, get_uniqueness)
         return rel_score
 
     def _init_ambiguities(self):
-        # use dummy ambiguities for now. to implement later
-        self._ambiguities = {node: 1 for node in self._graph.nodes}
-        pass
+        if self._use_ambiguities:
+            if self.first_attr_func is None or self.second_attr_func is None:
+                raise ValueError(
+                    'Using ambiguities requires both first_attr_func and'
+                    'second_attr_func to be valid functions instead of None'
+                )
+            self._ambiguities = self._graph.get_ambiguity_adar(
+                self.first_attr_func, self.first_attr_raw,
+                self.second_attr_func, self.second_attr_raw
+            )
 
-    def _calc_cluster_amb(self):
+    def _calc_cluster_uniq(self):
         neighbor_amb, attr_amb = dict(), dict()
-        ambiguities = self._ambiguities
-        for cluster, nodes in self._clusters.items():
-            num_neighbors = len(set(self._get_cluster_neighbors(cluster)))
-            # Add 1 to the denominator to avoid zero divider,
-            # but might not be appropriate
-            neighbor_amb[cluster] = 1 / (1+np.log(num_neighbors))
-            cluster_attr_amb = 0
-            for node in nodes:
-                cluster_attr_amb += self._ambiguities[node]
-            cluster_attr_amb /= len(nodes)
-            attr_amb[cluster] = 1 / cluster_attr_amb
-        return {'neighbor': neighbor_amb, 'attr': attr_amb}
+        if self._use_amb_type == 'neighbor':
+            def get_uniqueness(cluster):
+                neighbors = self._get_cluster_neighbors(cluster)
+                if type(neighbors) is not set:
+                    num_neighbors = len(set(neighbors))
+                else:
+                    num_neighbors = len(neighbors)
+                return 1 / (1+np.log(num_neighbors))
+        elif self._use_amb_type == 'attr':
+            def get_uniqueness(cluster):
+                attr_amb = 0
+                for node in self._clusters[cluster]:
+                    attr_amb += self._ambiguities[node]
+                attr_amb /= len(self._clusters[cluster])
+                return 1 / attr_amb
+        else:
+            get_uniqueness = None
+        return get_uniqueness
 
     def _get_cluster_neighbors(self, cluster):
-        nodes = self._clusters[cluster]
-        neighbors_list = (self._graph.get_neighbors(node) for node in nodes)
-        neighbor_nodes = itertools.chain(*neighbors_list)
-        return [self._inv_clusters[node] for node in neighbor_nodes]
+        cluster_neighbors = getattr(self, '_cluster_neighbors', None)
+        if not self._use_nbr_cache or cluster_neighbors is None:
+            nodes = self._clusters[cluster]
+            neighbors_list = (
+                self._graph.get_neighbors(node) for node in nodes
+            )
+            neighbor_nodes = itertools.chain(*neighbors_list)
+            result = [self._inv_clusters[node] for node in neighbor_nodes]
+        else:
+            result = cluster_neighbors[cluster]
+        return result

@@ -5,11 +5,13 @@ from .parser import GraphParser, GroundTruthParser
 class EntityResolver:
 
     def __init__(
-        self, attr_types, blocking_strategy, raw_blocking=False, alpha=0.5,
+        self, attr_types, blocking_strategy, raw_blocking=False, alpha=0,
         weights=None, attr_strategy=dict(), rel_strategy=None,
         blocking_threshold=3, bootstrap_strategy=None, raw_bootstrap=False,
-        edge_match_threshold=1, similarity_threshold=0.8,
-        evaluator_strategy='precision-recall', **kwargs
+        edge_match_threshold=1, first_attr_func=None, first_attr_raw=False,
+        second_attr_func=None, second_attr_raw=False,
+        similarity_threshold=0.935, evaluator_strategy='precision-recall',
+        **kwargs
     ):
         self.blocking_strategy = blocking_strategy
         self.raw_blocking = raw_blocking
@@ -21,6 +23,10 @@ class EntityResolver:
         self.bootstrap_strategy = bootstrap_strategy
         self.raw_bootstrap = raw_bootstrap
         self.edge_match_threshold = edge_match_threshold
+        self.first_attr_func = first_attr_func
+        self.first_attr_raw = first_attr_raw
+        self.second_attr_func = second_attr_func
+        self.second_attr_raw = second_attr_raw
         self.similarity_threshold = similarity_threshold
         self._kwargs = kwargs
         self._graph_parser = GraphParser(attr_types)
@@ -31,6 +37,8 @@ class EntityResolver:
             rel_strategy=rel_strategy, blocking_threshold=blocking_threshold,
             bootstrap_strategy=bootstrap_strategy, raw_bootstrap=raw_bootstrap,
             edge_match_threshold=edge_match_threshold,
+            first_attr_func=first_attr_func, first_attr_raw=first_attr_raw,
+            second_attr_func=second_attr_func, second_attr_raw=second_attr_raw,
             similarity_threshold=similarity_threshold, **kwargs
         )
         self._evaluator = Evaluator(strategy=evaluator_strategy)
