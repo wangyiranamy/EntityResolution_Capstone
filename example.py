@@ -32,6 +32,7 @@ entity_resolver = EntityResolver(
     jw_prefix_weight=0.15, soft_tfidf_threshold=0.5
 )
 res = entity_resolver.resolve_and_eval(graph_path, ground_truth_path)
+entity_resolver.print_time()
 os.remove(graph_path)
 os.remove(ground_truth_path)
 print(f'precision: {res[0]}')

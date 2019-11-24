@@ -1,6 +1,21 @@
 
+import time
+import functools
 import collections
 from py_stringmatching.similarity_measure import jaro_winkler, soft_tfidf, jaro
+
+
+def timeit(f):
+    @functools.wraps(f)
+    def timed_f(obj, *args, **kwargs):
+        start_time = time.time()
+        res = f(obj, *args, **kwargs)
+        end_time = time.time()
+        time_list = obj._time_dict[f.__name__]
+        time_list[0] += (end_time - start_time)
+        time_list[1] += 1
+        return res
+    return timed_f
 
 
 class SimFuncFactory:

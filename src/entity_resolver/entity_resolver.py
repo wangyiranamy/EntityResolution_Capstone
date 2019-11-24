@@ -60,3 +60,6 @@ class EntityResolver:
     def resolve_and_eval(self, graph_path, ground_truth_path):
         resolved_mapping = self.resolve(graph_path)
         return self.evaluate(ground_truth_path, resolved_mapping)
+
+    def print_time(self):
+        self._resolver.print_time()
