@@ -38,5 +38,3 @@ class TestParser:
 
     def get_second_attr(self, node_attr):
         return node_attr['name'][1]
-
-

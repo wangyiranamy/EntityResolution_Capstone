@@ -16,7 +16,6 @@ def exact_match(attrs1, attrs2):
     return attrs1['name'] == attrs2['name']
 
 
-
 file_path = 'data/citeseer/citeseer-mrdm05.dat'
 graph_path = 'testdata.json'
 ground_truth_path = 'testtruth.json'
