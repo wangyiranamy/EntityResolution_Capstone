@@ -169,12 +169,26 @@ class TestResolver:
         adar_neighbor_fr_resolver = Resolver(
             None, rel_strategy='adar_neighbor_fr'
         )
+        adar_attr_resolver = Resolver(
+            None, rel_strategy='adar_attr',
+            first_attr_func=lambda d: d['text'], first_attr_raw=True,
+            second_attr_func=lambda d: d['text'], second_attr_raw=True,
+        )
+        adar_attr_fr_resolver = Resolver(
+            None, rel_strategy='adar_attr_fr',
+            first_attr_func=lambda d: d['text'], first_attr_raw=True,
+            second_attr_func=lambda d: d['text'], second_attr_raw=True,
+        )
         self._init_resolver(jaccard_coef_resolver, graph)
         self._init_resolver(jaccard_coef_fr_resolver, graph)
         self._init_resolver(adar_neighbor_resolver, graph)
         self._init_resolver(adar_neighbor_fr_resolver, graph)
+        self._init_resolver(adar_attr_resolver, graph)
+        self._init_resolver(adar_attr_fr_resolver, graph)
         assert jaccard_coef_resolver._calc_rel_sim(1, 2) == 0.5
         assert jaccard_coef_fr_resolver._calc_rel_sim(1, 2) == 0.25
         assert round(adar_neighbor_resolver._calc_rel_sim(1, 2), 2) == 0.45
         assert round(adar_neighbor_fr_resolver._calc_rel_sim(1, 2), 2) == 0.23
+        round(adar_attr_resolver._calc_rel_sim(1, 2), 2) == 1.00
+        round(adar_attr_fr_resolver._calc_rel_sim(1, 2), 2) == 1.00
         cleanup()

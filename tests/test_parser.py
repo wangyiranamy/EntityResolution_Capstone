@@ -17,7 +17,10 @@ class TestParser:
         graph = graph_parser.parse(graph_output_path)
         ground_truth_parser = GroundTruthParser()
         ground_truth = ground_truth_parser.parse(ground_truth_output_path)
-        nodes_ambiguity = graph.get_ambiguity_adar(self.get_first_attr, self.get_second_attr, False, False)
+        nodes_ambiguity = graph.get_ambiguity_adar(
+            self.get_first_attr, False,
+            self.get_second_attr, False
+        )
         assert len(graph.get_neighbors(graph.nodes[0])) == 2
         assert len(graph.nodes) == 2888
         assert len(graph.edges) == 1504
