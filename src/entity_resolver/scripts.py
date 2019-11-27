@@ -1,60 +1,80 @@
 import argparse
 import json
-from functools import wraps
+import inspect
+from functools import wraps, partial
 
 
-def _subparser(subcommand, subcommand_help, *args):
-    def subparser_dec(f):
-        def gen_args(parsed_args):
-            for *names, arg_help in args:
-                canon_name = names[-1]
-                if canon_name[:2] == '--':
-                    canon_name = canon_name[2:]
-                yield getattr(parsed_args, canon_name)
+class Subparser:
 
-        @wraps(f)
-        def create_subparser(subparsers):
-            parser = subparsers.add_parser(subcommand, help=subcommand_help)
-            for *names, arg_help in args:
-                parser.add_argument(*names, help=arg_help)
-            parser.set_defaults(
-                func=lambda parsed_args: f(*gen_args(parsed_args))
+    def __init__(self, subcommand, subcommand_help, *helps):
+        self.subcommand = subcommand
+        self.subcommand_help = subcommand_help
+        self.helps = helps
+
+    def __call__(self, func):
+        return wraps(func)(partial(self._create_subparser, func))
+
+    def _create_subparser(self, func, subparsers):
+        parser = subparsers.add_parser(
+            self.subcommand,
+            help=self.subcommand_help
+        )
+        func_info = self._parse_func(func)
+        for name, default, arg_help in func_info:
+            parser.add_argument(
+                f'--{name}', type=type(default),
+                default=default, help=arg_help
             )
-        return create_subparser
-    return subparser_dec
+        parser_function = partial(self._parser_function, func, func_info)
+        parser.set_defaults(func=parser_function)
+
+    def _parse_func(self, func):
+        sig = inspect.signature(func)
+        func_info = list()
+        for arg_help, (name, param) in zip(self.helps, sig.parameters.items()):
+            func_info.append((name, param.default, arg_help))
+        return func_info
+
+    def _parser_function(self, func, func_info, args):
+        func_args = list()
+        for name, _, _ in func_info:
+            func_args.append(getattr(args, name))
+        return func(*func_args)
 
 
-@_subparser(
+@Subparser(
     'norm-arxiv',
     'Transform the arxiv data into the format expected by EntityResolver',
-    ('input', 'The path of the arxiv data to be transformed'),
-    ('graph_path', 'The path of the transformed arxiv graph data'),
-    (
-        'ground_truth_path',
-        'The path of the transformed arxiv ground truth data'
-    )
+    'The path of the arxiv data to be transformed',
+    'The path of the transformed arxiv graph data',
+    'The path of the transformed arxiv ground truth data'
 )
-def _norm_arxiv(input_path, graph_path, ground_truth_path):
-    parse_data(input_path, graph_path, ground_truth_path, 'arxiv')
+def _norm_arxiv(
+    data='data/arxiv/arxiv-mrdm05.dat',
+    graph='graph.json',
+    ground_truth='ground_truth.json'
+):
+    parse_data(data, graph, ground_truth, 'arxiv')
 
 
-@_subparser(
+@Subparser(
     'norm-citeseer',
     'Transform the citeseer data into the format expected by EntityResolver',
-    ('input', 'The input file path of the citeseer data to be transformed'),
-    ('graph_path', 'The path of the transformed citeseer graph data'),
-    (
-        'ground_truth_path',
-        'The path of the transformed citeseer ground truth data'
-    )
+    'The input file path of the citeseer data to be transformed',
+    'The path of the transformed citeseer graph data',
+    'The path of the transformed citeseer ground truth data'
 )
-def _norm_citeseer(input_path, graph_path, ground_truth_path):
-    parse_data(input_path, graph_path, ground_truth_path, 'citeseer')
+def _norm_citeseer(
+    data='data/citeseer/citeseer-mrdm05.dat',
+    graph='graph.json',
+    ground_truth='ground_truth.json'
+):
+    parse_data(data, graph, ground_truth, 'citeseer')
 
 
-def parse_data(input_path, graph_path, ground_truth_path, name):
-    graph, ground_truth = list(), list()
-    with open(input_path) as dat_file:
+def parse_data(data, graph, ground_truth, name):
+    graph_data, ground_truth_data = list(), list()
+    with open(data) as dat_file:
         for line in dat_file:
             row = [field for field in line.split('|', 7)]
             # Multiple different rows with id 2716 are present
@@ -72,13 +92,13 @@ def parse_data(input_path, graph_path, ground_truth_path, name):
                     'node_id': node_id,
                     'cluster_id': cluster_id
                 }
-                graph.append(graph_row)
-                ground_truth.append(ground_truth_row)
+                graph_data.append(graph_row)
+                ground_truth_data.append(ground_truth_row)
 
-    with open(graph_path, 'w') as f:
-        json.dump(graph, f)
-    with open(ground_truth_path, 'w') as f:
-        json.dump(ground_truth, f)
+    with open(graph, 'w') as f:
+        json.dump(graph_data, f)
+    with open(ground_truth, 'w') as f:
+        json.dump(ground_truth_data, f)
 
 
 def run(args=None):
