@@ -10,8 +10,10 @@ class TestParser:
         graph_output_path = 'testdata.json'
         ground_truth_output_path = 'testtruth.json'
         run([
-            'norm-citeseer', file_path,
-            graph_output_path, ground_truth_output_path
+            'norm-citeseer',
+            '--data', file_path,
+            '--graph', graph_output_path,
+            '--ground_truth', ground_truth_output_path
         ])
         graph_parser = GraphParser({'name': 'person_entity'})
         graph = graph_parser.parse(graph_output_path)

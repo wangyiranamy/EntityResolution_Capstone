@@ -10,8 +10,10 @@ class TestScripts:
         graph_path = 'testgraph.json'
         ground_truth_path = 'testtruth.json'
         run([
-            'norm-citeseer', file_path,
-            graph_path, ground_truth_path
+            'norm-citeseer',
+            '--data', file_path,
+            '--graph', graph_path,
+            '--ground_truth', ground_truth_path
         ])
         with open(graph_path, 'r') as f:
             graph = json.load(f)
@@ -31,8 +33,10 @@ class TestScripts:
         graph_path = 'testgraph.json'
         ground_truth_path = 'testtruth.json'
         run([
-            'norm-citeseer', file_path,
-            graph_path, ground_truth_path
+            'norm-citeseer',
+            '--data', file_path,
+            '--graph', graph_path,
+            '--ground_truth', ground_truth_path,
         ])
         with open(graph_path, 'r') as f:
             graph = json.load(f)
