@@ -1,7 +1,7 @@
 import itertools
 import logging
 from sklearn import metrics
-from .utils import WithLogger, Logtime
+from .utils import WithLogger, logtime
 
 
 class ClusteringMetrics:
@@ -64,7 +64,7 @@ class Evaluator(WithLogger):
         self.strategy = self.strategy_funcs[strategy]
         super().__init__()
 
-    @Logtime('Time taken for evaluation')
+    @logtime('Time taken for evaluation')
     def evaluate(self, labels, preds):
         num_label_clts = len(set(labels.values()))
         num_pred_clts = len(set(preds.values()))

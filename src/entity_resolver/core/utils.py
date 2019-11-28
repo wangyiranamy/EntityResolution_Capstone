@@ -29,7 +29,7 @@ def timeit(func):
     return timed_func
 
 
-class Logtime:
+class logtime:
 
     def __init__(self, header):
         self.header = header

@@ -5,7 +5,7 @@ import multiprocessing
 import numpy as np
 from .utils import (
     SimFuncFactory, DSU, PriorityQueue, SimilarityEntry,
-    WithLogger, Logtime, timeit
+    WithLogger, logtime, timeit
 )
 
 
@@ -64,7 +64,7 @@ class Resolver(WithLogger):
     def time_dict(self):
         return self._time_dict
 
-    @Logtime('Time taken for the core resolution algorithm')
+    @logtime('Time taken for the core resolution algorithm')
     def resolve(self, graph):
         self._init_cache(graph)
         buckets = self._blocking(graph)
@@ -76,7 +76,7 @@ class Resolver(WithLogger):
         }
         return resolved_mapping
 
-    @Logtime('Time taken for blocking')
+    @logtime('Time taken for blocking')
     def _blocking(self, graph):
         '''
         Initialize possible reference pairs using blocking techniques
@@ -103,7 +103,7 @@ class Resolver(WithLogger):
         self._logger.info(f'Number of buckets in blocking: {len(buckets)}')
         return buckets
 
-    @Logtime('Time taken for relational bootstrapping')
+    @logtime('Time taken for relational bootstrapping')
     def _relational_boostrapping(self, buckets):
         self._init_clusters(buckets, self.edge_match_threshold)
         self._init_sim_clusters_pool(buckets)
@@ -188,7 +188,7 @@ class Resolver(WithLogger):
                 return True
         return False
 
-    @Logtime('Time taken for clustering')
+    @logtime('Time taken for clustering')
     def _cluster_nodes(self):
         sim_clusters = collections.defaultdict(set)
         cluster_entries = collections.defaultdict(dict)

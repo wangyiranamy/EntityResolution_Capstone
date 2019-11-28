@@ -4,7 +4,7 @@ import inspect
 from functools import wraps, partial
 
 
-class Subparser:
+class subparser:
 
     def __init__(self, subcommand, subcommand_help, *helps):
         self.subcommand = subcommand
@@ -42,7 +42,7 @@ class Subparser:
         return func(*func_args)
 
 
-@Subparser(
+@subparser(
     'norm-arxiv',
     'Transform the arxiv data into the format expected by EntityResolver',
     'The path of the arxiv data to be transformed',
@@ -57,7 +57,7 @@ def _norm_arxiv(
     parse_data(data, graph, ground_truth, 'arxiv')
 
 
-@Subparser(
+@subparser(
     'norm-citeseer',
     'Transform the citeseer data into the format expected by EntityResolver',
     'The input file path of the citeseer data to be transformed',

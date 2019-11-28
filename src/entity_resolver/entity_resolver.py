@@ -1,6 +1,6 @@
 import logging
 from .core import Resolver, Evaluator
-from .core.utils import WithLogger, Logtime
+from .core.utils import WithLogger, logtime
 from .parser import GraphParser, GroundTruthParser
 
 
@@ -64,7 +64,7 @@ class EntityResolver(WithLogger):
         fmt = '[{asctime}] {name}: {msg}'
         logging.basicConfig(format=fmt, style='{', level=level)
 
-    @Logtime('Time taken for the whole resolution process')
+    @logtime('Time taken for the whole resolution process')
     def resolve(self, graph_path):
         graph = self._graph_parser.parse(graph_path)
         resolved_mapping = self._resolver.resolve(graph)
