@@ -1,6 +1,7 @@
 import os
 import time
 import subprocess
+import random
 from py_stringmatching.similarity_measure.levenshtein import Levenshtein
 from entity_resolver import EntityResolver
 
@@ -30,11 +31,14 @@ cmd_args = ['entity-resolver', 'norm-citeseer']
 subprocess.call(cmd_args)
 entity_resolver = EntityResolver(
     attr_types={'name': 'person_entity'}, blocking_strategy=edit_distance,
-    bootstrap_strategy=exact_match, raw_blocking=False, raw_bootstrap=False,
-    alpha=0, similarity_threshold=0.8,
-    attr_strategy={'name': 'jaro_winkler'},
-    jw_prefix_weight=0.1, soft_tfidf_threshold=0.5, verbose=2
+    raw_blocking=False, alpha=0, attr_strategy={'name': 'jaro_winkler'},
+    rel_strategy='jaccard_coef', bootstrap_strategy=exact_match,
+    raw_bootstrap=False, first_attr=None, first_attr_raw=False,
+    second_attr=None, second_attr_raw=False, linkage='max',
+    similarity_threshold=0.8, seed=7, evaluator_strategy='precision-recall',
+    verbose=1, jw_prefix_weight=0.1, soft_tfidf_threshold=0.5,
+    average_method='max'
 )
-res = entity_resolver.resolve_and_eval(graph_path, ground_truth_path)
+entity_resolver.resolve_and_eval(graph_path, ground_truth_path)
 os.remove(graph_path)
 os.remove(ground_truth_path)
