@@ -24,6 +24,6 @@ setup(
     python_requires='>=3.6',
     install_requires=[
         'pandas>=0.25.1', 'numpy>=1.17.2', 'scikit-learn>=0.21.3',
-        'nltk>=3.4.5', 'py-stringmatching>=0.4.1'
+        'nltk>=3.4.5', 'py-stringmatching>=0.4.1', 'matplotlib>=3.1.2'
     ]
 )
