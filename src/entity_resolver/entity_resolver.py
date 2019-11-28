@@ -10,10 +10,10 @@ class EntityResolver(WithLogger):
         self, attr_types, blocking_strategy, raw_blocking=False, alpha=0,
         weights=None, attr_strategy=dict(), rel_strategy=None,
         blocking_threshold=3, bootstrap_strategy=None, raw_bootstrap=False,
-        edge_match_threshold=1, first_attr_func=None, first_attr_raw=False,
-        second_attr_func=None, second_attr_raw=False,
+        edge_match_threshold=1, first_attr=None, first_attr_raw=False,
+        second_attr=None, second_attr_raw=False, linkage='max',
         similarity_threshold=0.935, evaluator_strategy='precision-recall',
-        verbose=0, **kwargs
+        seed=None, verbose=0, **kwargs
     ):
         self.blocking_strategy = blocking_strategy
         self.raw_blocking = raw_blocking
@@ -25,11 +25,13 @@ class EntityResolver(WithLogger):
         self.bootstrap_strategy = bootstrap_strategy
         self.raw_bootstrap = raw_bootstrap
         self.edge_match_threshold = edge_match_threshold
-        self.first_attr_func = first_attr_func
+        self.first_attr = first_attr
         self.first_attr_raw = first_attr_raw
-        self.second_attr_func = second_attr_func
+        self.second_attr = second_attr
         self.second_attr_raw = second_attr_raw
+        self.linkage = linkage
         self.similarity_threshold = similarity_threshold
+        self.seed = seed
         self.verbose = verbose
         self._kwargs = kwargs
         self._graph_parser = GraphParser(attr_types)
@@ -39,12 +41,12 @@ class EntityResolver(WithLogger):
             weights=weights, attr_strategy=attr_strategy,
             rel_strategy=rel_strategy, blocking_threshold=blocking_threshold,
             bootstrap_strategy=bootstrap_strategy, raw_bootstrap=raw_bootstrap,
-            edge_match_threshold=edge_match_threshold,
-            first_attr_func=first_attr_func, first_attr_raw=first_attr_raw,
-            second_attr_func=second_attr_func, second_attr_raw=second_attr_raw,
-            similarity_threshold=similarity_threshold, **kwargs
+            edge_match_threshold=edge_match_threshold, first_attr=first_attr,
+            first_attr_raw=first_attr_raw, second_attr=second_attr,
+            second_attr_raw=second_attr_raw, linkage=linkage,
+            similarity_threshold=similarity_threshold, seed=seed, **kwargs
         )
-        self._evaluator = Evaluator(strategy=evaluator_strategy)
+        self._evaluator = Evaluator(strategy=evaluator_strategy, **kwargs)
         self._config_logger()
         super().__init__()
 

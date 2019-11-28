@@ -9,7 +9,7 @@ class ClusteringMetrics:
     _logger = logging.getLogger('Evaluator')
 
     @classmethod
-    def precision_recall(cls, labels, preds):
+    def precision_recall(cls, labels, preds, **kwargs):
         tp, fp, fn = 0, 0, 0
         for p1, p2 in itertools.combinations(labels, 2):
             if labels[p1] == labels[p2] and preds[p1] == preds[p2]:
@@ -27,7 +27,7 @@ class ClusteringMetrics:
         return precision, recall, f1
 
     @classmethod
-    def v_measure(cls, labels, preds):
+    def v_measure(cls, labels, preds, **kwargs):
         labels = cls._reorder(labels)
         preds = cls._reorder(preds)
         score = metrics.v_measure_score(labels, preds)
@@ -35,12 +35,13 @@ class ClusteringMetrics:
         return score
 
     @classmethod
-    def ami(cls, labels, preds):
+    def ami(cls, labels, preds, average_method='max', **kwargs):
+        cls._logger.debug(f'average_method: {average_method}')
         labels = cls._reorder(labels)
         preds = cls._reorder(preds)
         score = metrics.adjusted_mutual_info_score(
             labels, preds,
-            average_method='max'
+            average_method=average_method
         )
         cls._logger.info(f'Adjusted mutual information: {score}')
         return score
@@ -59,9 +60,10 @@ class Evaluator(WithLogger):
         'precision-recall': ClusteringMetrics.precision_recall
     }
 
-    def __init__(self, strategy='precision-recall'):
+    def __init__(self, strategy='precision-recall', **kwargs):
         self._strategy_str = strategy
         self.strategy = self.strategy_funcs[strategy]
+        self._kwargs = kwargs
         super().__init__()
 
     @logtime('Time taken for evaluation')
@@ -72,4 +74,4 @@ class Evaluator(WithLogger):
         self._logger.debug(f'Number of clusters in labels: {num_label_clts}')
         self._logger.debug(f'Number of references in preds: {len(preds)}')
         self._logger.debug(f'Number of clusters in preds:: {num_pred_clts}')
-        return self.strategy(labels, preds)
+        return self.strategy(labels, preds, **self._kwargs)

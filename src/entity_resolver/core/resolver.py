@@ -15,9 +15,9 @@ class Resolver(WithLogger):
         self, blocking_strategy, raw_blocking=False, alpha=0, weights=None,
         attr_strategy=dict(), rel_strategy=None,
         blocking_threshold=3, bootstrap_strategy=None, raw_bootstrap=False,
-        edge_match_threshold=1, first_attr_func=None, first_attr_raw=False,
-        second_attr_func=None, second_attr_raw=False,
-        similarity_threshold=0.935, **kwargs
+        edge_match_threshold=1, first_attr=None, first_attr_raw=False,
+        second_attr=None, second_attr_raw=False, linkage='max',
+        similarity_threshold=0.935, seed=None, **kwargs
     ):
         self.blocking_strategy = blocking_strategy
         self.raw_blocking = raw_blocking
@@ -29,11 +29,13 @@ class Resolver(WithLogger):
         self.bootstrap_strategy = bootstrap_strategy
         self.raw_bootstrap = raw_bootstrap
         self.edge_match_threshold = edge_match_threshold
-        self.first_attr_func = first_attr_func
+        self.first_attr = first_attr
         self.first_attr_raw = first_attr_raw
-        self.second_attr_func = second_attr_func
+        self.second_attr = second_attr
         self.second_attr_raw = second_attr_raw
+        self.linkage = linkage
         self.similarity_threshold = similarity_threshold
+        self.seed = seed
         self._kwargs = kwargs
         self._sim_func_producers = {
             'stfidf_jaro_winkler': SimFuncFactory.produce_stfidf_jaro_winkler,
@@ -52,13 +54,8 @@ class Resolver(WithLogger):
             'relation': 'jaccard_coef'
         }
         self._time_dict = collections.defaultdict(lambda: [0, 0])
+        random.seed(seed)
         super().__init__()
-
-    def __getattr__(self, name):
-        try:
-            return self._kwargs[name]
-        except KeyError:
-            raise AttributeError(f'No attribute named {name}')
 
     @property
     def time_dict(self):
@@ -396,23 +393,21 @@ class Resolver(WithLogger):
     def _calc_attr_sim(self, cluster1, cluster2):
         nodes1 = self._clusters[cluster1]
         nodes2 = self._clusters[cluster2]
-        # the block below uses average similarity
-        # total_score = 0
-        # for node1, node2 in itertools.product(nodes1, nodes2):
-        #     total_score += self._calc_node_attr_sim(node1, node2)
-        # return total_score / (len(nodes1)*len(nodes2))
-
-        # the block below uses min similarity
-        # return min(
-        #     self._calc_node_attr_sim(node1, node2)
-        #     for node1, node2 in itertools.product(nodes1, nodes2)
-        # )
-
-        # the block below uses max similarity
-        return max(
-            self._calc_node_attr_sim(node1, node2)
-            for node1, node2 in itertools.product(nodes1, nodes2)
-        )
+        if self.linkage == 'average':
+            total_score = 0
+            for node1, node2 in itertools.product(nodes1, nodes2):
+                total_score += self._calc_node_attr_sim(node1, node2)
+            return total_score / (len(nodes1)*len(nodes2))
+        elif self.linkage == 'min':
+            return min(
+                self._calc_node_attr_sim(node1, node2)
+                for node1, node2 in itertools.product(nodes1, nodes2)
+            )
+        elif self.linkage == 'max':
+            return max(
+                self._calc_node_attr_sim(node1, node2)
+                for node1, node2 in itertools.product(nodes1, nodes2)
+            )
 
     @timeit
     def _calc_rel_sim(self, cluster1, cluster2):
@@ -424,14 +419,14 @@ class Resolver(WithLogger):
 
     def _init_ambiguities(self):
         if self._use_ambiguities:
-            if self.first_attr_func is None or self.second_attr_func is None:
+            if self.first_attr is None or self.second_attr is None:
                 raise ValueError(
-                    'Using ambiguities requires both first_attr_func and'
-                    'second_attr_func to be valid functions instead of None'
+                    'Using ambiguities requires both first_attr and'
+                    'second_attr to be valid functions instead of None'
                 )
             self._ambiguities = self._graph.get_ambiguity_adar(
-                self.first_attr_func, self.first_attr_raw,
-                self.second_attr_func, self.second_attr_raw
+                self.first_attr, self.first_attr_raw,
+                self.second_attr, self.second_attr_raw
             )
 
     @timeit

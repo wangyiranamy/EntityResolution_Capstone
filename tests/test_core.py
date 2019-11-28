@@ -171,13 +171,13 @@ class TestResolver:
         )
         adar_attr_resolver = Resolver(
             None, rel_strategy='adar_attr',
-            first_attr_func=lambda d: d['text'], first_attr_raw=True,
-            second_attr_func=lambda d: d['text'], second_attr_raw=True,
+            first_attr=lambda d: d['text'], first_attr_raw=True,
+            second_attr=lambda d: d['text'], second_attr_raw=True,
         )
         adar_attr_fr_resolver = Resolver(
             None, rel_strategy='adar_attr_fr',
-            first_attr_func=lambda d: d['text'], first_attr_raw=True,
-            second_attr_func=lambda d: d['text'], second_attr_raw=True,
+            first_attr=lambda d: d['text'], first_attr_raw=True,
+            second_attr=lambda d: d['text'], second_attr_raw=True,
         )
         self._init_resolver(jaccard_coef_resolver, graph)
         self._init_resolver(jaccard_coef_fr_resolver, graph)
