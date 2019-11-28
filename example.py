@@ -33,15 +33,8 @@ entity_resolver = EntityResolver(
     bootstrap_strategy=exact_match, raw_blocking=False, raw_bootstrap=False,
     alpha=0, similarity_threshold=0.8,
     attr_strategy={'name': 'jaro_winkler'},
-    jw_prefix_weight=0.1, soft_tfidf_threshold=0.5
+    jw_prefix_weight=0.1, soft_tfidf_threshold=0.5, verbose=2
 )
-start_time = time.time()
 res = entity_resolver.resolve_and_eval(graph_path, ground_truth_path)
-end_time = time.time()
-entity_resolver.print_time()
 os.remove(graph_path)
 os.remove(ground_truth_path)
-print(f'precision: {res[0]}')
-print(f'recall: {res[1]}')
-print(f'f1: {res[2]}')
-print(f'total time taken: {end_time - start_time}')
