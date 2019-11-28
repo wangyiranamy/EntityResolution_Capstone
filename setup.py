@@ -5,7 +5,7 @@ with open('README.md', 'r') as fh:
 
 setup(
     name='entity_resolver',
-    version='0.1.1',
+    version='0.1.2',
     author='Yiran Wang',
     author_email='yw3201@columbia.edu',
     description='A python package for collective entity resolution',
