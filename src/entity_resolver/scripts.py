@@ -1,45 +1,6 @@
 import argparse
 import json
-import inspect
-from functools import wraps, partial
-
-
-class subparser:
-
-    def __init__(self, subcommand, subcommand_help, *helps):
-        self.subcommand = subcommand
-        self.subcommand_help = subcommand_help
-        self.helps = helps
-
-    def __call__(self, func):
-        return wraps(func)(partial(self._create_subparser, func))
-
-    def _create_subparser(self, func, subparsers):
-        parser = subparsers.add_parser(
-            self.subcommand,
-            help=self.subcommand_help
-        )
-        func_info = self._parse_func(func)
-        for name, default, arg_help in func_info:
-            parser.add_argument(
-                f'--{name}', type=type(default),
-                default=default, help=arg_help
-            )
-        parser_function = partial(self._parser_function, func, func_info)
-        parser.set_defaults(func=parser_function)
-
-    def _parse_func(self, func):
-        sig = inspect.signature(func)
-        func_info = list()
-        for arg_help, (name, param) in zip(self.helps, sig.parameters.items()):
-            func_info.append((name, param.default, arg_help))
-        return func_info
-
-    def _parser_function(self, func, func_info, args):
-        func_args = list()
-        for name, _, _ in func_info:
-            func_args.append(getattr(args, name))
-        return func(*func_args)
+from .core.utils import subparser
 
 
 @subparser(
