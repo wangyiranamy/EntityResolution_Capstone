@@ -473,6 +473,6 @@ class Resolver(WithLogger):
     def log_time(self):
         for f_name, [total, count] in self._time_dict.items():
             average = total / count
-            self._logger.debug(f'total time taken by {f_name}: {total}s')
-            self._logger.debug(f'total number of calls to {f_name}: {count}')
-            self._logger.debug(f'average time taken by {f_name}: {average}s')
+            self._logger.debug(f'Total time taken by {f_name}: {total}s')
+            self._logger.debug(f'Total number of calls to {f_name}: {count}')
+            self._logger.debug(f'Average time taken by {f_name}: {average}s')

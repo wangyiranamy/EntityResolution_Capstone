@@ -21,9 +21,9 @@ class ClusteringMetrics:
         precision = tp / (tp+fp)
         recall = tp / (tp+fn)
         f1 = 2*precision*recall / (precision+recall)
-        cls._logger.info(f'precision: {precision}')
-        cls._logger.info(f'recall: {recall}')
-        cls._logger.info(f'f1 score: {f1}')
+        cls._logger.info(f'Precision: {precision}')
+        cls._logger.info(f'Recall: {recall}')
+        cls._logger.info(f'F1 score: {f1}')
         return precision, recall, f1
 
     @classmethod
@@ -31,7 +31,7 @@ class ClusteringMetrics:
         labels = cls._reorder(labels)
         preds = cls._reorder(preds)
         score = metrics.v_measure_score(labels, preds)
-        cls._logger.info(f'v-measure score: {score}')
+        cls._logger.info(f'V-measure score: {score}')
         return score
 
     @classmethod
@@ -42,7 +42,7 @@ class ClusteringMetrics:
             labels, preds,
             average_method='max'
         )
-        cls._logger.info(f'adjusted mutual information: {score}')
+        cls._logger.info(f'Adjusted mutual information: {score}')
         return score
 
     @staticmethod
