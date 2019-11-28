@@ -2,15 +2,14 @@ import itertools
 import collections
 import random
 import multiprocessing
-import logging
 import numpy as np
 from .utils import (
     SimFuncFactory, DSU, PriorityQueue, SimilarityEntry,
-    Logtime, timeit
+    WithLogger, Logtime, timeit
 )
 
 
-class Resolver:
+class Resolver(WithLogger):
 
     def __init__(
         self, blocking_strategy, raw_blocking=False, alpha=0, weights=None,
@@ -53,13 +52,17 @@ class Resolver:
             'relation': 'jaccard_coef'
         }
         self._time_dict = collections.defaultdict(lambda: [0, 0])
-        self._logger = logging.getLogger('Resolver')
+        super().__init__()
 
     def __getattr__(self, name):
         try:
             return self._kwargs[name]
         except KeyError:
             raise AttributeError(f'No attribute named {name}')
+
+    @property
+    def time_dict(self):
+        return self._time_dict
 
     @Logtime('Time taken for the core resolution algorithm')
     def resolve(self, graph):

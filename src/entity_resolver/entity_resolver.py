@@ -1,10 +1,10 @@
 import logging
 from .core import Resolver, Evaluator
-from .core.utils import Logtime
+from .core.utils import WithLogger, Logtime
 from .parser import GraphParser, GroundTruthParser
 
 
-class EntityResolver:
+class EntityResolver(WithLogger):
 
     def __init__(
         self, attr_types, blocking_strategy, raw_blocking=False, alpha=0,
@@ -45,21 +45,24 @@ class EntityResolver:
             similarity_threshold=similarity_threshold, **kwargs
         )
         self._evaluator = Evaluator(strategy=evaluator_strategy)
-        if verbose <= 0:
-            level = 'WARNING'
-        elif verbose == 1:
-            level = 'INFO'
-        else:
-            level = 'DEBUG'
-        fmt = '[{asctime}] {name}: {msg}'
-        logging.basicConfig(format=fmt, style='{', level=level)
-        self._logger = logging.getLogger('EntityResolver')
+        self._config_logger()
+        super().__init__()
 
     def __getattr__(self, name):
         try:
             return self._kwargs[name]
         except KeyError:
             raise AttributeError(f'No attribute named {name}')
+
+    def _config_logger(self):
+        if self.verbose <= 0:
+            level = 'WARNING'
+        elif self.verbose == 1:
+            level = 'INFO'
+        else:
+            level = 'DEBUG'
+        fmt = '[{asctime}] {name}: {msg}'
+        logging.basicConfig(format=fmt, style='{', level=level)
 
     @Logtime('Time taken for the whole resolution process')
     def resolve(self, graph_path):

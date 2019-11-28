@@ -1,7 +1,7 @@
 import itertools
 import logging
 from sklearn import metrics
-from .utils import Logtime
+from .utils import WithLogger, Logtime
 
 
 class ClusteringMetrics:
@@ -51,7 +51,7 @@ class ClusteringMetrics:
         return [pair[1] for pair in ordered_pairs]
 
 
-class Evaluator:
+class Evaluator(WithLogger):
 
     strategy_funcs = {
         'ami': ClusteringMetrics.ami,
@@ -62,7 +62,7 @@ class Evaluator:
     def __init__(self, strategy='precision-recall'):
         self._strategy_str = strategy
         self.strategy = self.strategy_funcs[strategy]
-        self._logger = logging.getLogger('Evaluator')
+        super().__init__()
 
     @Logtime('Time taken for evaluation')
     def evaluate(self, labels, preds):

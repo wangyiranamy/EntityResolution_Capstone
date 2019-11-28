@@ -1,12 +1,9 @@
 import json
 import time
-import logging
+from ..core.utils import WithLogger
 
 
-class GroundTruthParser:
-
-    def __init__(self):
-        self._logger = logging.getLogger('GroundTruthParser')
+class GroundTruthParser(WithLogger):
 
     def parse(self, data_path):
         start_time = time.time()

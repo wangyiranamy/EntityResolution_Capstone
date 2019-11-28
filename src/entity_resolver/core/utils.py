@@ -2,7 +2,18 @@
 import time
 import functools
 import collections
+import logging
 from py_stringmatching.similarity_measure import jaro_winkler, soft_tfidf, jaro
+
+
+class WithLogger:
+
+    def __init__(self):
+        self._logger = logging.getLogger(self.__class__.__name__)
+
+    @property
+    def logger(self):
+        return self._logger
 
 
 def timeit(func):
@@ -11,7 +22,7 @@ def timeit(func):
         start_time = time.time()
         res = func(obj, *args, **kwargs)
         end_time = time.time()
-        time_list = obj._time_dict[func.__name__]
+        time_list = obj.time_dict[func.__name__]
         time_list[0] += (end_time - start_time)
         time_list[1] += 1
         return res
@@ -34,7 +45,7 @@ class Logtime:
         res = func(obj, *args, **kwargs)
         end_time = time.time()
         time_taken = round(end_time - start_time, 2)
-        obj._logger.info(f'{self.header}: {time_taken}s')
+        obj.logger.info(f'{self.header}: {time_taken}s')
         return res
 
 

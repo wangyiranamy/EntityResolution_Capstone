@@ -1,20 +1,20 @@
 import time
-import logging
 import pandas as pd
 import numpy as np
 import json
 from collections import defaultdict
 from ..core.graph import Attribute, Node, Edge, Graph
+from ..core.utils import WithLogger
 
 
-class GraphParser:
+class GraphParser(WithLogger):
 
     def __init__(self, attr_types):
         """
         :param attr_types: e.g {'title': 'text', 'name': 'person_entity'}
         """
         self.attr_types = attr_types
-        self._logger = logging.getLogger('GraphParser')
+        super().__init__()
 
     def parse(self, graph_data_path):
         """
