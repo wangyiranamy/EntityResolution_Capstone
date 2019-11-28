@@ -1,3 +1,5 @@
+import time
+import logging
 import pandas as pd
 import numpy as np
 import json
@@ -12,6 +14,7 @@ class GraphParser:
         :param attr_types: e.g {'title': 'text', 'name': 'person_entity'}
         """
         self.attr_types = attr_types
+        self._logger = logging.getLogger('GraphParser')
 
     def parse(self, graph_data_path):
         """
@@ -19,6 +22,7 @@ class GraphParser:
             node_id, edge_id, attr_dict
         :return: Graph object
         """
+        start_time = time.time()
         with open(graph_data_path, 'r') as f:
             graph_df = json.load(f)
         node_list = []
@@ -36,4 +40,9 @@ class GraphParser:
             node_list.append(node)
             # append nodes to edges
             edge_dict[edge_id].add_node(node)
+        end_time = time.time()
+        time_taken = end_time - start_time
+        self._logger.debug(f'Time taken to buid graph: {time_taken}s')
+        self._logger.info(f'Number of nodes in graph: {len(node_list)}')
+        self._logger.info(f'Number of edges in graph: {len(edge_dict)}')
         return Graph(node_list, edge_dict, self.attr_types)

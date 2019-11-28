@@ -1,4 +1,6 @@
+import logging
 from .core import Resolver, Evaluator
+from .core.utils import Logtime
 from .parser import GraphParser, GroundTruthParser
 
 
@@ -11,7 +13,7 @@ class EntityResolver:
         edge_match_threshold=1, first_attr_func=None, first_attr_raw=False,
         second_attr_func=None, second_attr_raw=False,
         similarity_threshold=0.935, evaluator_strategy='precision-recall',
-        **kwargs
+        verbose=0, **kwargs
     ):
         self.blocking_strategy = blocking_strategy
         self.raw_blocking = raw_blocking
@@ -28,6 +30,7 @@ class EntityResolver:
         self.second_attr_func = second_attr_func
         self.second_attr_raw = second_attr_raw
         self.similarity_threshold = similarity_threshold
+        self.verbose = verbose
         self._kwargs = kwargs
         self._graph_parser = GraphParser(attr_types)
         self._ground_truth_parser = GroundTruthParser()
@@ -42,6 +45,15 @@ class EntityResolver:
             similarity_threshold=similarity_threshold, **kwargs
         )
         self._evaluator = Evaluator(strategy=evaluator_strategy)
+        if verbose <= 0:
+            level = 'WARNING'
+        elif verbose == 1:
+            level = 'INFO'
+        else:
+            level = 'DEBUG'
+        fmt = '[{asctime}] {name}: {msg}'
+        logging.basicConfig(format=fmt, style='{', level=level)
+        self._logger = logging.getLogger('EntityResolver')
 
     def __getattr__(self, name):
         try:
@@ -49,9 +61,12 @@ class EntityResolver:
         except KeyError:
             raise AttributeError(f'No attribute named {name}')
 
+    @Logtime('Time taken for the whole resolution process')
     def resolve(self, graph_path):
         graph = self._graph_parser.parse(graph_path)
-        return self._resolver.resolve(graph)
+        resolved_mapping = self._resolver.resolve(graph)
+        self._resolver.log_time()
+        return resolved_mapping
 
     def evaluate(self, ground_truth_path, resolved_mapping):
         ground_truth = self._ground_truth_parser.parse(ground_truth_path)
@@ -60,6 +75,3 @@ class EntityResolver:
     def resolve_and_eval(self, graph_path, ground_truth_path):
         resolved_mapping = self.resolve(graph_path)
         return self.evaluate(ground_truth_path, resolved_mapping)
-
-    def print_time(self):
-        self._resolver.print_time()

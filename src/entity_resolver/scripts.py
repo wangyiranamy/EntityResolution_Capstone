@@ -78,22 +78,23 @@ def parse_data(data, graph, ground_truth, name):
         for line in dat_file:
             row = [field for field in line.split('|', 7)]
             # Multiple different rows with id 2716 are present
-            if name == 'citeseer' and row[0] != '2716 ':
-                node_id = int(row[0])
-                attr = {'name': row[2].strip()}
-                cluster_id = int(row[1])
-                edge_id = int(row[5])
-                graph_row = {
-                    'node_id': node_id,
-                    'edge_id': edge_id,
-                    'attr_dict': attr
-                }
-                ground_truth_row = {
-                    'node_id': node_id,
-                    'cluster_id': cluster_id
-                }
-                graph_data.append(graph_row)
-                ground_truth_data.append(ground_truth_row)
+            if name == 'citeseer' and row[0] == '2716 ':
+                continue
+            node_id = int(row[0])
+            attr = {'name': row[2].strip()}
+            cluster_id = int(row[1])
+            edge_id = int(row[5])
+            graph_row = {
+                'node_id': node_id,
+                'edge_id': edge_id,
+                'attr_dict': attr
+            }
+            ground_truth_row = {
+                'node_id': node_id,
+                'cluster_id': cluster_id
+            }
+            graph_data.append(graph_row)
+            ground_truth_data.append(ground_truth_row)
 
     with open(graph, 'w') as f:
         json.dump(graph_data, f)

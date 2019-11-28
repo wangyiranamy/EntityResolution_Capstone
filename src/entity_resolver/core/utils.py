@@ -5,17 +5,37 @@ import collections
 from py_stringmatching.similarity_measure import jaro_winkler, soft_tfidf, jaro
 
 
-def timeit(f):
-    @functools.wraps(f)
-    def timed_f(obj, *args, **kwargs):
+def timeit(func):
+    @functools.wraps(func)
+    def timed_func(obj, *args, **kwargs):
         start_time = time.time()
-        res = f(obj, *args, **kwargs)
+        res = func(obj, *args, **kwargs)
         end_time = time.time()
-        time_list = obj._time_dict[f.__name__]
+        time_list = obj._time_dict[func.__name__]
         time_list[0] += (end_time - start_time)
         time_list[1] += 1
         return res
-    return timed_f
+    return timed_func
+
+
+class Logtime:
+
+    def __init__(self, header):
+        self.header = header
+
+    def __call__(self, func):
+        return functools.wraps(func)(
+            lambda obj, *args, **kwargs:
+                self._timed_func(func, obj, *args, **kwargs)
+        )
+
+    def _timed_func(self, func, obj, *args, **kwargs):
+        start_time = time.time()
+        res = func(obj, *args, **kwargs)
+        end_time = time.time()
+        time_taken = round(end_time - start_time, 2)
+        obj._logger.info(f'{self.header}: {time_taken}s')
+        return res
 
 
 class SimFuncFactory:

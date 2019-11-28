@@ -2,8 +2,12 @@ import itertools
 import collections
 import random
 import multiprocessing
+import logging
 import numpy as np
-from .utils import SimFuncFactory, DSU, PriorityQueue, SimilarityEntry, timeit
+from .utils import (
+    SimFuncFactory, DSU, PriorityQueue, SimilarityEntry,
+    Logtime, timeit
+)
 
 
 class Resolver:
@@ -49,6 +53,7 @@ class Resolver:
             'relation': 'jaccard_coef'
         }
         self._time_dict = collections.defaultdict(lambda: [0, 0])
+        self._logger = logging.getLogger('Resolver')
 
     def __getattr__(self, name):
         try:
@@ -56,6 +61,7 @@ class Resolver:
         except KeyError:
             raise AttributeError(f'No attribute named {name}')
 
+    @Logtime('Time taken for the core resolution algorithm')
     def resolve(self, graph):
         self._init_cache(graph)
         buckets = self._blocking(graph)
@@ -67,10 +73,10 @@ class Resolver:
         }
         return resolved_mapping
 
-    @timeit
+    @Logtime('Time taken for blocking')
     def _blocking(self, graph):
         '''
-        Initialize possible reference pairs using Blocking techniques
+        Initialize possible reference pairs using blocking techniques
         :param graph: reference graph
         :return:list of buckets contains similar references
         '''
@@ -91,10 +97,10 @@ class Resolver:
                     assigned = True
             if not assigned:
                 buckets.append([node])
-        print(f'number of buckets: {len(buckets)}')
+        self._logger.info(f'Number of buckets in blocking: {len(buckets)}')
         return buckets
 
-    @timeit
+    @Logtime('Time taken for relational bootstrapping')
     def _relational_boostrapping(self, buckets):
         self._init_clusters(buckets, self.edge_match_threshold)
         self._init_sim_clusters_pool(buckets)
@@ -116,7 +122,7 @@ class Resolver:
             parent = dsu.find(node)
             clusters[parent.id].add(node)
             inv_clusters[node] = parent.id
-        print(f'number of initial clusters: {len(clusters)}')
+        self._logger.info(f'Number of initial clusters: {len(clusters)}')
         self._clusters = clusters
         self._inv_clusters = inv_clusters
         cluster_neighbors = {
@@ -139,7 +145,8 @@ class Resolver:
                     and (cluster2, cluster1) not in sim_clusters_pool
                 ):
                     sim_clusters_pool.add((cluster1, cluster2))
-        print(f'number of initial similar pairs: {len(sim_clusters_pool)}')
+        num_pairs = len(sim_clusters_pool)
+        self._logger.info(f'Number of initial similar pairs: {num_pairs}')
         self._sim_clusters_pool = sim_clusters_pool
 
     @timeit
@@ -178,13 +185,17 @@ class Resolver:
                 return True
         return False
 
-    @timeit
+    @Logtime('Time taken for clustering')
     def _cluster_nodes(self):
         sim_clusters = collections.defaultdict(set)
         cluster_entries = collections.defaultdict(dict)
         pqueue = self._init_queue_entries(cluster_entries, sim_clusters)
+        counter = 0
         while pqueue:
             entry = pqueue.pop()
+            counter += 1
+            if (counter % 1000000 == 0):
+                self._logger.debug(f'Number of pops from queue: {counter}')
             if entry.similarity < self.similarity_threshold:
                 break
             cluster1, cluster2 = entry.clusters
@@ -202,6 +213,7 @@ class Resolver:
                 cluster1, cluster2, pqueue,
                 cluster_entries, sim_clusters
             )
+        self._logger.debug(f'Total number of pops from queue: {counter}')
 
     @timeit
     def _init_queue_entries(self, cluster_entries, sim_clusters):
@@ -228,6 +240,7 @@ class Resolver:
         self._update_adj_set(cluster1, cluster2, sim_clusters, True)
         self._update_adj_set(cluster1, cluster2, cluster_neighbors, False)
 
+    @timeit
     def _update_adj_set(self, cluster1, cluster2, adjacency_set, remove_self):
         for cluster in adjacency_set[cluster2]:
             if cluster != cluster2:
@@ -376,6 +389,7 @@ class Resolver:
         rel_score = self._calc_rel_sim(cluster1, cluster2)
         return (1-self.alpha)*attr_score + self.alpha*rel_score
 
+    @timeit
     def _calc_attr_sim(self, cluster1, cluster2):
         nodes1 = self._clusters[cluster1]
         nodes2 = self._clusters[cluster2]
@@ -417,6 +431,7 @@ class Resolver:
                 self.second_attr_func, self.second_attr_raw
             )
 
+    @timeit
     def _calc_cluster_uniq(self):
         neighbor_amb, attr_amb = dict(), dict()
         if self._use_amb_type == 'neighbor':
@@ -438,6 +453,7 @@ class Resolver:
             get_uniqueness = None
         return get_uniqueness
 
+    @timeit
     def _get_cluster_neighbors(self, cluster):
         cluster_neighbors = getattr(self, '_cluster_neighbors', None)
         if not self._use_nbr_cache or cluster_neighbors is None:
@@ -451,8 +467,9 @@ class Resolver:
             result = cluster_neighbors[cluster]
         return result
 
-    def print_time(self):
+    def log_time(self):
         for f_name, [total, count] in self._time_dict.items():
-            print(f'total time taken by {f_name}: {total}s')
-            print(f'total number of calls to {f_name}: {count}')
-            print(f'average time taken by {f_name}: {total / count}s')
+            average = total / count
+            self._logger.debug(f'total time taken by {f_name}: {total}s')
+            self._logger.debug(f'total number of calls to {f_name}: {count}')
+            self._logger.debug(f'average time taken by {f_name}: {average}s')
