@@ -3,9 +3,8 @@ import collections
 import random
 import multiprocessing
 import numpy as np
-from .evaluator import ClusteringMetrics
 from .utils import (
-    SimFuncFactory, DSU, PriorityQueue, SimilarityEntry,
+    SimFuncFactory, ClusteringMetrics, DSU, PriorityQueue, SimilarityEntry,
     WithLogger, logtime, timeit
 )
 
@@ -195,12 +194,14 @@ class Resolver(WithLogger):
     def _cluster_nodes(self, ground_truth):
         sim_clusters = collections.defaultdict(set)
         cluster_entries = collections.defaultdict(dict)
+        self._logger.debug('Start building priority queue.')
         pqueue = self._init_queue_entries(cluster_entries, sim_clusters)
         counter = 0
+        self._logger.debug('Finish building priority queue. Start popping.')
         while pqueue:
             entry = pqueue.pop()
             counter += 1
-            if (counter % 1000000 == 0):
+            if (counter % 10000 == 0):
                 self._logger.debug(f'Number of pops from queue: {counter}')
             if entry.similarity < self.similarity_threshold:
                 break

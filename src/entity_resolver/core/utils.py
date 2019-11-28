@@ -3,6 +3,8 @@ import collections
 import inspect
 import logging
 from functools import wraps, partial
+import numpy as np
+from sklearn import metrics
 from py_stringmatching.similarity_measure import jaro_winkler, soft_tfidf, jaro
 
 
@@ -229,6 +231,49 @@ class SimFuncFactory:
             union = accumulator(union, union_count, key)
             intersect = accumulator(intersect, intersect_count, key)
         return union, intersect
+
+
+class ClusteringMetrics:
+
+    _logger = logging.getLogger('Evaluator')
+
+    @classmethod
+    def precision_recall(cls, labels, preds, log=True, **kwargs):
+        cmatrix = metrics.cluster.contingency_matrix(labels, preds)
+        row_sum, col_sum = np.sum(cmatrix, axis=1), np.sum(cmatrix, axis=0)
+        pairs = cmatrix * (cmatrix-1) // 2
+        label_pairs = row_sum * (row_sum-1) // 2
+        pred_pairs = col_sum * (col_sum-1) // 2
+        tp = np.sum(pairs)
+        fp = np.sum(pred_pairs - np.sum(pairs, axis=0))
+        fn = np.sum(label_pairs - np.sum(pairs, axis=1))
+        precision = tp / (tp+fp)
+        recall = tp / (tp+fn)
+        f1 = 2*precision*recall / (precision+recall)
+        if log:
+            cls._logger.debug(f'True positive count: {tp}')
+            cls._logger.debug(f'False positive count: {fp}')
+            cls._logger.debug(f'False negative count: {fn}')
+            cls._logger.info(f'Precision: {precision}')
+            cls._logger.info(f'Recall: {recall}')
+            cls._logger.info(f'F1 score: {f1}')
+        return precision, recall, f1
+
+    @classmethod
+    def v_measure(cls, labels, preds, **kwargs):
+        score = metrics.v_measure_score(labels, preds)
+        cls._logger.info(f'V-measure score: {score}')
+        return score
+
+    @classmethod
+    def ami(cls, labels, preds, average_method='max', **kwargs):
+        cls._logger.debug(f'average_method: {average_method}')
+        score = metrics.adjusted_mutual_info_score(
+            labels, preds,
+            average_method=average_method
+        )
+        cls._logger.info(f'Adjusted mutual information: {score}')
+        return score
 
 
 class DSU:
