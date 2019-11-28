@@ -1,4 +1,3 @@
-import sys
 import time
 import functools
 import collections
@@ -24,7 +23,7 @@ class WithLogger:
             level = logging.INFO
         else:
             level = logging.DEBUG
-        handler = logging.StreamHandler(sys.stdout)
+        handler = logging.StreamHandler()
         fmt = '[{asctime}] {levelname} {name}: {msg}'
         formatter = logging.Formatter(fmt=fmt, style='{')
         handler.setFormatter(formatter)
