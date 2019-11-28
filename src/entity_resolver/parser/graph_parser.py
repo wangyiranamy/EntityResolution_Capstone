@@ -9,12 +9,12 @@ from ..core.utils import WithLogger
 
 class GraphParser(WithLogger):
 
-    def __init__(self, attr_types):
+    def __init__(self, attr_types, verbose=0):
         """
         :param attr_types: e.g {'title': 'text', 'name': 'person_entity'}
         """
         self.attr_types = attr_types
-        super().__init__()
+        super().__init__(verbose)
 
     def parse(self, graph_data_path):
         """

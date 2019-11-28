@@ -1,4 +1,4 @@
-
+import sys
 import time
 import functools
 import collections
@@ -8,12 +8,28 @@ from py_stringmatching.similarity_measure import jaro_winkler, soft_tfidf, jaro
 
 class WithLogger:
 
-    def __init__(self):
+    def __init__(self, verbose=0):
+        self.verbose = verbose
         self._logger = logging.getLogger(self.__class__.__name__)
+        self._config_logger()
 
     @property
     def logger(self):
         return self._logger
+
+    def _config_logger(self):
+        if self.verbose <= 0:
+            level = logging.WARNING
+        elif self.verbose == 1:
+            level = logging.INFO
+        else:
+            level = logging.DEBUG
+        handler = logging.StreamHandler(sys.stdout)
+        fmt = '[{asctime}] {levelname} {name}: {msg}'
+        formatter = logging.Formatter(fmt=fmt, style='{')
+        handler.setFormatter(formatter)
+        self._logger.addHandler(handler)
+        self._logger.setLevel(level)
 
 
 def timeit(func):

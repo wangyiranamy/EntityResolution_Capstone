@@ -1,5 +1,6 @@
 import itertools
 import logging
+import numpy as np
 from sklearn import metrics
 from .utils import WithLogger, logtime
 
@@ -9,27 +10,29 @@ class ClusteringMetrics:
     _logger = logging.getLogger('Evaluator')
 
     @classmethod
-    def precision_recall(cls, labels, preds, **kwargs):
-        tp, fp, fn = 0, 0, 0
-        for p1, p2 in itertools.combinations(labels, 2):
-            if labels[p1] == labels[p2] and preds[p1] == preds[p2]:
-                tp += 1
-            elif labels[p1] != labels[p2] and preds[p1] == preds[p2]:
-                fp += 1
-            elif labels[p1] == labels[p2] and preds[p1] != preds[p2]:
-                fn += 1
+    def precision_recall(cls, labels, preds, log=True, **kwargs):
+        cmatrix = metrics.cluster.contingency_matrix(labels, preds)
+        row_sum, col_sum = np.sum(cmatrix, axis=1), np.sum(cmatrix, axis=0)
+        pairs = cmatrix * (cmatrix-1) // 2
+        label_pairs = row_sum * (row_sum-1) // 2
+        pred_pairs = col_sum * (col_sum-1) // 2
+        tp = np.sum(pairs)
+        fp = np.sum(pred_pairs - np.sum(pairs, axis=0))
+        fn = np.sum(label_pairs - np.sum(pairs, axis=1))
         precision = tp / (tp+fp)
         recall = tp / (tp+fn)
         f1 = 2*precision*recall / (precision+recall)
-        cls._logger.info(f'Precision: {precision}')
-        cls._logger.info(f'Recall: {recall}')
-        cls._logger.info(f'F1 score: {f1}')
+        if log:
+            cls._logger.debug(f'True positive count: {tp}')
+            cls._logger.debug(f'False positive count: {fp}')
+            cls._logger.debug(f'False negative count: {fn}')
+            cls._logger.info(f'Precision: {precision}')
+            cls._logger.info(f'Recall: {recall}')
+            cls._logger.info(f'F1 score: {f1}')
         return precision, recall, f1
 
     @classmethod
     def v_measure(cls, labels, preds, **kwargs):
-        labels = cls._reorder(labels)
-        preds = cls._reorder(preds)
         score = metrics.v_measure_score(labels, preds)
         cls._logger.info(f'V-measure score: {score}')
         return score
@@ -37,19 +40,12 @@ class ClusteringMetrics:
     @classmethod
     def ami(cls, labels, preds, average_method='max', **kwargs):
         cls._logger.debug(f'average_method: {average_method}')
-        labels = cls._reorder(labels)
-        preds = cls._reorder(preds)
         score = metrics.adjusted_mutual_info_score(
             labels, preds,
             average_method=average_method
         )
         cls._logger.info(f'Adjusted mutual information: {score}')
         return score
-
-    @staticmethod
-    def _reorder(labels):
-        ordered_pairs = sorted(labels.items(), key=lambda pair: pair[0])
-        return [pair[1] for pair in ordered_pairs]
 
 
 class Evaluator(WithLogger):
@@ -60,18 +56,21 @@ class Evaluator(WithLogger):
         'precision-recall': ClusteringMetrics.precision_recall
     }
 
-    def __init__(self, strategy='precision-recall', **kwargs):
+    def __init__(
+        self, strategy='precision-recall',
+        plot_prc=False, verbose=0, **kwargs
+    ):
         self._strategy_str = strategy
         self.strategy = self.strategy_funcs[strategy]
+        self.plot_prc = plot_prc
         self._kwargs = kwargs
-        super().__init__()
+        super().__init__(verbose)
 
     @logtime('Time taken for evaluation')
     def evaluate(self, labels, preds):
-        num_label_clts = len(set(labels.values()))
-        num_pred_clts = len(set(preds.values()))
+        labels, preds = list(labels.values()), list(preds.values())
         self._logger.debug(f'Number of references in labels: {len(labels)}')
-        self._logger.debug(f'Number of clusters in labels: {num_label_clts}')
+        self._logger.debug(f'Number of clusters in labels: {len(set(labels))}')
         self._logger.debug(f'Number of references in preds: {len(preds)}')
-        self._logger.debug(f'Number of clusters in preds:: {num_pred_clts}')
+        self._logger.debug(f'Number of clusters in preds:: {len(set(preds))}')
         return self.strategy(labels, preds, **self._kwargs)

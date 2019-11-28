@@ -3,6 +3,7 @@ import collections
 import random
 import multiprocessing
 import numpy as np
+from .evaluator import ClusteringMetrics
 from .utils import (
     SimFuncFactory, DSU, PriorityQueue, SimilarityEntry,
     WithLogger, logtime, timeit
@@ -17,7 +18,8 @@ class Resolver(WithLogger):
         blocking_threshold=3, bootstrap_strategy=None, raw_bootstrap=False,
         edge_match_threshold=1, first_attr=None, first_attr_raw=False,
         second_attr=None, second_attr_raw=False, linkage='max',
-        similarity_threshold=0.935, seed=None, **kwargs
+        similarity_threshold=0.935, seed=None, plot_prc=False, verbose=0,
+        **kwargs
     ):
         self.blocking_strategy = blocking_strategy
         self.raw_blocking = raw_blocking
@@ -35,6 +37,7 @@ class Resolver(WithLogger):
         self.second_attr_raw = second_attr_raw
         self.linkage = linkage
         self.similarity_threshold = similarity_threshold
+        self.plot_prc = plot_prc
         self.seed = seed
         self._kwargs = kwargs
         self._sim_func_producers = {
@@ -55,22 +58,25 @@ class Resolver(WithLogger):
         }
         self._time_dict = collections.defaultdict(lambda: [0, 0])
         random.seed(seed)
-        super().__init__()
+        if plot_prc:
+            self._prc_list = list()
+        super().__init__(verbose)
 
     @property
     def time_dict(self):
         return self._time_dict
 
     @logtime('Time taken for the core resolution algorithm')
-    def resolve(self, graph):
+    def resolve(self, graph, ground_truth=None):
         self._init_cache(graph)
         buckets = self._blocking(graph)
         self._relational_boostrapping(buckets)
-        self._cluster_nodes()
-        resolved_mapping = {
-            node.id: cluster
-            for node, cluster in self._inv_clusters.items()
-        }
+        self._cluster_nodes(list(ground_truth.values()))
+        resolved_mapping = collections.OrderedDict()
+        for node, cluster in self._inv_clusters.items():
+            resolved_mapping[node.id] = cluster
+        if self.plot_prc:
+            return resolved_mapping, self._prc_list
         return resolved_mapping
 
     @logtime('Time taken for blocking')
@@ -109,7 +115,7 @@ class Resolver(WithLogger):
     def _init_clusters(self, buckets, edge_match_threshold):
         nodes = self._graph.nodes
         clusters = collections.defaultdict(set)
-        inv_clusters = dict()
+        inv_clusters = collections.OrderedDict()
         dsu = DSU(nodes)
         for bucket in buckets:
             for node1, node2 in itertools.combinations(bucket, 2):
@@ -118,7 +124,7 @@ class Resolver(WithLogger):
                 edge_check_passed = self._check_edge_match(node1, node2)
                 if exact_match and edge_check_passed:
                     dsu.union(node1, node2)
-        for node in dsu.items:
+        for node in sorted(dsu.items, key=lambda node: node.id):
             parent = dsu.find(node)
             clusters[parent.id].add(node)
             inv_clusters[node] = parent.id
@@ -186,7 +192,7 @@ class Resolver(WithLogger):
         return False
 
     @logtime('Time taken for clustering')
-    def _cluster_nodes(self):
+    def _cluster_nodes(self, ground_truth):
         sim_clusters = collections.defaultdict(set)
         cluster_entries = collections.defaultdict(dict)
         pqueue = self._init_queue_entries(cluster_entries, sim_clusters)
@@ -213,6 +219,8 @@ class Resolver(WithLogger):
                 cluster1, cluster2, pqueue,
                 cluster_entries, sim_clusters
             )
+            if self.plot_prc:
+                self._add_pr(ground_truth)
         self._logger.debug(f'Total number of pops from queue: {counter}')
 
     @timeit
@@ -273,6 +281,15 @@ class Resolver(WithLogger):
             cluster1, pqueue, cluster_entries,
             sim_clusters, added_pairs
         )
+
+    @timeit
+    def _add_pr(self, ground_truth):
+        precision, recall, _ = ClusteringMetrics.precision_recall(
+            ground_truth,
+            list(self._inv_clusters.values()),
+            log=False
+        )
+        self._prc_list.append((precision, recall))
 
     @timeit
     def _add_sim_entries(

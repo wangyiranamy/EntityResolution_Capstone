@@ -35,9 +35,9 @@ entity_resolver = EntityResolver(
     rel_strategy='jaccard_coef', bootstrap_strategy=exact_match,
     raw_bootstrap=False, first_attr=None, first_attr_raw=False,
     second_attr=None, second_attr_raw=False, linkage='max',
-    similarity_threshold=0.8, seed=7, evaluator_strategy='precision-recall',
-    verbose=1, jw_prefix_weight=0.1, soft_tfidf_threshold=0.5,
-    average_method='max'
+    similarity_threshold=0.8, seed=None, plot_prc=False,
+    evaluator_strategy='precision-recall', verbose=1, jw_prefix_weight=0.1,
+    soft_tfidf_threshold=0.5, average_method='max'
 )
 entity_resolver.resolve_and_eval(graph_path, ground_truth_path)
 os.remove(graph_path)
