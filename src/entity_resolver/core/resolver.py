@@ -198,6 +198,10 @@ class Resolver(WithLogger):
         pqueue = self._init_queue_entries(cluster_entries, sim_clusters)
         counter = 0
         self._logger.debug('Finish building priority queue. Start popping.')
+        if self.plot_prc:
+            # Add a point to be plotted every <step> time to reduce computation
+            # 1600 is completely empirical and can be arbitrarily modified
+            step = len(pqueue) // 1600
         while pqueue:
             entry = pqueue.pop()
             counter += 1
@@ -220,9 +224,12 @@ class Resolver(WithLogger):
                 cluster1, cluster2, pqueue,
                 cluster_entries, sim_clusters
             )
-            if self.plot_prc:
+            if self.plot_prc and counter % step == 0:
                 self._add_pr(ground_truth)
         self._logger.debug(f'Total number of pops from queue: {counter}')
+        if self.plot_prc:
+            num_pr = len(self._prc_list)
+            self._logger.debug(f'Number of precision-recall pairs: {num_pr}')
 
     @timeit
     def _init_queue_entries(self, cluster_entries, sim_clusters):
