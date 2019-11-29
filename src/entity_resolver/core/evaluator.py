@@ -4,7 +4,7 @@ from .utils import WithLogger, logtime, ClusteringMetrics
 
 class Evaluator(WithLogger):
 
-    strategy_funcs = {
+    _strategy_funcs = {
         'ami': ClusteringMetrics.ami,
         'v-measure': ClusteringMetrics.v_measure,
         'precision-recall': ClusteringMetrics.precision_recall
@@ -15,7 +15,7 @@ class Evaluator(WithLogger):
         plot_prc=False, verbose=0, **kwargs
     ):
         self._strategy_str = strategy
-        self.strategy = self.strategy_funcs[strategy]
+        self.strategy = self._strategy_funcs[strategy]
         self.plot_prc = plot_prc
         self._kwargs = kwargs
         super().__init__(verbose)
