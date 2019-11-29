@@ -4,8 +4,8 @@ with open('README.md', 'r') as fh:
     long_description = fh.read()
 
 setup(
-    name='entity_resolver',
-    version='0.1.2',
+    name='entity-resolver',
+    version='0.1.3',
     author='Yiran Wang',
     author_email='yw3201@columbia.edu',
     description='A python package for collective entity resolution',
