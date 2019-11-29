@@ -7,19 +7,36 @@ from nltk.corpus import stopwords
 class Attribute:
 
     def __init__(self, name, attr_type, value, deep_clean=True):
-        self.name = name
-        self.type = attr_type
-        if self.type == 'text':
-            self.value = self._tokenize(value)
-            self.raw_value = value
-        elif self.type == 'person_entity' and deep_clean:
-            self.value = self._clean_person_name(value)
-            self.raw_value = value
+        self._name = name
+        self._type = attr_type
+        if attr_type == 'text':
+            self._value = self._tokenize(value)
+            self._raw_value = value
+        elif attr_type == 'person_entity' and deep_clean:
+            self._value = self._clean_person_name(value)
+            self._raw_value = value
         else:
-            self.value = value
-            self.raw_value = value
+            self._value = value
+            self._raw_value = value
 
-    def _tokenize(self, doc, to_stem=False):
+    @property
+    def name(self):
+        return self._name
+
+    @property
+    def type(self):
+        return self._type
+
+    @property
+    def value(self):
+        return self._value
+
+    @property
+    def raw_value(self):
+        return self._raw_value
+
+    @staticmethod
+    def _tokenize(doc, to_stem=False):
         """
         :param doc: string of text value
         :param to_stem: whether stemmed or not
@@ -37,7 +54,8 @@ class Attribute:
         else:
             return doc
 
-    def _clean_person_name(self, value):
+    @staticmethod
+    def _clean_person_name(value):
         last, *first = value.split('_')
         first = ' '.join(first).strip()
         return last, first
@@ -51,39 +69,68 @@ class Node:
         :param edge: edge object
         :param attrs:  list of Attribute()
         """
-        self.id = node_id
-        self.edge = edge
+        self._id = node_id
+        self._edge = edge
         attr_vals, raw_attr_vals = dict(), dict()
         for attr in attrs:
             attr_vals[attr.name] = attr.value
             raw_attr_vals[attr.name] = attr.raw_value
-        self.attr_vals = attr_vals
-        self.raw_attr_vals = raw_attr_vals
+        self._attr_vals = attr_vals
+        self._raw_attr_vals = raw_attr_vals
+
+    @property
+    def id(self):
+        return self._id
+
+    @property
+    def edge(self):
+        return self._edge
+
+    @property
+    def attr_vals(self):
+        return self._attr_vals
+
+    @property
+    def raw_attr_vals(self):
+        return self._raw_attr_vals
 
     def __hash__(self):
-        return self.id
+        return self._id
 
     def __eq__(self, other):
         if type(self) is type(other):
-            return self.id == other.id
+            return self._id == other.id
         return NotImplemented
 
 
 class Edge:
+
     def __init__(self, edge_id, attrs=None):
         """
         :param edge_id: int
         :param attrs: list of Attribute()
         """
-        self.id = edge_id
-        self.nodes = []
-        self.attrs = attrs
+        self._id = edge_id
+        self._nodes = []
+        self._attrs = attrs
+
+    @property
+    def id(self):
+        return self._id
+
+    @property
+    def nodes(self):
+        return self._nodes
+
+    @property
+    def attrs(self):
+        return self._attrs
 
     def add_node(self, node):
         """
         :param node: Node() object
         """
-        self.nodes.append(node)
+        self._nodes.append(node)
 
 
 class Graph:
@@ -93,9 +140,9 @@ class Graph:
         :param nodes: iterables (list) of Node()
         :param edges: iterables (list) of Edge()
         """
-        self.nodes = list(nodes)
-        self.edges = list(edges.values())
-        self.attr_types = attr_types
+        self._nodes = list(nodes)
+        self._edges = list(edges.values())
+        self._attr_types = attr_types
         attr_vals = collections.defaultdict(list)
         raw_attr_vals = collections.defaultdict(list)
         for name in attr_types:
@@ -105,20 +152,40 @@ class Graph:
                 attr_vals[name].append(value)
             for name, raw_value in node.raw_attr_vals.items():
                 raw_attr_vals[name].append(raw_value)
-        self.attr_vals = attr_vals
-        self.raw_attr_vals = raw_attr_vals
+        self._attr_vals = attr_vals
+        self._raw_attr_vals = raw_attr_vals
+
+    @property
+    def nodes(self):
+        return self._nodes
+
+    @property
+    def edges(self):
+        return self._edges
+
+    @property
+    def attr_types(self):
+        return self._attr_types
+
+    @property
+    def attr_vals(self):
+        return self._attr_vals
+
+    @property
+    def raw_attr_vals(self):
+        return self._raw_attr_vals
 
     def add_nodes(self, new_nodes):
         """
         :param new_nodes:  iterables (list) of Node()
         """
-        self.nodes.extend(new_nodes)
+        self._nodes.extend(new_nodes)
 
     def add_edges(self, new_edges):
         """
         :param new_edges:  iterables (list) of Edge()
         """
-        self.nodes.extend(new_edges)
+        self._nodes.extend(new_edges)
 
     def get_neighbors(self, node):
         """
@@ -140,7 +207,7 @@ class Graph:
         first_attrs, second_attrs = dict(), dict()
         first_attr2node = collections.defaultdict(list)
         cal_amb_a1_a2 = collections.defaultdict()
-        for node in self.nodes:
+        for node in self._nodes:
             if is_raw1:
                 a1_val = f1(node.raw_attr_vals)
                 a2_val = f2(node.raw_attr_vals)
@@ -155,7 +222,7 @@ class Graph:
             a2_vals = set()
             for node in nodes:
                 a2_vals.add(second_attrs[node])
-            cal_amb_a1_a2[a1_val] = len(a2_vals)/len(self.nodes)
+            cal_amb_a1_a2[a1_val] = len(a2_vals)/len(self._nodes)
         node_ambiguity = collections.defaultdict()
         for node, a1_val in first_attrs.items():
             node_ambiguity[node] = cal_amb_a1_a2[a1_val]
