@@ -1,1 +1,1 @@
-from .entity_resolver import EntityResolver
+from .main import EntityResolver
