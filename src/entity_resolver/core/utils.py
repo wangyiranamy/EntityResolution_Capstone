@@ -304,87 +304,83 @@ class PriorityQueue:
 
     def __init__(self, items=[]):
         self._queue = list(items)
-        self._indicies = {item: index for index, item in enumerate(items)}
         self._heapify()
 
     def __len__(self):
         return len(self._queue)
 
-    def _heapify(self):
-        for i in range(len(self._queue) - 1, -1, -1):
-            self._shiftdown(i)
-
-    def _shiftup(self, pos):
-        while pos > 0:
-            parent_pos = ((pos+1) >> 1)-1
-            if self._queue[pos] < self._queue[parent_pos]:
-                self._swap(pos, parent_pos)
-                pos = parent_pos
-            else:
-                break
-
-    def _shiftdown(self, pos):
-        while pos < len(self._queue):
-            left_pos = ((pos+1) << 1) - 1
-            right_pos = ((pos+1) << 1)
-            curr = self._queue[pos]
-            left, right = None, None
-            if left_pos < len(self._queue):
-                left = self._queue[left_pos]
-            if right_pos < len(self._queue):
-                right = self._queue[right_pos]
-            if left is None:
-                break
-            if right is None and left >= curr:
-                break
-            if (
-                (right is None and left < curr)
-                or (left < curr and left <= right)
-            ):
-                self._swap(pos, left_pos)
-                pos = left_pos
-            elif right < curr and right <= left:
-                self._swap(pos, right_pos)
-                pos = right_pos
-            else:
-                break
-
-    def _swap(self, pos1, pos2):
-        item1, item2 = self._queue[pos1], self._queue[pos2]
-        self._queue[pos1] = item2
-        self._queue[pos2] = item1
-        self._indicies[item1] = pos2
-        self._indicies[item2] = pos1
-
     def push(self, item):
         self._queue.append(item)
         index = len(self._queue) - 1
-        self._indicies[item] = index
-        self._shiftup(index)
+        item.index = index
+        self._siftdown(0, index)
 
     def pop(self):
         return self.remove(self._queue[0])
 
-    def remove(self, item):
-        item_index = self._indicies[item]
-        self._swap(item_index, len(self._queue) - 1)
-        self._queue.pop()
-        self._indicies.pop(item)
-        if item_index < len(self._queue):
-            self._shiftdown(item_index)
-            self._shiftup(item_index)
-        return item
-
     def discard(self, item):
-        if item in self._indicies:
+        if item.index >= 0:
             return self.remove(item)
 
+    def remove(self, item):
+        item_index = item.index
+        last = self._queue.pop()
+        if item_index < len(self._queue):
+            self._queue[item_index] = last
+            self._queue[item_index].index = item_index
+            self._siftdown(0, item_index)
+            self._siftup(item_index)
+        item.index = -1
+        return item
+
     def update(self, item, new_item):
-        item_index = self._indicies.pop(item)
+        item_index = item.index
         self._queue[item_index] = new_item
-        self._indicies[new_item] = item_index
-        self._shiftdown(item_index)
-        self._shiftup(item_index)
+        self._queue[item_index].index = item_index
+        item.index = -1
+        self._siftdown(0, item_index)
+        self._siftup(item_index)
+
+    def _heapify(self):
+        length = len(self._queue)
+        for i in reversed(range(length)):
+            self._queue[i].index = i
+            if i < length // 2:
+                self._siftup(i)
+
+    def _siftup(self, pos):
+        end_pos = len(self._queue)
+        start_pos = pos
+        new_item = self._queue[pos]
+        child_pos = 2*pos + 1
+        while child_pos < end_pos:
+            right_pos = child_pos + 1
+            if (
+                right_pos < end_pos
+                and not self._queue[child_pos] < self._queue[right_pos]
+            ):
+                child_pos = right_pos
+            self._queue[pos] = self._queue[child_pos]
+            self._queue[pos].index = pos
+            pos = child_pos
+            child_pos = 2*pos + 1
+        self._queue[pos] = new_item
+        self._queue[pos].index = pos
+        self._siftdown(start_pos, pos)
+
+    def _siftdown(self, start_pos, pos):
+        new_item = self._queue[pos]
+        while pos > start_pos:
+            parent_pos = (pos - 1) >> 1
+            parent = self._queue[parent_pos]
+            if new_item < parent:
+                self._queue[pos] = parent
+                self._queue[pos].index = pos
+                pos = parent_pos
+                continue
+            break
+        self._queue[pos] = new_item
+        self._queue[pos].index = pos
 
 
 class SimilarityEntry:
@@ -392,9 +388,7 @@ class SimilarityEntry:
     def __init__(self, cluster1, cluster2, similarity):
         self.clusters = (cluster1, cluster2)
         self.similarity = similarity
-
-    def __hash__(self):
-        return hash(self.clusters)
+        self.index = -1
 
     def __eq__(self, other):
         if type(self) is type(other):
