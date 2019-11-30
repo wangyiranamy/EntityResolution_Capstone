@@ -22,14 +22,14 @@ class TestEvaluator:
         assert round(ami_score, 2) == 0.23
 
     def test_v_measure(self, ground_truth, resolved_mapping):
-        v_measure_evaluator = Evaluator(strategy='v-measure')
+        v_measure_evaluator = Evaluator(strategy='v_measure')
         v_measure_score = v_measure_evaluator.evaluate(
             ground_truth, resolved_mapping
         )
         assert round(v_measure_score, 2) == 0.67
 
     def test_precision_recall(self, ground_truth, resolved_mapping):
-        precision_recall_evaluator = Evaluator(strategy='precision-recall')
+        precision_recall_evaluator = Evaluator(strategy='precision_recall')
         precision_recall_score = precision_recall_evaluator.evaluate(
             ground_truth, resolved_mapping
         )
@@ -144,7 +144,7 @@ class TestResolver:
     def test_attr_sim(self, complex_attr_graph_suite):
         graph, cleanup = complex_attr_graph_suite
         resolver = Resolver(
-            None, attr_strategy={'text': 'stfidf_jaro_winkler'}
+            None, attr_strategy={'text': 'stfidf'}
         )
         resolver._init_cache(graph)
         node1 = [node for node in graph.nodes if node.id == 1][0]
