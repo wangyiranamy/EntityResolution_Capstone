@@ -112,7 +112,7 @@ class SimFuncFactory:
     @classmethod
     def produce_stfidf(
         cls, weight, corpus_list, stfidf_threshold=0.5,
-        second_sim='jaro_winkler', jw_prefix_weight=0.15, **kwargs
+        second_sim='jaro_winkler', jw_prefix_weight=0.1, **kwargs
     ):
         if second_sim == 'jaro_winkler':
             sim_func = jaro_winkler.JaroWinkler(jw_prefix_weight).get_sim_score
