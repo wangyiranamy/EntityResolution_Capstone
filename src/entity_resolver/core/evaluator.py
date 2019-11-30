@@ -6,12 +6,12 @@ class Evaluator(WithLogger):
 
     _strategy_funcs = {
         'ami': ClusteringMetrics.ami,
-        'v-measure': ClusteringMetrics.v_measure,
-        'precision-recall': ClusteringMetrics.precision_recall
+        'v_measure': ClusteringMetrics.v_measure,
+        'precision_recall': ClusteringMetrics.precision_recall
     }
 
     def __init__(
-        self, strategy='precision-recall',
+        self, strategy='precision_recall',
         plot_prc=False, verbose=0, **kwargs
     ):
         self._strategy_str = strategy
