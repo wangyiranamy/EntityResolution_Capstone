@@ -5,7 +5,9 @@ import logging
 from functools import wraps, partial
 import numpy as np
 from sklearn import metrics
-from py_stringmatching.similarity_measure import jaro_winkler, soft_tfidf, jaro
+from py_stringmatching.similarity_measure import (
+    jaro_winkler, soft_tfidf, jaro, levenshtein
+)
 
 
 class WithLogger:
@@ -108,14 +110,19 @@ class logtime:
 class SimFuncFactory:
 
     @classmethod
-    def produce_stfidf_jaro_winkler(
-        cls, weight, corpus_list, soft_tfidf_threshold=0.5,
-        jw_prefix_weight=0.15, **kwargs
+    def produce_stfidf(
+        cls, weight, corpus_list, stfidf_threshold=0.5,
+        second_sim='jaro_winkler', jw_prefix_weight=0.15, **kwargs
     ):
-        sim_func = jaro_winkler.JaroWinkler().get_sim_score
+        if second_sim == 'jaro_winkler':
+            sim_func = jaro_winkler.JaroWinkler(jw_prefix_weight).get_sim_score
+        elif second_sim == 'jaro':
+            sim_func = jaro.Jaro().get_sim_score
+        elif second_sim == 'scaled_lev':
+            sim_func = levenshtein.Levenshtein().get_sim_score
         soft_tfidf_obj = soft_tfidf.SoftTfIdf(
             corpus_list, sim_func,
-            soft_tfidf_threshold
+            stfidf_threshold
         )
 
         def stfidf_jaro_winkler_sim(value1, value2):
