@@ -40,7 +40,7 @@ class Resolver(WithLogger):
         self.seed = seed
         self._kwargs = kwargs
         self._sim_func_producers = {
-            'stfidf_jaro_winkler': SimFuncFactory.produce_stfidf_jaro_winkler,
+            'stfidf': SimFuncFactory.produce_stfidf,
             'jaro_winkler': SimFuncFactory.produce_jaro_winkler,
             'jaro': SimFuncFactory.produce_jaro,
             'jaccard_coef': SimFuncFactory.produce_jaccard_coef,
@@ -51,7 +51,7 @@ class Resolver(WithLogger):
             'adar_attr_fr': SimFuncFactory.produce_adar_attr_fr
         }
         self._default_strategies = {
-            'text': 'stfidf_jaro_winkler',
+            'text': 'stfidf',
             'person_entity': 'jaro_winkler',
             'relation': 'jaccard_coef'
         }
