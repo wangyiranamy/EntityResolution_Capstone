@@ -26,18 +26,23 @@ class TestEntityResolver:
         entity_resolver = EntityResolver(None, None)
         with pytest.raises(ValueError):
             entity_resolver = EntityResolver(None, None, alpha=-1)
+        with pytest.raises(ValueError):
             entity_resolver.alpha = -1
         with pytest.raises(ValueError):
             entity_resolver = EntityResolver(None, None, average_method='foo')
+        with pytest.raises(ValueError):
             entity_resolver.average_method = 'foo'
         with pytest.raises(ValueError):
             entity_resolver = EntityResolver(
                 None, None, evaluator_strategy='bar'
             )
+        with pytest.raises(ValueError):
             entity_resolver.evaluator_strategy = 'bar'
         with pytest.raises(ValueError):
             entity_resolver = EntityResolver(None, None, linkage='boo')
+        with pytest.raises(ValueError):
             entity_resolver.linkage = 'boo'
         with pytest.raises(ValueError):
             entity_resolver = EntityResolver(None, None, second_sim='baz')
+        with pytest.raises(ValueError):
             entity_resolver.second_sim = 'baz'
