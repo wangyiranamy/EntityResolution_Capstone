@@ -248,7 +248,8 @@ class EntityResolver(WithLogger):
             'second_sim': 'jaro_winkler', 'stfidf_threshold': 0.5,
             'jw_prefix_weight': 0.1, 'average_method': 'max'
         }
-        self._kwargs.update(kwargs)
+        for key, value in kwargs.items():
+            setattr(self, key, value)
         self._graph_parser = GraphParser(attr_types, verbose=verbose)
         self._ground_truth_parser = GroundTruthParser(verbose=verbose)
         self._resolver = Resolver(
