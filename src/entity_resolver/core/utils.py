@@ -134,7 +134,7 @@ class SimFuncFactory:
     @classmethod
     def produce_jaro_winkler(
         cls, weight, corpus_list,
-        jw_prefix_weight=0.15, **kwargs
+        jw_prefix_weight=0.1, **kwargs
     ):
         def jaro_winkler_sim(value1, value2):
             jaro_winkler_obj = jaro_winkler.JaroWinkler(jw_prefix_weight)
