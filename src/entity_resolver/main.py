@@ -557,7 +557,9 @@ class EntityResolver(WithLogger):
         """ Resolve entities in the given data and return the entity mapping.
 
         Args:
-            graph_path: The path to the input data for entity resolution.
+            graph_path: The path to the input data for entity resolution. The
+                data file has to **strictly follow** the format as described in
+                :doc:`../quickstart`.
 
         Returns:
             A `collections.OrderedDict` object mapping reference ids to cluster
@@ -584,7 +586,8 @@ class EntityResolver(WithLogger):
 
         Args:
             ground_truth_path: The path to ground truth data used for
-                evaluation.
+                evaluation. The data file has to **strictly follow** the format
+                as described in :doc:`../quickstart`.
             resolved_mapping: Mapping reference id to cluster id. The reference
                 ids must correspond to those in ground truth data, while their
                 cluster ids may differ.
@@ -614,9 +617,12 @@ class EntityResolver(WithLogger):
         """ Resolve entities in the given data and evaluate the result.
 
         Args:
-            graph_path: The path to the input data for entity resolution.
+            graph_path: The path to the input data for entity resolution. The
+                data file has to **strictly follow** the format as described in
+                :doc:`../quickstart`.
             ground_truth_path: The path to ground truth data used for
-                evaulation.
+                evaulation. The data file has to **strictly follow** the format
+                as described in :doc:`../quickstart`.
 
         Returns:
             This depends on the values of ``evaluator_strategy`` and
@@ -664,7 +670,9 @@ class EntityResolver(WithLogger):
         """ A helper method for parsing the ground truth data.
 
         Args:
-            ground_truth_path: The path to ground truth data.
+            ground_truth_path: The path to ground truth data. The data file has
+                to **strictly follow** the format as described in
+                :doc:`../quickstart`.
 
         Returns:
             A `collections.OrderedDict` mapping reference ids to ground truth
