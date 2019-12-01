@@ -10,7 +10,7 @@ class TestEntityResolver:
         assert entity_resolver.stfidf_threshold == 0.5
         assert entity_resolver.jw_prefix_weight == 0.1
         assert entity_resolver.average_method == 'max'
-    
+
     def test_set_kwargs(self):
         entity_resolver = EntityResolver(
             None, None,
