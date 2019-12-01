@@ -22,7 +22,11 @@ class Evaluator(WithLogger):
 
     @logtime('Time taken for evaluation')
     def evaluate(self, labels, preds):
-        labels, preds = list(labels.values()), list(preds.values())
+        sorted_preds = list()
+        for _, cluster_id in sorted(preds.items(), key=lambda pair: pair[0]):
+            sorted_preds.append(cluster_id)
+        labels = list(labels.values())
+        preds = sorted_preds
         self._logger.debug(f'Number of references in labels: {len(labels)}')
         self._logger.debug(f'Number of clusters in labels: {len(set(labels))}')
         self._logger.debug(f'Number of references in preds: {len(preds)}')
