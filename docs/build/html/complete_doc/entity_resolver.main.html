@@ -1,0 +1,1035 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>entity_resolver.main module &mdash; entity-resolver  documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../_static/jquery.js"></script>
+        <script type="text/javascript" src="../_static/underscore.js"></script>
+        <script type="text/javascript" src="../_static/doctools.js"></script>
+        <script type="text/javascript" src="../_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="entity_resolver.scripts module" href="entity_resolver.scripts.html" />
+    <link rel="prev" title="entity_resolver.parser.ground_truth_parser module" href="entity_resolver.parser.ground_truth_parser.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../index.html" class="icon icon-home"> entity-resolver
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Table of Contents</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../quickstart.html">Quickstart</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../advanced_guide.html">Advanced Guide</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../complete_doc.html">Complete Documentation</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="entity_resolver.html">entity_resolver package</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="entity_resolver.html#subpackages">Subpackages</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="entity_resolver.core.html">entity_resolver.core package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="entity_resolver.parser.html">entity_resolver.parser package</a></li>
+</ul>
+</li>
+<li class="toctree-l3 current"><a class="reference internal" href="entity_resolver.html#submodules">Submodules</a><ul class="current">
+<li class="toctree-l4 current"><a class="current reference internal" href="#">entity_resolver.main module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="entity_resolver.scripts.html">entity_resolver.scripts module</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">entity-resolver</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../complete_doc.html">Complete Documentation</a> &raquo;</li>
+        
+          <li><a href="entity_resolver.html">entity_resolver package</a> &raquo;</li>
+        
+      <li>entity_resolver.main module</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            
+              <a href="https://github.com/Terry1004/EntityResolution_Capstone/blob/master/docs/source/complete_doc/entity_resolver.main.rst" class="fa fa-github"> Edit on GitHub</a>
+            
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="module-entity_resolver.main">
+<span id="entity-resolver-main-module"></span><h1>entity_resolver.main module<a class="headerlink" href="#module-entity_resolver.main" title="Permalink to this headline">¶</a></h1>
+<p>The interface module exposed to users.</p>
+<p>This module contains a single class <code class="docutils literal notranslate"><span class="pre">EntityResolver</span></code> which serves as the
+only interface for users to apply the collective entity resolution algorithm
+to their data.</p>
+<p class="rubric">Example</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">entity_resolver</span> <span class="kn">import</span> <span class="n">EntityResolver</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">entity_resolver</span> <span class="o">=</span> <span class="n">EntityResolver</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">data_path</span> <span class="o">=</span> <span class="s1">&#39;path/to/your/data&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">label_path</span> <span class="o">=</span> <span class="s1">&#39;path/to/your/ground_truth&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">score</span> <span class="o">=</span> <span class="n">entity_resolver</span><span class="o">.</span><span class="n">resolve_and_eval</span><span class="p">(</span><span class="n">data_path</span><span class="p">,</span> <span class="n">label_path</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="admonition tip">
+<p class="admonition-title">Tip</p>
+<p>Although currently the <code class="docutils literal notranslate"><span class="pre">attr_types</span></code> argument only support
+<code class="docutils literal notranslate"><span class="pre">'person_entity'</span></code> and <code class="docutils literal notranslate"><span class="pre">'text'</span></code> as values, the effects of this argument
+is restricted to certain preprocessing, default attribute similarity
+function, and deciding what values are passed when computing attribute
+similarities (thus affecting inputs if users are passing functions to
+<code class="docutils literal notranslate"><span class="pre">attr_strategy</span></code>).</p>
+<p>If an unsupported type is input, then no preprocessings are done and their
+original values are passed to computation of attribute similarity
+functions. The attribute name with an unsupported type <strong>must</strong> be mapped
+to an attribute similarity strategy in <code class="docutils literal notranslate"><span class="pre">attr_strategy</span></code> as well.</p>
+</div>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<ul class="simple">
+<li><p>Detailed explanation for the above example can be found in
+<a class="reference internal" href="../quickstart.html"><span class="doc">Quickstart</span></a>.</p></li>
+<li><p>A more comprehensive explanation for the input parameters of this class
+can be found in <a class="reference internal" href="../advanced_guide.html"><span class="doc">Advanced Guide</span></a>.</p></li>
+</ul>
+</div>
+<dl class="class">
+<dt id="entity_resolver.main.EntityResolver">
+<em class="property">class </em><code class="sig-prename descclassname">entity_resolver.main.</code><code class="sig-name descname">EntityResolver</code><span class="sig-paren">(</span><em class="sig-param">attr_types</em>, <em class="sig-param">blocking_strategy</em>, <em class="sig-param">raw_blocking=False</em>, <em class="sig-param">alpha=0</em>, <em class="sig-param">weights=None</em>, <em class="sig-param">attr_strategy={}</em>, <em class="sig-param">rel_strategy=None</em>, <em class="sig-param">blocking_threshold=3</em>, <em class="sig-param">bootstrap_strategy=None</em>, <em class="sig-param">raw_bootstrap=False</em>, <em class="sig-param">edge_match_threshold=1</em>, <em class="sig-param">first_attr=None</em>, <em class="sig-param">first_attr_raw=False</em>, <em class="sig-param">second_attr=None</em>, <em class="sig-param">second_attr_raw=False</em>, <em class="sig-param">linkage='max'</em>, <em class="sig-param">similarity_threshold=0.935</em>, <em class="sig-param">evaluator_strategy='precision_recall'</em>, <em class="sig-param">seed=None</em>, <em class="sig-param">plot_prc=False</em>, <em class="sig-param">verbose=0</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/Terry1004/EntityResolution_Capstone/blob/master/src/entity_resolver/main.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#entity_resolver.main.EntityResolver" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="entity_resolver.core.utils.html#entity_resolver.core.utils.WithLogger" title="entity_resolver.core.utils.WithLogger"><code class="xref py py-class docutils literal notranslate"><span class="pre">entity_resolver.core.utils.WithLogger</span></code></a></p>
+<p>The interface class of the collective entity resolution algorithm.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>attr_types</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/typing.html#typing.Mapping" title="(in Python v3.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Mapping</span></code></a>[<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>, <a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>]) – Mapping attribute names to their types.</p></li>
+<li><p><strong>blocking_strategy</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/typing.html#typing.Callable" title="(in Python v3.6)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Callable</span></code></a>[[<a class="reference external" href="https://docs.python.org/3.6/library/typing.html#typing.Mapping" title="(in Python v3.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Mapping</span></code></a>[<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>, <a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>], <a class="reference external" href="https://docs.python.org/3.6/library/typing.html#typing.Mapping" title="(in Python v3.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Mapping</span></code></a>[<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>, <a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>]], <a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a>]) – Describe the strategy for blocking. It should accept
+two dictionaries as reference attributes and return their
+distance.</p></li>
+<li><p><strong>raw_blocking</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#bool" title="(in Python v3.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a>) – Indicate if raw values of reference attributes are to be
+used in blocking. It affects the input of <code class="docutils literal notranslate"><span class="pre">blocking</span> <span class="pre">strategy</span></code>.</p></li>
+<li><p><strong>alpha</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/typing.html#typing.Union" title="(in Python v3.6)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code></a>[<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a>, <a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a>]) – The ratio of relational similarity involved in calculating
+cluster similarities. It should be between 0 and 1 (inclusive).</p></li>
+<li><p><strong>weights</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/typing.html#typing.Optional" title="(in Python v3.6)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code></a>[<a class="reference external" href="https://docs.python.org/3.6/library/typing.html#typing.Mapping" title="(in Python v3.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Mapping</span></code></a>[<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>, <a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a>]]) – Mapping attribute names to their ratio when calculating
+attribute similarities. The ratio should sum to 1. If it is
+<code class="docutils literal notranslate"><span class="pre">None</span></code> (default), each attribute is assigned equal weight.</p></li>
+<li><p><strong>attr_strategy</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/typing.html#typing.Mapping" title="(in Python v3.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Mapping</span></code></a>[<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>, <a class="reference external" href="https://docs.python.org/3.6/library/typing.html#typing.Union" title="(in Python v3.6)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code></a>[<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>, <a class="reference external" href="https://docs.python.org/3.6/library/typing.html#typing.Callable" title="(in Python v3.6)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Callable</span></code></a>]]) – Mapping attribute names to similarity strategy names.
+Valid values are either strings including <code class="docutils literal notranslate"><span class="pre">'stfidf'</span></code>,
+<code class="docutils literal notranslate"><span class="pre">'jaro_winkler'</span></code>, and <code class="docutils literal notranslate"><span class="pre">'jaro'</span></code>. or a callable that takes two
+attribute values and return their similarity score. If not
+specified, a default strategy will be employed depending on the
+attribute type: <code class="docutils literal notranslate"><span class="pre">'text'</span></code> for soft-tfidf, and <code class="docutils literal notranslate"><span class="pre">person_entity</span></code>
+for Jaro-Winkler. Refer to <a class="reference internal" href="../advanced_guide.html"><span class="doc">Advanced Guide</span></a> for more
+details.</p></li>
+<li><p><strong>rel_strategy</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/typing.html#typing.Optional" title="(in Python v3.6)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code></a>[<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>]) – Name of the strategy to compute relational similarity.
+Valid values are <code class="docutils literal notranslate"><span class="pre">'jaccard_coef'</span></code>, <code class="docutils literal notranslate"><span class="pre">'jaraccard_coef_fr'</span></code>,
+<code class="docutils literal notranslate"><span class="pre">'adar_neighbor'</span></code>, <code class="docutils literal notranslate"><span class="pre">'adar_neighbor_fr'</span></code>, <code class="docutils literal notranslate"><span class="pre">'adar_attr'</span></code>, and
+<code class="docutils literal notranslate"><span class="pre">'adar_attr_fr'</span></code>. If it is <code class="docutils literal notranslate"><span class="pre">None</span></code>, <code class="docutils literal notranslate"><span class="pre">'jaccard_coef'</span></code> for
+Jaccard Coefficient will be used. Refer to <a class="reference internal" href="../advanced_guide.html"><span class="doc">Advanced Guide</span></a>
+for more details.</p></li>
+<li><p><strong>blocking_threshold</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/typing.html#typing.Union" title="(in Python v3.6)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code></a>[<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a>, <a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a>]) – The threshold for allowing two references to be put
+in one bucket during blocking. Only references with distance
+(computed by <code class="docutils literal notranslate"><span class="pre">blocking_strategy</span></code>) <strong>strictly less than</strong> this
+threshold are put in the same bucket.</p></li>
+<li><p><strong>bootstrap_strategy</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/typing.html#typing.Optional" title="(in Python v3.6)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code></a>[<a class="reference external" href="https://docs.python.org/3.6/library/typing.html#typing.Callable" title="(in Python v3.6)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Callable</span></code></a>[[<a class="reference external" href="https://docs.python.org/3.6/library/typing.html#typing.Mapping" title="(in Python v3.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Mapping</span></code></a>[<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>, <a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>], <a class="reference external" href="https://docs.python.org/3.6/library/typing.html#typing.Mapping" title="(in Python v3.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Mapping</span></code></a>[<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>, <a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>]], <a class="reference external" href="https://docs.python.org/3.6/library/functions.html#bool" title="(in Python v3.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a>]]) – Describe the strategy for bootstrapping. It should
+accept two dictionaries as reference attributes and return if they
+can be a bootstrap candidate pair. If it is <code class="docutils literal notranslate"><span class="pre">None</span></code> (default),
+only two references with all attributes being exactly the same can
+be bootstrap a candidate pair. See also <code class="docutils literal notranslate"><span class="pre">edge_match_threshold</span></code>.</p></li>
+<li><p><strong>raw_bootstrap</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#bool" title="(in Python v3.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a>) – Indicate if raw values of reference attributes are to be
+used in bootstrapping. It affects the input of
+<code class="docutils literal notranslate"><span class="pre">bootstrap_strategy</span></code>.</p></li>
+<li><p><strong>edge_match_threshold</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a>) – The number of extra
+(<strong>greater than or equal to</strong>) neighboring reference pairs needed
+to pass <code class="docutils literal notranslate"><span class="pre">bootstrap_strategy</span></code> check for a bootstrap candidate pair
+to be finally put in the same cluster during bootstrapping.</p></li>
+<li><p><strong>first_attr</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/typing.html#typing.Optional" title="(in Python v3.6)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code></a>[<a class="reference external" href="https://docs.python.org/3.6/library/typing.html#typing.Callable" title="(in Python v3.6)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Callable</span></code></a>[[<a class="reference external" href="https://docs.python.org/3.6/library/typing.html#typing.Mapping" title="(in Python v3.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Mapping</span></code></a>[<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>, <a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>]], <a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>]]) – Describe how to obtain the first attribute value in
+computation of a reference ambiguity. It should either be <code class="docutils literal notranslate"><span class="pre">None</span></code>
+(default) or a function accepting one dictionary as reference
+attributes and return a hashable value. If <code class="docutils literal notranslate"><span class="pre">rel_strategy</span></code> is
+<code class="docutils literal notranslate"><span class="pre">'adar_attr'</span></code> or <code class="docutils literal notranslate"><span class="pre">'adar_attr_fr'</span></code>, this must be a valid
+function and cannot be <code class="docutils literal notranslate"><span class="pre">None</span></code>. Refer to <a class="reference internal" href="../advanced_guide.html"><span class="doc">Advanced Guide</span></a>
+for more details.</p></li>
+<li><p><strong>first_attr_raw</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#bool" title="(in Python v3.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a>) – Indicate if raw values of reference attributes are to
+be used in calculating reference ambiguity. It affects the input of
+<code class="docutils literal notranslate"><span class="pre">first_attr</span></code>.</p></li>
+<li><p><strong>second_attr</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/typing.html#typing.Optional" title="(in Python v3.6)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code></a>[<a class="reference external" href="https://docs.python.org/3.6/library/typing.html#typing.Callable" title="(in Python v3.6)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Callable</span></code></a>[[<a class="reference external" href="https://docs.python.org/3.6/library/typing.html#typing.Mapping" title="(in Python v3.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Mapping</span></code></a>[<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>, <a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>]], <a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>]]) – Similar to <code class="docutils literal notranslate"><span class="pre">first_attr</span></code>. Describe how to obtain the
+second attribute value in computation of a reference ambiguity
+instead. Refer to <a class="reference internal" href="../advanced_guide.html"><span class="doc">Advanced Guide</span></a> for more details.</p></li>
+<li><p><strong>second_attr_raw</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#bool" title="(in Python v3.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a>) – Similar to <code class="docutils literal notranslate"><span class="pre">first_attr_raw</span></code>. It affects the input of
+<code class="docutils literal notranslate"><span class="pre">second_attr</span></code> instead.</p></li>
+<li><p><strong>linkage</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>) – Describe how to compute cluster attribute similarities based
+on reference attribute similarities. Valid values are <code class="docutils literal notranslate"><span class="pre">'min'</span></code>,
+<code class="docutils literal notranslate"><span class="pre">'max'</span></code>, and <code class="docutils literal notranslate"><span class="pre">'average'</span></code>. Refer to <a class="reference internal" href="../advanced_guide.html"><span class="doc">Advanced Guide</span></a> for
+more details.</p></li>
+<li><p><strong>similarity_threshold</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a>) – When the entry with the largest similarity in the
+priority queue is less than this value, the algorithm stops.</p></li>
+<li><p><strong>evaluator_strategy</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/typing.html#typing.Union" title="(in Python v3.6)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code></a>[<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>, <a class="reference external" href="https://docs.python.org/3.6/library/typing.html#typing.Callable" title="(in Python v3.6)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Callable</span></code></a>]) – The strategy name to be used for evaluation when
+needed. Valid values are either strings including
+<code class="docutils literal notranslate"><span class="pre">'precision_recall'</span></code>, <code class="docutils literal notranslate"><span class="pre">'ami'</span></code>, and <code class="docutils literal notranslate"><span class="pre">'v_measure'</span></code>, or a
+callable that follows the signatures of class methods in
+<a class="reference internal" href="entity_resolver.core.utils.html#entity_resolver.core.utils.ClusteringMetrics" title="entity_resolver.core.utils.ClusteringMetrics"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ClusteringMetrics</span></code></a> (two
+<a class="reference external" href="https://docs.python.org/3.6/library/collections.html#collections.OrderedDict" title="(in Python v3.6)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">OrderedDict</span></code></a> as inputs and any performance indicator
+as output). Refer to <a class="reference internal" href="../advanced_guide.html"><span class="doc">Advanced Guide</span></a> for more details.</p></li>
+<li><p><strong>seed</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/typing.html#typing.Optional" title="(in Python v3.6)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code></a>[<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a>]) – The random seed to be used in blocking, which is the only source
+of randomness in this algorithm. If it is <code class="docutils literal notranslate"><span class="pre">None</span></code> (default), the
+current system time is used as the seed.</p></li>
+<li><p><strong>plot_prc</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#bool" title="(in Python v3.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a>) – Indicate whether to plot a precision-recall curve at the end
+of evaluation if <code class="docutils literal notranslate"><span class="pre">resolve_and_eval</span></code> method is called. It also
+affects the output of <code class="docutils literal notranslate"><span class="pre">resolve_and_eval</span></code> method. Note that
+setting this to <code class="docutils literal notranslate"><span class="pre">True</span></code> will <strong>significantly increase</strong> the time
+taken for the program to complete.</p></li>
+<li><p><strong>verbose</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a>) – <p>Indicate how much information to be logged/printed in the
+console during the program execution.</p>
+<ul>
+<li><p>0 or smaller: no logging</p></li>
+<li><p>1: Some meta information are logged. This includes the input
+data, built graph, evaluation results, and time taken for major
+steps of the program.</p></li>
+<li><p>2 or larger: All messages are logged, most of them are used for
+debugging purpose.</p></li>
+</ul>
+</p></li>
+<li><p><strong>**kwargs</strong> – <p>Additional keyword arguments that are only used in specific
+cases. Refer to <a class="reference internal" href="../advanced_guide.html"><span class="doc">Advanced Guide</span></a> for more details. Valid
+arguments are:</p>
+<ul>
+<li><p>second_sim (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">str</span></code></a>): Indicate the secondary similarity
+measure used for SoftTfIdf similarity computation if it is set
+in <code class="docutils literal notranslate"><span class="pre">attr_strategy</span></code>. Valid values are <code class="docutils literal notranslate"><span class="pre">'jaro_winkler'</span></code>,
+<code class="docutils literal notranslate"><span class="pre">'jaro'</span></code> and <code class="docutils literal notranslate"><span class="pre">'scaled_lev'</span></code>. Default is <code class="docutils literal notranslate"><span class="pre">'jaro_winkler'</span></code>.</p></li>
+<li><p>stfidf_threshold (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">float</span></code></a>): Indicate the threshold of
+secondary similarity used in SoftTfIdf similarity computation if
+it is set in <code class="docutils literal notranslate"><span class="pre">attr_strategy</span></code>. Default is <code class="docutils literal notranslate"><span class="pre">0.5</span></code>.</p></li>
+<li><p>jw_prefix_weight (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">float</span></code></a>): Indicate the prefix weight used
+in Jaro-winkler similarity computation if it, or SoftTfIdf with
+Jaro-winkler as secondary similarity is set in <code class="docutils literal notranslate"><span class="pre">attr_strategy</span></code>.
+Default is <code class="docutils literal notranslate"><span class="pre">0.1</span></code>.</p></li>
+<li><p>average_method (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">str</span></code></a>): Indicate how to compute adjusted
+mutual information if it is set in <code class="docutils literal notranslate"><span class="pre">evaluator_strategy</span></code>. Valid
+values are <code class="docutils literal notranslate"><span class="pre">'min'</span></code>, <code class="docutils literal notranslate"><span class="pre">'geometric'</span></code>, <code class="docutils literal notranslate"><span class="pre">'arithmetic'</span></code>, and
+<code class="docutils literal notranslate"><span class="pre">'max'</span></code>. Default is <code class="docutils literal notranslate"><span class="pre">'max'</span></code>.</p></li>
+</ul>
+</p></li>
+</ul>
+</dd>
+</dl>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>All protected attributes below which have corresponding parameters in
+the above section without prefix underscores are essentially the same.
+They are encapsulated by corresponding properties (without underscore)
+using <code class="docutils literal notranslate"><span class="pre">&#64;property</span></code> to be protected against invalid value assignments.
+Their documentations are therefore omitted.</p>
+</div>
+<div class="admonition tip">
+<p class="admonition-title">Tip</p>
+<p>Although setting <code class="docutils literal notranslate"><span class="pre">plot_prc</span></code> to <code class="docutils literal notranslate"><span class="pre">True</span></code> will automatically plot a
+precision-recall curve at the end, it will also significantly increase
+the running time, and the plot is not customizable. However, if it is
+set to <code class="docutils literal notranslate"><span class="pre">True</span></code>, the <code class="docutils literal notranslate"><span class="pre">resolve_and_eval</span></code> method will return the list
+of precision and recall scores to plot the curve. It is recommended to
+store it for further usage.</p>
+</div>
+<dl class="attribute">
+<dt id="entity_resolver.main.EntityResolver._attr_types">
+<code class="sig-name descname">_attr_types</code><a class="reference external" href="https://github.com/Terry1004/EntityResolution_Capstone/blob/master/src/entity_resolver/main.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#entity_resolver.main.EntityResolver._attr_types" title="Permalink to this definition">¶</a></dt>
+<dd><p>Omitted.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.6/library/typing.html#typing.Mapping" title="(in Python v3.6)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Mapping</span></code></a>[<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">str</span></code></a>, <a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">str</span></code></a>]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="entity_resolver.main.EntityResolver._blocking_strategy">
+<code class="sig-name descname">_blocking_strategy</code><a class="reference external" href="https://github.com/Terry1004/EntityResolution_Capstone/blob/master/src/entity_resolver/main.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#entity_resolver.main.EntityResolver._blocking_strategy" title="Permalink to this definition">¶</a></dt>
+<dd><p>Omitted.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.6/library/typing.html#typing.Callable" title="(in Python v3.6)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Callable</span></code></a>[[<a class="reference external" href="https://docs.python.org/3.6/library/typing.html#typing.Mapping" title="(in Python v3.6)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Mapping</span></code></a>[<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">str</span></code></a>, <a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">str</span></code></a>], <a class="reference external" href="https://docs.python.org/3.6/library/typing.html#typing.Mapping" title="(in Python v3.6)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Mapping</span></code></a>[<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">str</span></code></a>, <a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">str</span></code></a>]], <a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">float</span></code></a>]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="entity_resolver.main.EntityResolver._raw_blocking">
+<code class="sig-name descname">_raw_blocking</code><a class="reference external" href="https://github.com/Terry1004/EntityResolution_Capstone/blob/master/src/entity_resolver/main.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#entity_resolver.main.EntityResolver._raw_blocking" title="Permalink to this definition">¶</a></dt>
+<dd><p>Omitted.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#bool" title="(in Python v3.6)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">bool</span></code></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="entity_resolver.main.EntityResolver._alpha">
+<code class="sig-name descname">_alpha</code><a class="reference external" href="https://github.com/Terry1004/EntityResolution_Capstone/blob/master/src/entity_resolver/main.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#entity_resolver.main.EntityResolver._alpha" title="Permalink to this definition">¶</a></dt>
+<dd><p>Omitted.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.6/library/typing.html#typing.Union" title="(in Python v3.6)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Union</span></code></a>[<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">float</span></code></a>, <a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">int</span></code></a>]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="entity_resolver.main.EntityResolver._weights">
+<code class="sig-name descname">_weights</code><a class="reference external" href="https://github.com/Terry1004/EntityResolution_Capstone/blob/master/src/entity_resolver/main.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#entity_resolver.main.EntityResolver._weights" title="Permalink to this definition">¶</a></dt>
+<dd><p>Omitted.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.6/library/typing.html#typing.Optional" title="(in Python v3.6)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Optional</span></code></a>[<a class="reference external" href="https://docs.python.org/3.6/library/typing.html#typing.Mapping" title="(in Python v3.6)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Mapping</span></code></a>[<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">str</span></code></a>, <a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">float</span></code></a>]]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="entity_resolver.main.EntityResolver._attr_strategy">
+<code class="sig-name descname">_attr_strategy</code><a class="reference external" href="https://github.com/Terry1004/EntityResolution_Capstone/blob/master/src/entity_resolver/main.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#entity_resolver.main.EntityResolver._attr_strategy" title="Permalink to this definition">¶</a></dt>
+<dd><p>Omitted.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.6/library/typing.html#typing.Mapping" title="(in Python v3.6)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Mapping</span></code></a>[<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">str</span></code></a>, <a class="reference external" href="https://docs.python.org/3.6/library/typing.html#typing.Union" title="(in Python v3.6)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Union</span></code></a>[<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">str</span></code></a>, <a class="reference external" href="https://docs.python.org/3.6/library/typing.html#typing.Callable" title="(in Python v3.6)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Callable</span></code></a>]]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="entity_resolver.main.EntityResolver._rel_strategy">
+<code class="sig-name descname">_rel_strategy</code><a class="reference external" href="https://github.com/Terry1004/EntityResolution_Capstone/blob/master/src/entity_resolver/main.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#entity_resolver.main.EntityResolver._rel_strategy" title="Permalink to this definition">¶</a></dt>
+<dd><p>Omitted.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.6/library/typing.html#typing.Optional" title="(in Python v3.6)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Optional</span></code></a>[<a class="reference external" href="https://docs.python.org/3.6/library/typing.html#typing.Union" title="(in Python v3.6)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Union</span></code></a>[<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">str</span></code></a>, <a class="reference external" href="https://docs.python.org/3.6/library/typing.html#typing.Callable" title="(in Python v3.6)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Callable</span></code></a>]]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="entity_resolver.main.EntityResolver._blocking_threshold">
+<code class="sig-name descname">_blocking_threshold</code><a class="reference external" href="https://github.com/Terry1004/EntityResolution_Capstone/blob/master/src/entity_resolver/main.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#entity_resolver.main.EntityResolver._blocking_threshold" title="Permalink to this definition">¶</a></dt>
+<dd><p>Omitted.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.6/library/typing.html#typing.Union" title="(in Python v3.6)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Union</span></code></a>[<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">float</span></code></a>, <a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">int</span></code></a>]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="entity_resolver.main.EntityResolver._bootstrapping_strategy">
+<code class="sig-name descname">_bootstrapping_strategy</code><a class="reference external" href="https://github.com/Terry1004/EntityResolution_Capstone/blob/master/src/entity_resolver/main.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#entity_resolver.main.EntityResolver._bootstrapping_strategy" title="Permalink to this definition">¶</a></dt>
+<dd><p>Omitted.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.6/library/typing.html#typing.Optional" title="(in Python v3.6)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Optional</span></code></a>[<a class="reference external" href="https://docs.python.org/3.6/library/typing.html#typing.Callable" title="(in Python v3.6)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Callable</span></code></a>[[<a class="reference external" href="https://docs.python.org/3.6/library/typing.html#typing.Mapping" title="(in Python v3.6)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Mapping</span></code></a>[<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">str</span></code></a>, <a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">str</span></code></a>], <a class="reference external" href="https://docs.python.org/3.6/library/typing.html#typing.Mapping" title="(in Python v3.6)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Mapping</span></code></a>[<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">str</span></code></a>, <a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">str</span></code></a>]], <a class="reference external" href="https://docs.python.org/3.6/library/functions.html#bool" title="(in Python v3.6)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">bool</span></code></a>]]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="entity_resolver.main.EntityResolver._raw_bootstrap">
+<code class="sig-name descname">_raw_bootstrap</code><a class="reference external" href="https://github.com/Terry1004/EntityResolution_Capstone/blob/master/src/entity_resolver/main.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#entity_resolver.main.EntityResolver._raw_bootstrap" title="Permalink to this definition">¶</a></dt>
+<dd><p>Omitted.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#bool" title="(in Python v3.6)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">bool</span></code></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="entity_resolver.main.EntityResolver._edge_match_threshold">
+<code class="sig-name descname">_edge_match_threshold</code><a class="reference external" href="https://github.com/Terry1004/EntityResolution_Capstone/blob/master/src/entity_resolver/main.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#entity_resolver.main.EntityResolver._edge_match_threshold" title="Permalink to this definition">¶</a></dt>
+<dd><p>Omitted.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">int</span></code></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="entity_resolver.main.EntityResolver._first_attr">
+<code class="sig-name descname">_first_attr</code><a class="reference external" href="https://github.com/Terry1004/EntityResolution_Capstone/blob/master/src/entity_resolver/main.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#entity_resolver.main.EntityResolver._first_attr" title="Permalink to this definition">¶</a></dt>
+<dd><p>Omitted.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.6/library/typing.html#typing.Optional" title="(in Python v3.6)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Optional</span></code></a>[<a class="reference external" href="https://docs.python.org/3.6/library/typing.html#typing.Callable" title="(in Python v3.6)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Callable</span></code></a>[[<a class="reference external" href="https://docs.python.org/3.6/library/typing.html#typing.Mapping" title="(in Python v3.6)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Mapping</span></code></a>[<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">str</span></code></a>, <a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">str</span></code></a>]], <a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">str</span></code></a>]]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="entity_resolver.main.EntityResolver._first_attr_raw">
+<code class="sig-name descname">_first_attr_raw</code><a class="reference external" href="https://github.com/Terry1004/EntityResolution_Capstone/blob/master/src/entity_resolver/main.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#entity_resolver.main.EntityResolver._first_attr_raw" title="Permalink to this definition">¶</a></dt>
+<dd><p>Omitted.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#bool" title="(in Python v3.6)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">bool</span></code></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="entity_resolver.main.EntityResolver._second_attr">
+<code class="sig-name descname">_second_attr</code><a class="reference external" href="https://github.com/Terry1004/EntityResolution_Capstone/blob/master/src/entity_resolver/main.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#entity_resolver.main.EntityResolver._second_attr" title="Permalink to this definition">¶</a></dt>
+<dd><p>Omitted.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.6/library/typing.html#typing.Optional" title="(in Python v3.6)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Optional</span></code></a>[<a class="reference external" href="https://docs.python.org/3.6/library/typing.html#typing.Callable" title="(in Python v3.6)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Callable</span></code></a>[[<a class="reference external" href="https://docs.python.org/3.6/library/typing.html#typing.Mapping" title="(in Python v3.6)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Mapping</span></code></a>[<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">str</span></code></a>, <a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">str</span></code></a>]], <a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">str</span></code></a>]]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="entity_resolver.main.EntityResolver._second_attr_raw">
+<code class="sig-name descname">_second_attr_raw</code><a class="reference external" href="https://github.com/Terry1004/EntityResolution_Capstone/blob/master/src/entity_resolver/main.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#entity_resolver.main.EntityResolver._second_attr_raw" title="Permalink to this definition">¶</a></dt>
+<dd><p>Omitted.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#bool" title="(in Python v3.6)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">bool</span></code></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="entity_resolver.main.EntityResolver._linkage">
+<code class="sig-name descname">_linkage</code><a class="reference external" href="https://github.com/Terry1004/EntityResolution_Capstone/blob/master/src/entity_resolver/main.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#entity_resolver.main.EntityResolver._linkage" title="Permalink to this definition">¶</a></dt>
+<dd><p>Omitted.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">str</span></code></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="entity_resolver.main.EntityResolver._similarity_threshold">
+<code class="sig-name descname">_similarity_threshold</code><a class="reference external" href="https://github.com/Terry1004/EntityResolution_Capstone/blob/master/src/entity_resolver/main.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#entity_resolver.main.EntityResolver._similarity_threshold" title="Permalink to this definition">¶</a></dt>
+<dd><p>Omitted.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">float</span></code></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="entity_resolver.main.EntityResolver._evaluator_strategy">
+<code class="sig-name descname">_evaluator_strategy</code><a class="reference external" href="https://github.com/Terry1004/EntityResolution_Capstone/blob/master/src/entity_resolver/main.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#entity_resolver.main.EntityResolver._evaluator_strategy" title="Permalink to this definition">¶</a></dt>
+<dd><p>Omitted.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">str</span></code></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="entity_resolver.main.EntityResolver._seed">
+<code class="sig-name descname">_seed</code><a class="reference external" href="https://github.com/Terry1004/EntityResolution_Capstone/blob/master/src/entity_resolver/main.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#entity_resolver.main.EntityResolver._seed" title="Permalink to this definition">¶</a></dt>
+<dd><p>Omitted.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.6/library/typing.html#typing.Optional" title="(in Python v3.6)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Optional</span></code></a>[<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">int</span></code></a>]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="entity_resolver.main.EntityResolver._plot_prc">
+<code class="sig-name descname">_plot_prc</code><a class="reference external" href="https://github.com/Terry1004/EntityResolution_Capstone/blob/master/src/entity_resolver/main.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#entity_resolver.main.EntityResolver._plot_prc" title="Permalink to this definition">¶</a></dt>
+<dd><p>Omitted.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#bool" title="(in Python v3.6)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">bool</span></code></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="entity_resolver.main.EntityResolver._kwargs">
+<code class="sig-name descname">_kwargs</code><a class="reference external" href="https://github.com/Terry1004/EntityResolution_Capstone/blob/master/src/entity_resolver/main.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#entity_resolver.main.EntityResolver._kwargs" title="Permalink to this definition">¶</a></dt>
+<dd><p>Omitted.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="entity_resolver.main.EntityResolver._graph_parser">
+<code class="sig-name descname">_graph_parser</code><a class="reference external" href="https://github.com/Terry1004/EntityResolution_Capstone/blob/master/src/entity_resolver/main.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#entity_resolver.main.EntityResolver._graph_parser" title="Permalink to this definition">¶</a></dt>
+<dd><p>Created based on input parameters to parse the graph data.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="entity_resolver.parser.graph_parser.html#entity_resolver.parser.graph_parser.GraphParser" title="entity_resolver.parser.graph_parser.GraphParser"><code class="xref py py-obj docutils literal notranslate"><span class="pre">GraphParser</span></code></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="entity_resolver.main.EntityResolver._ground_truth_parser">
+<code class="sig-name descname">_ground_truth_parser</code><a class="reference external" href="https://github.com/Terry1004/EntityResolution_Capstone/blob/master/src/entity_resolver/main.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#entity_resolver.main.EntityResolver._ground_truth_parser" title="Permalink to this definition">¶</a></dt>
+<dd><p>Created based on input parameters to parse the ground truth data.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="entity_resolver.parser.ground_truth_parser.html#entity_resolver.parser.ground_truth_parser.GroundTruthParser" title="entity_resolver.parser.ground_truth_parser.GroundTruthParser"><code class="xref py py-obj docutils literal notranslate"><span class="pre">GroundTruthParser</span></code></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="entity_resolver.main.EntityResolver._resolver">
+<code class="sig-name descname">_resolver</code><a class="reference external" href="https://github.com/Terry1004/EntityResolution_Capstone/blob/master/src/entity_resolver/main.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#entity_resolver.main.EntityResolver._resolver" title="Permalink to this definition">¶</a></dt>
+<dd><p>Created based on
+input parameters to execute the main collective entity resolution
+algorithm. It is the core part of this whole project.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="entity_resolver.core.resolver.html#entity_resolver.core.resolver.Resolver" title="entity_resolver.core.resolver.Resolver"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Resolver</span></code></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="entity_resolver.main.EntityResolver._evaluator">
+<code class="sig-name descname">_evaluator</code><a class="reference external" href="https://github.com/Terry1004/EntityResolution_Capstone/blob/master/src/entity_resolver/main.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#entity_resolver.main.EntityResolver._evaluator" title="Permalink to this definition">¶</a></dt>
+<dd><p>Created based
+on input parameters to evaluate the results of entity resolution.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="entity_resolver.core.evaluator.html#entity_resolver.core.evaluator.Evaluator" title="entity_resolver.core.evaluator.Evaluator"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Evaluator</span></code></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="entity_resolver.main.EntityResolver._parse_ground_truth">
+<code class="sig-name descname">_parse_ground_truth</code><span class="sig-paren">(</span><em class="sig-param">ground_truth_path</em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/Terry1004/EntityResolution_Capstone/blob/master/src/entity_resolver/main.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#entity_resolver.main.EntityResolver._parse_ground_truth" title="Permalink to this definition">¶</a></dt>
+<dd><p>A helper method for parsing the ground truth data.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>ground_truth_path</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>) – The path to ground truth data. The data file has
+to <strong>strictly follow</strong> the format as described in
+<a class="reference internal" href="../quickstart.html"><span class="doc">Quickstart</span></a>.</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3.6/library/collections.html#collections.OrderedDict" title="(in Python v3.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">OrderedDict</span></code></a></p>
+</dd>
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>Mapping reference ids to ground truth cluster ids. The dictionary
+is sorted (key-value pairs are inserted) in ascending order of node
+id.</p>
+</dd>
+</dl>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<p>It ultimately calls the <code class="docutils literal notranslate"><span class="pre">parse</span></code> method of the
+<code class="docutils literal notranslate"><span class="pre">GroundTruthParser</span></code> object in
+<a class="reference internal" href="entity_resolver.parser.ground_truth_parser.html"><span class="doc">entity_resolver.parser.ground_truth_parser module</span></a>.</p>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="entity_resolver.main.EntityResolver._plot">
+<code class="sig-name descname">_plot</code><span class="sig-paren">(</span><em class="sig-param">prc_list</em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/Terry1004/EntityResolution_Capstone/blob/master/src/entity_resolver/main.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#entity_resolver.main.EntityResolver._plot" title="Permalink to this definition">¶</a></dt>
+<dd><p>A helper method for plotting the precision-recall curve.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>prc_list</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/typing.html#typing.List" title="(in Python v3.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code></a>[<a class="reference external" href="https://docs.python.org/3.6/library/typing.html#typing.Tuple" title="(in Python v3.6)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Tuple</span></code></a>[<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a>, <a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a>]]) – A list consisting of (precision, recall) tuples computed
+at different steps of the algorithm (reflecting the behavior
+with different <code class="docutils literal notranslate"><span class="pre">similarity_threshold</span></code>).</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><code class="docutils literal notranslate"><span class="pre">None</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="entity_resolver.main.EntityResolver._set_verbose">
+<code class="sig-name descname">_set_verbose</code><span class="sig-paren">(</span><em class="sig-param">value</em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/Terry1004/EntityResolution_Capstone/blob/master/src/entity_resolver/main.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#entity_resolver.main.EntityResolver._set_verbose" title="Permalink to this definition">¶</a></dt>
+<dd><p>Override the parent verbose setter.</p>
+<p>Update the <code class="docutils literal notranslate"><span class="pre">verbose</span></code> attributes of objectes contained in this class
+when its own <code class="docutils literal notranslate"><span class="pre">verbose</span></code> attribute changes.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>value</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a>) – The verbose value to be set to.</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><code class="docutils literal notranslate"><span class="pre">None</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="entity_resolver.main.EntityResolver.alpha">
+<em class="property">property </em><code class="sig-name descname">alpha</code><a class="reference external" href="https://github.com/Terry1004/EntityResolution_Capstone/blob/master/src/entity_resolver/main.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#entity_resolver.main.EntityResolver.alpha" title="Permalink to this definition">¶</a></dt>
+<dd><p><a class="reference external" href="https://docs.python.org/3.6/library/typing.html#typing.Union" title="(in Python v3.6)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Union</span></code></a>[<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">float</span></code></a>, <a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">int</span></code></a>]: Omitted.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Raises</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.6/library/exceptions.html#ValueError" title="(in Python v3.6)"><strong>ValueError</strong></a> – If set to a value not between 0 and 1 (inclusive).</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="entity_resolver.main.EntityResolver.attr_strategy">
+<em class="property">property </em><code class="sig-name descname">attr_strategy</code><a class="reference external" href="https://github.com/Terry1004/EntityResolution_Capstone/blob/master/src/entity_resolver/main.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#entity_resolver.main.EntityResolver.attr_strategy" title="Permalink to this definition">¶</a></dt>
+<dd><p><a class="reference external" href="https://docs.python.org/3.6/library/typing.html#typing.Mapping" title="(in Python v3.6)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Mapping</span></code></a>[<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">str</span></code></a>, <a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">str</span></code></a>]: Omitted.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="entity_resolver.main.EntityResolver.attr_types">
+<em class="property">property </em><code class="sig-name descname">attr_types</code><a class="reference external" href="https://github.com/Terry1004/EntityResolution_Capstone/blob/master/src/entity_resolver/main.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#entity_resolver.main.EntityResolver.attr_types" title="Permalink to this definition">¶</a></dt>
+<dd><p><a class="reference external" href="https://docs.python.org/3.6/library/typing.html#typing.Mapping" title="(in Python v3.6)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Mapping</span></code></a>[<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">str</span></code></a>, <a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">str</span></code></a>]: Omitted.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="entity_resolver.main.EntityResolver.average_method">
+<em class="property">property </em><code class="sig-name descname">average_method</code><a class="reference external" href="https://github.com/Terry1004/EntityResolution_Capstone/blob/master/src/entity_resolver/main.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#entity_resolver.main.EntityResolver.average_method" title="Permalink to this definition">¶</a></dt>
+<dd><p><a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">str</span></code></a>: Refer to <code class="docutils literal notranslate"><span class="pre">kwargs</span></code> parameter above.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Raises</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.6/library/exceptions.html#ValueError" title="(in Python v3.6)"><strong>ValueError</strong></a> – If set to any value other than <code class="docutils literal notranslate"><span class="pre">'min'</span></code>,
+    <code class="docutils literal notranslate"><span class="pre">'geometric'</span></code>, <code class="docutils literal notranslate"><span class="pre">'arithmetic'</span></code>, or <code class="docutils literal notranslate"><span class="pre">'max'</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="entity_resolver.main.EntityResolver.blocking_strategy">
+<em class="property">property </em><code class="sig-name descname">blocking_strategy</code><a class="reference external" href="https://github.com/Terry1004/EntityResolution_Capstone/blob/master/src/entity_resolver/main.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#entity_resolver.main.EntityResolver.blocking_strategy" title="Permalink to this definition">¶</a></dt>
+<dd><p><a class="reference external" href="https://docs.python.org/3.6/library/typing.html#typing.Callable" title="(in Python v3.6)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Callable</span></code></a>[[<a class="reference external" href="https://docs.python.org/3.6/library/typing.html#typing.Mapping" title="(in Python v3.6)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Mapping</span></code></a>[<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">str</span></code></a>, <a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">str</span></code></a>], <a class="reference external" href="https://docs.python.org/3.6/library/typing.html#typing.Mapping" title="(in Python v3.6)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Mapping</span></code></a>[<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">str</span></code></a>, <a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">str</span></code></a>]], <a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">float</span></code></a>]: Omitted.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="entity_resolver.main.EntityResolver.blocking_threshold">
+<em class="property">property </em><code class="sig-name descname">blocking_threshold</code><a class="reference external" href="https://github.com/Terry1004/EntityResolution_Capstone/blob/master/src/entity_resolver/main.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#entity_resolver.main.EntityResolver.blocking_threshold" title="Permalink to this definition">¶</a></dt>
+<dd><p><a class="reference external" href="https://docs.python.org/3.6/library/typing.html#typing.Union" title="(in Python v3.6)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Union</span></code></a>[<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">float</span></code></a>, <a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">int</span></code></a>]: Omitted.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="entity_resolver.main.EntityResolver.bootstrap_strategy">
+<em class="property">property </em><code class="sig-name descname">bootstrap_strategy</code><a class="reference external" href="https://github.com/Terry1004/EntityResolution_Capstone/blob/master/src/entity_resolver/main.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#entity_resolver.main.EntityResolver.bootstrap_strategy" title="Permalink to this definition">¶</a></dt>
+<dd><p><a class="reference external" href="https://docs.python.org/3.6/library/typing.html#typing.Optional" title="(in Python v3.6)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Optional</span></code></a>[<a class="reference external" href="https://docs.python.org/3.6/library/typing.html#typing.Callable" title="(in Python v3.6)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Callable</span></code></a>[[<a class="reference external" href="https://docs.python.org/3.6/library/typing.html#typing.Mapping" title="(in Python v3.6)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Mapping</span></code></a>[<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">str</span></code></a>, <a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">str</span></code></a>], <a class="reference external" href="https://docs.python.org/3.6/library/typing.html#typing.Mapping" title="(in Python v3.6)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Mapping</span></code></a>[<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">str</span></code></a>, <a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">str</span></code></a>]], <a class="reference external" href="https://docs.python.org/3.6/library/functions.html#bool" title="(in Python v3.6)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">bool</span></code></a>]]: Omitted.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="entity_resolver.main.EntityResolver.edge_match_threshold">
+<em class="property">property </em><code class="sig-name descname">edge_match_threshold</code><a class="reference external" href="https://github.com/Terry1004/EntityResolution_Capstone/blob/master/src/entity_resolver/main.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#entity_resolver.main.EntityResolver.edge_match_threshold" title="Permalink to this definition">¶</a></dt>
+<dd><p><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">int</span></code></a>: Omitted.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="entity_resolver.main.EntityResolver.evaluate">
+<code class="sig-name descname">evaluate</code><span class="sig-paren">(</span><em class="sig-param">ground_truth_path</em>, <em class="sig-param">resolved_mapping</em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/Terry1004/EntityResolution_Capstone/blob/master/src/entity_resolver/main.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#entity_resolver.main.EntityResolver.evaluate" title="Permalink to this definition">¶</a></dt>
+<dd><p>Evaluate the resolved result using ground truth data.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>ground_truth_path</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>) – The path to ground truth data used for
+evaluation. The data file has to <strong>strictly follow</strong> the format
+as described in <a class="reference internal" href="../quickstart.html"><span class="doc">Quickstart</span></a>.</p></li>
+<li><p><strong>resolved_mapping</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/typing.html#typing.Mapping" title="(in Python v3.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Mapping</span></code></a>) – Mapping reference id to cluster id. The reference
+ids must correspond to those in ground truth data, while their
+cluster ids may differ.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3.6/library/typing.html#typing.Any" title="(in Python v3.6)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code></a></p>
+</dd>
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p><ul class="simple">
+<li><p>If <code class="docutils literal notranslate"><span class="pre">evaluator_strategy</span></code> is set to <code class="docutils literal notranslate"><span class="pre">'precision_recall'</span></code>, the
+result is a tuple of three numbers representing precision,
+recall, and f1 in the order.</p></li>
+<li><p>Otherwise, the result is a single number representing the score
+computed as specified by <code class="docutils literal notranslate"><span class="pre">evaluator_strategy</span></code>.</p></li>
+</ul>
+</p>
+</dd>
+</dl>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<p>It ultimately calls the <code class="docutils literal notranslate"><span class="pre">evaluate</span></code> method of an <code class="docutils literal notranslate"><span class="pre">Evaluator</span></code>
+object in <a class="reference internal" href="entity_resolver.core.evaluator.html"><span class="doc">entity_resolver.core.evaluator module</span></a>.</p>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="entity_resolver.main.EntityResolver.evaluator_strategy">
+<em class="property">property </em><code class="sig-name descname">evaluator_strategy</code><a class="reference external" href="https://github.com/Terry1004/EntityResolution_Capstone/blob/master/src/entity_resolver/main.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#entity_resolver.main.EntityResolver.evaluator_strategy" title="Permalink to this definition">¶</a></dt>
+<dd><p><a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">str</span></code></a>: Omitted</p>
+<dl class="field-list simple">
+<dt class="field-odd">Raises</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.6/library/exceptions.html#ValueError" title="(in Python v3.6)"><strong>ValueError</strong></a> – If set to any value other than a callable,
+    <code class="docutils literal notranslate"><span class="pre">'precision_recall'</span></code>, <code class="docutils literal notranslate"><span class="pre">'ami'</span></code>, or <code class="docutils literal notranslate"><span class="pre">'v_measure'</span></code>.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="entity_resolver.main.EntityResolver.first_attr">
+<em class="property">property </em><code class="sig-name descname">first_attr</code><a class="reference external" href="https://github.com/Terry1004/EntityResolution_Capstone/blob/master/src/entity_resolver/main.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#entity_resolver.main.EntityResolver.first_attr" title="Permalink to this definition">¶</a></dt>
+<dd><p><a class="reference external" href="https://docs.python.org/3.6/library/typing.html#typing.Optional" title="(in Python v3.6)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Optional</span></code></a>[<a class="reference external" href="https://docs.python.org/3.6/library/typing.html#typing.Callable" title="(in Python v3.6)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Callable</span></code></a>[[<a class="reference external" href="https://docs.python.org/3.6/library/typing.html#typing.Mapping" title="(in Python v3.6)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Mapping</span></code></a>[<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">str</span></code></a>, <a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">str</span></code></a>]], <a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">str</span></code></a>]]: Omitted.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="entity_resolver.main.EntityResolver.first_attr_raw">
+<em class="property">property </em><code class="sig-name descname">first_attr_raw</code><a class="reference external" href="https://github.com/Terry1004/EntityResolution_Capstone/blob/master/src/entity_resolver/main.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#entity_resolver.main.EntityResolver.first_attr_raw" title="Permalink to this definition">¶</a></dt>
+<dd><p><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#bool" title="(in Python v3.6)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">bool</span></code></a>: Omitted.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="entity_resolver.main.EntityResolver.jw_prefix_weight">
+<em class="property">property </em><code class="sig-name descname">jw_prefix_weight</code><a class="reference external" href="https://github.com/Terry1004/EntityResolution_Capstone/blob/master/src/entity_resolver/main.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#entity_resolver.main.EntityResolver.jw_prefix_weight" title="Permalink to this definition">¶</a></dt>
+<dd><p><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">float</span></code></a>: Refer to <code class="docutils literal notranslate"><span class="pre">kwargs</span></code> parameter above.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="entity_resolver.main.EntityResolver.linkage">
+<em class="property">property </em><code class="sig-name descname">linkage</code><a class="reference external" href="https://github.com/Terry1004/EntityResolution_Capstone/blob/master/src/entity_resolver/main.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#entity_resolver.main.EntityResolver.linkage" title="Permalink to this definition">¶</a></dt>
+<dd><p><a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">str</span></code></a>: Omitted.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Raises</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.6/library/exceptions.html#ValueError" title="(in Python v3.6)"><strong>ValueError</strong></a> – If set to any value other than <code class="docutils literal notranslate"><span class="pre">'min'</span></code>, <code class="docutils literal notranslate"><span class="pre">'max'</span></code>, or
+    <code class="docutils literal notranslate"><span class="pre">'average'</span></code>.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="entity_resolver.main.EntityResolver.plot_prc">
+<em class="property">property </em><code class="sig-name descname">plot_prc</code><a class="reference external" href="https://github.com/Terry1004/EntityResolution_Capstone/blob/master/src/entity_resolver/main.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#entity_resolver.main.EntityResolver.plot_prc" title="Permalink to this definition">¶</a></dt>
+<dd><p><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#bool" title="(in Python v3.6)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">bool</span></code></a>: Omitted</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="entity_resolver.main.EntityResolver.raw_blocking">
+<em class="property">property </em><code class="sig-name descname">raw_blocking</code><a class="reference external" href="https://github.com/Terry1004/EntityResolution_Capstone/blob/master/src/entity_resolver/main.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#entity_resolver.main.EntityResolver.raw_blocking" title="Permalink to this definition">¶</a></dt>
+<dd><p><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#bool" title="(in Python v3.6)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">bool</span></code></a>: Omitted.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="entity_resolver.main.EntityResolver.raw_bootstrap">
+<em class="property">property </em><code class="sig-name descname">raw_bootstrap</code><a class="reference external" href="https://github.com/Terry1004/EntityResolution_Capstone/blob/master/src/entity_resolver/main.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#entity_resolver.main.EntityResolver.raw_bootstrap" title="Permalink to this definition">¶</a></dt>
+<dd><p><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#bool" title="(in Python v3.6)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">bool</span></code></a>: Omitted.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="entity_resolver.main.EntityResolver.rel_strategy">
+<em class="property">property </em><code class="sig-name descname">rel_strategy</code><a class="reference external" href="https://github.com/Terry1004/EntityResolution_Capstone/blob/master/src/entity_resolver/main.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#entity_resolver.main.EntityResolver.rel_strategy" title="Permalink to this definition">¶</a></dt>
+<dd><p><a class="reference external" href="https://docs.python.org/3.6/library/typing.html#typing.Optional" title="(in Python v3.6)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Optional</span></code></a>[<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">str</span></code></a>]: Omitted.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Raises</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.6/library/exceptions.html#ValueError" title="(in Python v3.6)"><strong>ValueError</strong></a> – If set to any value other than <code class="docutils literal notranslate"><span class="pre">'jaccard_coef'</span></code>,
+    <code class="docutils literal notranslate"><span class="pre">'jaraccard_coef_fr'</span></code>, <code class="docutils literal notranslate"><span class="pre">'adar_neighbor'</span></code>,
+    <code class="docutils literal notranslate"><span class="pre">'adar_neighbor_fr'</span></code>, <code class="docutils literal notranslate"><span class="pre">'adar_attr'</span></code>, or <code class="docutils literal notranslate"><span class="pre">'adar_attr_fr'</span></code>.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="entity_resolver.main.EntityResolver.resolve">
+<code class="sig-name descname">resolve</code><span class="sig-paren">(</span><em class="sig-param">graph_path</em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/Terry1004/EntityResolution_Capstone/blob/master/src/entity_resolver/main.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#entity_resolver.main.EntityResolver.resolve" title="Permalink to this definition">¶</a></dt>
+<dd><p>Resolve entities in the given data and return the entity mapping.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>graph_path</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>) – The path to the input data for entity resolution. The
+data file has to <strong>strictly follow</strong> the format as described in
+<a class="reference internal" href="../quickstart.html"><span class="doc">Quickstart</span></a>.</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3.6/library/collections.html#collections.OrderedDict" title="(in Python v3.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">OrderedDict</span></code></a></p>
+</dd>
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>Mapping reference ids to cluster ids. The dictionary is sorted
+(key-value pairs are inserted) in ascending order of reference ids.</p>
+</dd>
+<dt class="field-even">Raises</dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3.6/library/exceptions.html#ValueError" title="(in Python v3.6)"><strong>ValueError</strong></a> – If <code class="docutils literal notranslate"><span class="pre">plot_prc</span></code> is set to <code class="docutils literal notranslate"><span class="pre">True</span></code>.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="entity_resolver.main.EntityResolver.resolve_and_eval">
+<code class="sig-name descname">resolve_and_eval</code><span class="sig-paren">(</span><em class="sig-param">graph_path</em>, <em class="sig-param">ground_truth_path</em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/Terry1004/EntityResolution_Capstone/blob/master/src/entity_resolver/main.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#entity_resolver.main.EntityResolver.resolve_and_eval" title="Permalink to this definition">¶</a></dt>
+<dd><p>Resolve entities in the given data and evaluate the result.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>graph_path</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>) – The path to the input data for entity resolution. The
+data file has to <strong>strictly follow</strong> the format as described in
+<a class="reference internal" href="../quickstart.html"><span class="doc">Quickstart</span></a>.</p></li>
+<li><p><strong>ground_truth_path</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>) – The path to ground truth data used for
+evaulation. The data file has to <strong>strictly follow</strong> the format
+as described in <a class="reference internal" href="../quickstart.html"><span class="doc">Quickstart</span></a>.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3.6/library/typing.html#typing.Union" title="(in Python v3.6)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code></a>[<a class="reference external" href="https://docs.python.org/3.6/library/typing.html#typing.Any" title="(in Python v3.6)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code></a>, <a class="reference external" href="https://docs.python.org/3.6/library/typing.html#typing.Tuple" title="(in Python v3.6)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Tuple</span></code></a>[<a class="reference external" href="https://docs.python.org/3.6/library/typing.html#typing.Any" title="(in Python v3.6)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code></a>, <a class="reference external" href="https://docs.python.org/3.6/library/typing.html#typing.List" title="(in Python v3.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code></a>[<a class="reference external" href="https://docs.python.org/3.6/library/typing.html#typing.Tuple" title="(in Python v3.6)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Tuple</span></code></a>[<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a>, <a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a>]]]]</p>
+</dd>
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p><p>This depends on the values of <code class="docutils literal notranslate"><span class="pre">evaluator_strategy</span></code> and
+<code class="docutils literal notranslate"><span class="pre">plot_prc</span></code>.</p>
+<ul class="simple">
+<li><p>If <code class="docutils literal notranslate"><span class="pre">evaluator_strategy</span> <span class="pre">==</span> <span class="pre">'precision_recall'</span></code>:</p>
+<ul>
+<li><p>If <code class="docutils literal notranslate"><span class="pre">plot_prc</span> <span class="pre">==</span> <span class="pre">False</span></code>, the result is a tuple of three
+numbers representing precision, recall, and f1 in the order.</p></li>
+<li><p>If <code class="docutils literal notranslate"><span class="pre">plot_prc</span> <span class="pre">==</span> <span class="pre">True</span></code>, the result is a tuple of two objects:</p>
+<ul>
+<li><p>The first one is a tuple of three numbers representing
+precision, recall, and f1 in the order, same as above.</p></li>
+<li><p>The second is a list of tuples, each consisting of the
+precision and recall value at different steps of the
+algorithm (reflecting the behavior with different
+<code class="docutils literal notranslate"><span class="pre">similarity_threshold</span></code>).</p></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><p>If <code class="docutils literal notranslate"><span class="pre">evaluator_strategy</span> <span class="pre">!=</span> <span class="pre">'precision_recall'</span></code>:</p>
+<ul>
+<li><p>If <code class="docutils literal notranslate"><span class="pre">plot_prc</span> <span class="pre">==</span> <span class="pre">False</span></code>, the result is a single number
+representing the score computed as specified by
+<code class="docutils literal notranslate"><span class="pre">evaluator_strategy</span></code>.</p></li>
+<li><p>If <code class="docutils literal notranslate"><span class="pre">plot_prc</span> <span class="pre">==</span> <span class="pre">True</span></code>, the result is a tuple of two objects:</p>
+<ul>
+<li><p>The first one is a single number same as in the
+<code class="docutils literal notranslate"><span class="pre">plot_prc</span> <span class="pre">==</span> <span class="pre">False</span></code> case.</p></li>
+<li><p>The second one is a list of tuples same as in the second
+object in the <code class="docutils literal notranslate"><span class="pre">evaluator_strategy</span> <span class="pre">==</span> <span class="pre">'precision_recall'</span></code>
+and <code class="docutils literal notranslate"><span class="pre">plot_prc</span> <span class="pre">==</span> <span class="pre">True</span></code> case.</p></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="entity_resolver.main.EntityResolver.second_attr">
+<em class="property">property </em><code class="sig-name descname">second_attr</code><a class="reference external" href="https://github.com/Terry1004/EntityResolution_Capstone/blob/master/src/entity_resolver/main.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#entity_resolver.main.EntityResolver.second_attr" title="Permalink to this definition">¶</a></dt>
+<dd><p><a class="reference external" href="https://docs.python.org/3.6/library/typing.html#typing.Optional" title="(in Python v3.6)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Optional</span></code></a>[<a class="reference external" href="https://docs.python.org/3.6/library/typing.html#typing.Callable" title="(in Python v3.6)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Callable</span></code></a>[[<a class="reference external" href="https://docs.python.org/3.6/library/typing.html#typing.Mapping" title="(in Python v3.6)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Mapping</span></code></a>[<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">str</span></code></a>, <a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">str</span></code></a>]], <a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">str</span></code></a>]]: Omitted.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="entity_resolver.main.EntityResolver.second_attr_raw">
+<em class="property">property </em><code class="sig-name descname">second_attr_raw</code><a class="reference external" href="https://github.com/Terry1004/EntityResolution_Capstone/blob/master/src/entity_resolver/main.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#entity_resolver.main.EntityResolver.second_attr_raw" title="Permalink to this definition">¶</a></dt>
+<dd><p><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#bool" title="(in Python v3.6)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">bool</span></code></a>: Omitted.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="entity_resolver.main.EntityResolver.second_sim">
+<em class="property">property </em><code class="sig-name descname">second_sim</code><a class="reference external" href="https://github.com/Terry1004/EntityResolution_Capstone/blob/master/src/entity_resolver/main.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#entity_resolver.main.EntityResolver.second_sim" title="Permalink to this definition">¶</a></dt>
+<dd><p><a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">str</span></code></a>: Refer to <code class="docutils literal notranslate"><span class="pre">kwargs</span></code> parameter above.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Raises</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.6/library/exceptions.html#ValueError" title="(in Python v3.6)"><strong>ValueError</strong></a> – If set to any value other than <code class="docutils literal notranslate"><span class="pre">'jaro_winkler'</span></code>,
+    <code class="docutils literal notranslate"><span class="pre">'jaro'</span></code>, or <code class="docutils literal notranslate"><span class="pre">'scaled_lev'</span></code>.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="entity_resolver.main.EntityResolver.seed">
+<em class="property">property </em><code class="sig-name descname">seed</code><a class="reference external" href="https://github.com/Terry1004/EntityResolution_Capstone/blob/master/src/entity_resolver/main.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#entity_resolver.main.EntityResolver.seed" title="Permalink to this definition">¶</a></dt>
+<dd><p><a class="reference external" href="https://docs.python.org/3.6/library/typing.html#typing.Optional" title="(in Python v3.6)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Optional</span></code></a>[<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">int</span></code></a>]: Omitted.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="entity_resolver.main.EntityResolver.similarity_threshold">
+<em class="property">property </em><code class="sig-name descname">similarity_threshold</code><a class="reference external" href="https://github.com/Terry1004/EntityResolution_Capstone/blob/master/src/entity_resolver/main.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#entity_resolver.main.EntityResolver.similarity_threshold" title="Permalink to this definition">¶</a></dt>
+<dd><p><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">float</span></code></a>: Omitted.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="entity_resolver.main.EntityResolver.stfidf_threshold">
+<em class="property">property </em><code class="sig-name descname">stfidf_threshold</code><a class="reference external" href="https://github.com/Terry1004/EntityResolution_Capstone/blob/master/src/entity_resolver/main.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#entity_resolver.main.EntityResolver.stfidf_threshold" title="Permalink to this definition">¶</a></dt>
+<dd><p><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">float</span></code></a>: Refer to <code class="docutils literal notranslate"><span class="pre">kwargs</span></code> parameter above.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="entity_resolver.main.EntityResolver.weights">
+<em class="property">property </em><code class="sig-name descname">weights</code><a class="reference external" href="https://github.com/Terry1004/EntityResolution_Capstone/blob/master/src/entity_resolver/main.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#entity_resolver.main.EntityResolver.weights" title="Permalink to this definition">¶</a></dt>
+<dd><p><a class="reference external" href="https://docs.python.org/3.6/library/typing.html#typing.Optional" title="(in Python v3.6)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Optional</span></code></a>[<a class="reference external" href="https://docs.python.org/3.6/library/typing.html#typing.Mapping" title="(in Python v3.6)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Mapping</span></code></a>[<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">str</span></code></a>, <a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">float</span></code></a>]]: Omitted.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Raises</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.6/library/exceptions.html#ValueError" title="(in Python v3.6)"><strong>ValueError</strong></a> – If set to a dictionary whose values do not sum to 1.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="entity_resolver.scripts.html" class="btn btn-neutral float-right" title="entity_resolver.scripts module" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="entity_resolver.parser.ground_truth_parser.html" class="btn btn-neutral float-left" title="entity_resolver.parser.ground_truth_parser module" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2019, Y. Cao, K. Kang, X. Huang, Y. Huang, Y. Wang
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>
