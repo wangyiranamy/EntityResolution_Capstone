@@ -655,7 +655,7 @@ class ClusteringMetrics:
     @classmethod
     def precision_recall(
         cls,
-        labels: Mapping,
+        labels: collections.OrderedDict,
         preds: collections.OrderedDict,
         log: bool = True,
         **kwargs
@@ -664,7 +664,9 @@ class ClusteringMetrics:
 
         Args:
             labels: Mapping reference ids to cluster ids. The cluster ids may
-                be different from those in the ground truth.
+                be different from those in the ground truth.  The dictionary is
+                sorted (key-value pairs are inserted) in ascending order of
+                node id.
             preds: Mapping reference ids to cluster ids. The dictionary is
                 sorted (key-value pairs are inserted) in ascending order of
                 node id.
@@ -696,7 +698,7 @@ class ClusteringMetrics:
     @classmethod
     def v_measure(
         cls,
-        labels: Mapping,
+        labels: collections.OrderedDict,
         preds: collections.OrderedDict,
         **kwargs
     ) -> float:
@@ -706,7 +708,9 @@ class ClusteringMetrics:
 
         Args:
             labels: Mapping reference ids to cluster ids. The cluster ids may
-                be different from those in the ground truth.
+                be different from those in the ground truth.  The dictionary is
+                sorted (key-value pairs are inserted) in ascending order of
+                node id.
             preds: Mapping reference ids to cluster ids. The dictionary is
                 sorted (key-value pairs are inserted) in ascending order of
                 node id.
@@ -726,7 +730,7 @@ class ClusteringMetrics:
     @classmethod
     def ami(
         cls,
-        labels: Mapping,
+        labels: collections.OrderedDict,
         preds: collections.OrderedDict,
         average_method: str = 'max',
         **kwargs
@@ -737,7 +741,9 @@ class ClusteringMetrics:
 
         Args:
             labels: Mapping reference ids to cluster ids. The cluster ids may
-                be different from those in the ground truth.
+                be different from those in the ground truth.  The dictionary is
+                sorted (key-value pairs are inserted) in ascending order of
+                node id.
             preds: Mapping reference ids to cluster ids. The dictionary is
                 sorted (key-value pairs are inserted) in ascending order of
                 node id.

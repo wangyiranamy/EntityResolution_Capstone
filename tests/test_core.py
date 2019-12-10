@@ -36,6 +36,13 @@ class TestEvaluator:
         assert round(precision_recall_score[0], 2) == 0.33
         assert round(precision_recall_score[1], 2) == 0.5
         assert round(precision_recall_score[2], 2) == 0.4
+    
+    def test_evaluator_func(self, ground_truth, resolved_mapping):
+        evaluator = Evaluator(
+            strategy=lambda labels, preds: len(labels)+ len(preds)
+        )
+        score = evaluator.evaluate(ground_truth, resolved_mapping)
+        assert score == 10
 
 
 class TestResolver:
@@ -201,4 +208,20 @@ class TestResolver:
         resolver._graph = graph
         with pytest.raises(ValueError):
             resolver._parse_strategy()
+        cleanup()
+
+    def test_attr_stategy_func(self, simple_graph_suite):
+        graph, cleanup = simple_graph_suite
+        resolver = Resolver(
+            None,
+            alpha=0.5,
+            attr_strategy={
+                'text1': 'stfidf',
+                'text2': lambda l1, l2: len(l1)*10 + len(l2)*10
+                }
+            )
+        resolver._init_cache(graph)
+        node1 = [node for node in graph.nodes if node.id == 1][0]
+        node2 = [node for node in graph.nodes if node.id == 2][0]
+        assert resolver._calc_node_attr_sim(node1, node2) == 10.5
         cleanup()

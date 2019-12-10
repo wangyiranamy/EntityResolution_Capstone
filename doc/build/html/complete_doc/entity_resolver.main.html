@@ -190,7 +190,8 @@ to their data.</p>
 <code class="docutils literal notranslate"><span class="pre">'person_entity'</span></code> and <code class="docutils literal notranslate"><span class="pre">'text'</span></code> as values, the effects of this argument
 is restricted to certain preprocessing, default attribute similarity
 function, and deciding what values are passed when computing attribute
-similarities.</p>
+similarities (thus affecting inputs if users are passing functions to
+<code class="docutils literal notranslate"><span class="pre">attr_strategy</span></code>).</p>
 <p>If an unsupported type is input, then no preprocessings are done and their
 original values are passed to computation of attribute similarity
 functions. The attribute name with an unsupported type <strong>must</strong> be mapped
@@ -224,14 +225,20 @@ cluster similarities. It should be between 0 and 1 (inclusive).</p></li>
 <li><p><strong>weights</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/typing.html#typing.Optional" title="(in Python v3.6)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code></a>[<a class="reference external" href="https://docs.python.org/3.6/library/typing.html#typing.Mapping" title="(in Python v3.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Mapping</span></code></a>[<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>, <a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a>]]) – Mapping attribute names to their ratio when calculating
 attribute similarities. The ratio should sum to 1. If it is
 <code class="docutils literal notranslate"><span class="pre">None</span></code> (default), each attribute is assigned equal weight.</p></li>
-<li><p><strong>attr_strategy</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/typing.html#typing.Mapping" title="(in Python v3.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Mapping</span></code></a>[<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>, <a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>]) – Mapping attribute names to similarity strategy names.
-Valid values are <code class="docutils literal notranslate"><span class="pre">'stfidf'</span></code>, <code class="docutils literal notranslate"><span class="pre">'jaro_winkler'</span></code>, and <code class="docutils literal notranslate"><span class="pre">'jaro'</span></code>.
-Refer to <a class="reference internal" href="../advanced_guide.html"><span class="doc">Advanced Guide</span></a> for more details.</p></li>
+<li><p><strong>attr_strategy</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/typing.html#typing.Mapping" title="(in Python v3.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Mapping</span></code></a>[<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>, <a class="reference external" href="https://docs.python.org/3.6/library/typing.html#typing.Union" title="(in Python v3.6)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code></a>[<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>, <a class="reference external" href="https://docs.python.org/3.6/library/typing.html#typing.Callable" title="(in Python v3.6)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Callable</span></code></a>]]) – Mapping attribute names to similarity strategy names.
+Valid values are either strings including <code class="docutils literal notranslate"><span class="pre">'stfidf'</span></code>,
+<code class="docutils literal notranslate"><span class="pre">'jaro_winkler'</span></code>, and <code class="docutils literal notranslate"><span class="pre">'jaro'</span></code>. or a callable that takes two
+attribute values and return their similarity score. If not
+specified, a default strategy will be employed depending on the
+attribute type: <code class="docutils literal notranslate"><span class="pre">'text'</span></code> for soft-tfidf, and <code class="docutils literal notranslate"><span class="pre">person_entity</span></code>
+for Jaro-Winkler. Refer to <a class="reference internal" href="../advanced_guide.html"><span class="doc">Advanced Guide</span></a> for more
+details.</p></li>
 <li><p><strong>rel_strategy</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/typing.html#typing.Optional" title="(in Python v3.6)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code></a>[<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>]) – Name of the strategy to compute relational similarity.
 Valid values are <code class="docutils literal notranslate"><span class="pre">'jaccard_coef'</span></code>, <code class="docutils literal notranslate"><span class="pre">'jaraccard_coef_fr'</span></code>,
-<code class="docutils literal notranslate"><span class="pre">'adar_neighbor'</span></code>, <code class="docutils literal notranslate"><span class="pre">'adar_neighbor_fr'</span></code>, <code class="docutils literal notranslate"><span class="pre">'adar_attr'</span></code>,
-<code class="docutils literal notranslate"><span class="pre">'adar_attr_fr'</span></code>. Refer to <a class="reference internal" href="../advanced_guide.html"><span class="doc">Advanced Guide</span></a> for more
-details.</p></li>
+<code class="docutils literal notranslate"><span class="pre">'adar_neighbor'</span></code>, <code class="docutils literal notranslate"><span class="pre">'adar_neighbor_fr'</span></code>, <code class="docutils literal notranslate"><span class="pre">'adar_attr'</span></code>, and
+<code class="docutils literal notranslate"><span class="pre">'adar_attr_fr'</span></code>. If it is <code class="docutils literal notranslate"><span class="pre">None</span></code>, <code class="docutils literal notranslate"><span class="pre">'jaccard_coef'</span></code> for
+Jaccard Coefficient will be used. Refer to <a class="reference internal" href="../advanced_guide.html"><span class="doc">Advanced Guide</span></a>
+for more details.</p></li>
 <li><p><strong>blocking_threshold</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/typing.html#typing.Union" title="(in Python v3.6)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code></a>[<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a>, <a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a>]) – The threshold for allowing two references to be put
 in one bucket during blocking. Only references with distance
 (computed by <code class="docutils literal notranslate"><span class="pre">blocking_strategy</span></code>) <strong>strictly less than</strong> this
@@ -269,10 +276,13 @@ on reference attribute similarities. Valid values are <code class="docutils lite
 more details.</p></li>
 <li><p><strong>similarity_threshold</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a>) – When the entry with the largest similarity in the
 priority queue is less than this value, the algorithm stops.</p></li>
-<li><p><strong>evaluator_strategy</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>) – The strategy name to be used for evaluation when
-needed. Valid values are <code class="docutils literal notranslate"><span class="pre">'precision_recall'</span></code>, <code class="docutils literal notranslate"><span class="pre">'ami'</span></code>, and
-<code class="docutils literal notranslate"><span class="pre">'v_measure'</span></code>. Refer to <a class="reference internal" href="../advanced_guide.html"><span class="doc">Advanced Guide</span></a> for more
-details.</p></li>
+<li><p><strong>evaluator_strategy</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/typing.html#typing.Union" title="(in Python v3.6)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code></a>[<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>, <a class="reference external" href="https://docs.python.org/3.6/library/typing.html#typing.Callable" title="(in Python v3.6)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Callable</span></code></a>]) – The strategy name to be used for evaluation when
+needed. Valid values are either strings including
+<code class="docutils literal notranslate"><span class="pre">'precision_recall'</span></code>, <code class="docutils literal notranslate"><span class="pre">'ami'</span></code>, and <code class="docutils literal notranslate"><span class="pre">'v_measure'</span></code>, or a
+callable that follows the signatures of class methods in
+<a class="reference internal" href="entity_resolver.core.utils.html#entity_resolver.core.utils.ClusteringMetrics" title="entity_resolver.core.utils.ClusteringMetrics"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ClusteringMetrics</span></code></a> (two
+<a class="reference external" href="https://docs.python.org/3.6/library/collections.html#collections.OrderedDict" title="(in Python v3.6)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">OrderedDict</span></code></a> as inputs and any performance indicator
+as output). Refer to <a class="reference internal" href="../advanced_guide.html"><span class="doc">Advanced Guide</span></a> for more details.</p></li>
 <li><p><strong>seed</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/typing.html#typing.Optional" title="(in Python v3.6)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code></a>[<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a>]) – The random seed to be used in blocking, which is the only source
 of randomness in this algorithm. If it is <code class="docutils literal notranslate"><span class="pre">None</span></code> (default), the
 current system time is used as the seed.</p></li>
@@ -332,13 +342,6 @@ the running time, and the plot is not customizable. However, if it is
 set to <code class="docutils literal notranslate"><span class="pre">True</span></code>, the <code class="docutils literal notranslate"><span class="pre">resolve_and_eval</span></code> method will return the list
 of precision and recall scores to plot the curve. It is recommended to
 store it for further usage.</p>
-</div>
-<div class="admonition-todo admonition" id="id1">
-<p class="admonition-title">Todo</p>
-<ul class="simple">
-<li><p>Add support for custom similarity functions.</p></li>
-<li><p>Add support for custome evaluation functions.</p></li>
-</ul>
 </div>
 <dl class="attribute">
 <dt id="entity_resolver.main.EntityResolver._attr_types">
@@ -401,7 +404,7 @@ store it for further usage.</p>
 <dd><p>Omitted.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.6/library/typing.html#typing.Mapping" title="(in Python v3.6)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Mapping</span></code></a>[<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">str</span></code></a>, <a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">str</span></code></a>]</p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.6/library/typing.html#typing.Mapping" title="(in Python v3.6)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Mapping</span></code></a>[<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">str</span></code></a>, <a class="reference external" href="https://docs.python.org/3.6/library/typing.html#typing.Union" title="(in Python v3.6)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Union</span></code></a>[<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">str</span></code></a>, <a class="reference external" href="https://docs.python.org/3.6/library/typing.html#typing.Callable" title="(in Python v3.6)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Callable</span></code></a>]]</p>
 </dd>
 </dl>
 </dd></dl>
@@ -412,7 +415,7 @@ store it for further usage.</p>
 <dd><p>Omitted.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.6/library/typing.html#typing.Optional" title="(in Python v3.6)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Optional</span></code></a>[<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">str</span></code></a>]</p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.6/library/typing.html#typing.Optional" title="(in Python v3.6)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Optional</span></code></a>[<a class="reference external" href="https://docs.python.org/3.6/library/typing.html#typing.Union" title="(in Python v3.6)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Union</span></code></a>[<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">str</span></code></a>, <a class="reference external" href="https://docs.python.org/3.6/library/typing.html#typing.Callable" title="(in Python v3.6)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Callable</span></code></a>]]</p>
 </dd>
 </dl>
 </dd></dl>
@@ -710,7 +713,7 @@ when its own <code class="docutils literal notranslate"><span class="pre">verbos
 <dl class="method">
 <dt id="entity_resolver.main.EntityResolver.blocking_strategy">
 <em class="property">property </em><code class="sig-name descname">blocking_strategy</code><a class="reference external" href="https://github.com/wangyiranamy/EntityResolution_Capstone/blob/master/src/entity_resolver/main.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#entity_resolver.main.EntityResolver.blocking_strategy" title="Permalink to this definition">¶</a></dt>
-<dd><p><a class="reference external" href="https://docs.python.org/3.6/library/typing.html#typing.Callable" title="(in Python v3.6)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Callable</span></code></a>[[<a class="reference external" href="https://docs.python.org/3.6/library/typing.html#typing.Mapping" title="(in Python v3.6)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Mapping</span></code></a>[<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">str</span></code></a>, <a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">str</span></code></a>], <a class="reference external" href="https://docs.python.org/3.6/library/typing.html#typing.Mapping" title="(in Python v3.6)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Mapping</span></code></a>[<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">str</span></code></a>, <a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">str</span></code></a>]],`float`]: Omitted.</p>
+<dd><p><a class="reference external" href="https://docs.python.org/3.6/library/typing.html#typing.Callable" title="(in Python v3.6)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Callable</span></code></a>[[<a class="reference external" href="https://docs.python.org/3.6/library/typing.html#typing.Mapping" title="(in Python v3.6)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Mapping</span></code></a>[<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">str</span></code></a>, <a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">str</span></code></a>], <a class="reference external" href="https://docs.python.org/3.6/library/typing.html#typing.Mapping" title="(in Python v3.6)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Mapping</span></code></a>[<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">str</span></code></a>, <a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">str</span></code></a>]], <a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">float</span></code></a>]: Omitted.</p>
 </dd></dl>
 
 <dl class="method">
@@ -773,8 +776,8 @@ object in <a class="reference internal" href="entity_resolver.core.evaluator.htm
 <dd><p><a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">str</span></code></a>: Omitted</p>
 <dl class="field-list simple">
 <dt class="field-odd">Raises</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.6/library/exceptions.html#ValueError" title="(in Python v3.6)"><strong>ValueError</strong></a> – If set to any value other than <code class="docutils literal notranslate"><span class="pre">'precision_recall'</span></code>,
-    <code class="docutils literal notranslate"><span class="pre">'ami'</span></code>, or <code class="docutils literal notranslate"><span class="pre">'v_measure'</span></code>.</p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.6/library/exceptions.html#ValueError" title="(in Python v3.6)"><strong>ValueError</strong></a> – If set to any value other than a callable,
+    <code class="docutils literal notranslate"><span class="pre">'precision_recall'</span></code>, <code class="docutils literal notranslate"><span class="pre">'ami'</span></code>, or <code class="docutils literal notranslate"><span class="pre">'v_measure'</span></code>.</p>
 </dd>
 </dl>
 </dd></dl>
@@ -831,6 +834,13 @@ object in <a class="reference internal" href="entity_resolver.core.evaluator.htm
 <dt id="entity_resolver.main.EntityResolver.rel_strategy">
 <em class="property">property </em><code class="sig-name descname">rel_strategy</code><a class="reference external" href="https://github.com/wangyiranamy/EntityResolution_Capstone/blob/master/src/entity_resolver/main.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#entity_resolver.main.EntityResolver.rel_strategy" title="Permalink to this definition">¶</a></dt>
 <dd><p><a class="reference external" href="https://docs.python.org/3.6/library/typing.html#typing.Optional" title="(in Python v3.6)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Optional</span></code></a>[<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">str</span></code></a>]: Omitted.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Raises</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.6/library/exceptions.html#ValueError" title="(in Python v3.6)"><strong>ValueError</strong></a> – If set to any value other than <code class="docutils literal notranslate"><span class="pre">'jaccard_coef'</span></code>,
+    <code class="docutils literal notranslate"><span class="pre">'jaraccard_coef_fr'</span></code>, <code class="docutils literal notranslate"><span class="pre">'adar_neighbor'</span></code>,
+    <code class="docutils literal notranslate"><span class="pre">'adar_neighbor_fr'</span></code>, <code class="docutils literal notranslate"><span class="pre">'adar_attr'</span></code>, or <code class="docutils literal notranslate"><span class="pre">'adar_attr_fr'</span></code>.</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="method">
@@ -993,7 +1003,7 @@ and <code class="docutils literal notranslate"><span class="pre">plot_prc</span>
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2019, Yiran Wang
+        &copy; Copyright 2019, Y. Cao, K. Kang, X. Huang, Y. Huang, Y. Wang
 
     </p>
   </div>

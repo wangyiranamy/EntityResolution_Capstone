@@ -212,8 +212,10 @@ clustering metric computations.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>labels</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/typing.html#typing.Mapping" title="(in Python v3.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Mapping</span></code></a>) – Mapping reference ids to cluster ids. The cluster ids may
-be different from those in the ground truth.</p></li>
+<li><p><strong>labels</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/collections.html#collections.OrderedDict" title="(in Python v3.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">OrderedDict</span></code></a>) – Mapping reference ids to cluster ids. The cluster ids may
+be different from those in the ground truth.  The dictionary is
+sorted (key-value pairs are inserted) in ascending order of
+node id.</p></li>
 <li><p><strong>preds</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/collections.html#collections.OrderedDict" title="(in Python v3.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">OrderedDict</span></code></a>) – Mapping reference ids to cluster ids. The dictionary is
 sorted (key-value pairs are inserted) in ascending order of
 node id.</p></li>
@@ -243,8 +245,10 @@ scikit-learn.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>labels</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/typing.html#typing.Mapping" title="(in Python v3.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Mapping</span></code></a>) – Mapping reference ids to cluster ids. The cluster ids may
-be different from those in the ground truth.</p></li>
+<li><p><strong>labels</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/collections.html#collections.OrderedDict" title="(in Python v3.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">OrderedDict</span></code></a>) – Mapping reference ids to cluster ids. The cluster ids may
+be different from those in the ground truth.  The dictionary is
+sorted (key-value pairs are inserted) in ascending order of
+node id.</p></li>
 <li><p><strong>preds</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/collections.html#collections.OrderedDict" title="(in Python v3.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">OrderedDict</span></code></a>) – Mapping reference ids to cluster ids. The dictionary is
 sorted (key-value pairs are inserted) in ascending order of
 node id.</p></li>
@@ -268,8 +272,10 @@ node id.</p></li>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>labels</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/typing.html#typing.Mapping" title="(in Python v3.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Mapping</span></code></a>) – Mapping reference ids to cluster ids. The cluster ids may
-be different from those in the ground truth.</p></li>
+<li><p><strong>labels</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/collections.html#collections.OrderedDict" title="(in Python v3.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">OrderedDict</span></code></a>) – Mapping reference ids to cluster ids. The cluster ids may
+be different from those in the ground truth.  The dictionary is
+sorted (key-value pairs are inserted) in ascending order of
+node id.</p></li>
 <li><p><strong>preds</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/collections.html#collections.OrderedDict" title="(in Python v3.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">OrderedDict</span></code></a>) – Mapping reference ids to cluster ids. The dictionary is
 sorted (key-value pairs are inserted) in ascending order of
 node id.</p></li>
@@ -1340,7 +1346,7 @@ time spent by the time taken for this method call.</p>
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2019, Yiran Wang
+        &copy; Copyright 2019, Y. Cao, K. Kang, X. Huang, Y. Huang, Y. Wang
 
     </p>
   </div>

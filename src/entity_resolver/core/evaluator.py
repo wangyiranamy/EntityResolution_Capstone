@@ -3,13 +3,13 @@
 Example:
 
     >>> from entity_resolver.core import Evaluator
-    >>> evaluator = Evaluator(strategy_str='ami')  # AMI score
+    >>> evaluator = Evaluator(strategy='ami')  # AMI score
     >>> score = evaluator.evaluate(labels, preds)
 """
 
 import itertools
 import collections
-from typing import Mapping, Dict, Any
+from typing import Mapping, Dict, Any, Union, Callable
 from .utils import WithLogger, logtime, ClusteringMetrics
 
 
@@ -29,7 +29,7 @@ class Evaluator(WithLogger):
             for details.
 
     Attributes:
-        strategy (`str`): Same as ``strategy`` in the above parameters
+        strategy (`~typing.Union`\ [`str`, `~typing.Callable`]): Same as ``strategy`` in the above parameters
             section.
         kwargs: Same as ``kwargs`` in the above parameters section.
         _strategy_funcs (`~typing.Dict`\ [`str`, `~typing.Callable`\ [[`~typing.Mapping`, `~collections.OrderedDict`], `~typing.Any`]]):
@@ -44,7 +44,7 @@ class Evaluator(WithLogger):
     }
 
     def __init__(
-        self, strategy: str = 'precision_recall',
+        self, strategy: Union[str, Callable] = 'precision_recall',
         verbose: int = 0, **kwargs
     ):
         self.strategy = strategy
@@ -57,14 +57,15 @@ class Evaluator(WithLogger):
         A strategy function that returns something that represents the
         performance of the entity resolution. After instantiation
 
-        * If ``strategy_str`` is set to ``'ami'``, or ``'v_measure'``,
-          the return type is a single `float` representing the score.
-        * If ``strategy_str`` is set to ``'precision_recall'``
-          (default), the return type is
-          `~typing.Tuple`\ [`float`, `float`, `float`] representing
-          precision, recall, and f1 scores in the order. Refer to
+        * If ``strategy`` is set to ``'ami'``, or ``'v_measure'``, the return
+          type is a single `float` representing the score.
+        * If ``strategy`` is set to ``'precision_recall'`` (default), the
+          return type is `~typing.Tuple`\ [`float`, `float`, `float`]
+          representing precision, recall, and f1 scores in the order. Refer to
           :doc:`../advanced_guide` for more details.
         """
+        if callable(self.strategy):
+            return self.strategy
         return self._strategy_funcs[self.strategy]
 
     @logtime('Time taken for evaluation')

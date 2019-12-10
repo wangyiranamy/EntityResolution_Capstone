@@ -174,20 +174,51 @@
             
   <div class="section" id="module-entity_resolver.parser.graph_parser">
 <span id="entity-resolver-parser-graph-parser-module"></span><h1>entity_resolver.parser.graph_parser module<a class="headerlink" href="#module-entity_resolver.parser.graph_parser" title="Permalink to this headline">¶</a></h1>
+<p>Contains only one parser class to be used by the main module.</p>
+<p class="rubric">Example</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">entity_resolver.parser</span> <span class="kn">import</span> <span class="n">GraphParser</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">parser</span> <span class="o">=</span> <span class="n">GraphParser</span><span class="p">(</span><span class="n">attr_types</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;person_entity&#39;</span><span class="p">})</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">graph</span> <span class="o">=</span> <span class="n">parser</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="s1">&#39;graph.json&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
 <dl class="class">
 <dt id="entity_resolver.parser.graph_parser.GraphParser">
 <em class="property">class </em><code class="sig-prename descclassname">entity_resolver.parser.graph_parser.</code><code class="sig-name descname">GraphParser</code><span class="sig-paren">(</span><em class="sig-param">attr_types</em>, <em class="sig-param">verbose=0</em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/wangyiranamy/EntityResolution_Capstone/blob/master/src/entity_resolver/parser/graph_parser.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#entity_resolver.parser.graph_parser.GraphParser" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="entity_resolver.core.utils.html#entity_resolver.core.utils.WithLogger" title="entity_resolver.core.utils.WithLogger"><code class="xref py py-class docutils literal notranslate"><span class="pre">entity_resolver.core.utils.WithLogger</span></code></a></p>
+<p>A parser class to parse graph data file.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>attr_types</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/typing.html#typing.Mapping" title="(in Python v3.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Mapping</span></code></a>[<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>, <a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>]) – Mapping attribute names to the attribute type. Refer to the
+<code class="docutils literal notranslate"><span class="pre">attr_type</span></code> attribute of <a class="reference internal" href="entity_resolver.core.graph.html#entity_resolver.core.graph.Attribute" title="entity_resolver.core.graph.Attribute"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Attribute</span></code></a>
+for details on attribute types.</p></li>
+<li><p><strong>verbose</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a>) – Indicate how much information to be logged/printed in the
+console during the program execution. Same as in the
+<a class="reference internal" href="entity_resolver.main.html#entity_resolver.main.EntityResolver" title="entity_resolver.main.EntityResolver"><code class="xref py py-obj docutils literal notranslate"><span class="pre">EntityResolver</span></code></a> class.</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="attribute">
+<dt id="entity_resolver.parser.graph_parser.GraphParser.attr_types">
+<code class="sig-name descname">attr_types</code><a class="reference external" href="https://github.com/wangyiranamy/EntityResolution_Capstone/blob/master/src/entity_resolver/parser/graph_parser.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#entity_resolver.parser.graph_parser.GraphParser.attr_types" title="Permalink to this definition">¶</a></dt>
+<dd><p>Same as in the above parameters section.</p>
+</dd></dl>
+
 <dl class="method">
 <dt id="entity_resolver.parser.graph_parser.GraphParser.parse">
 <code class="sig-name descname">parse</code><span class="sig-paren">(</span><em class="sig-param">graph_data_path</em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/wangyiranamy/EntityResolution_Capstone/blob/master/src/entity_resolver/parser/graph_parser.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#entity_resolver.parser.graph_parser.GraphParser.parse" title="Permalink to this definition">¶</a></dt>
-<dd><dl class="field-list simple">
+<dd><p>Parse the graph data into a Graph object.</p>
+<dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>graph_data_path</strong> – table with three columns:
-node_id, edge_id, attr_dict</p>
+<dd class="field-odd"><p><strong>graph_data_path</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>) – The path to the graph data. The data file has to
+<strong>strictly follow</strong> the format as described in
+<a class="reference internal" href="../quickstart.html"><span class="doc">Quickstart</span></a>.</p>
 </dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p>Graph object</p>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference internal" href="entity_resolver.core.graph.html#entity_resolver.core.graph.Graph" title="entity_resolver.core.graph.Graph"><code class="xref py py-class docutils literal notranslate"><span class="pre">Graph</span></code></a></p>
+</dd>
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>The parsed Graph object.</p>
 </dd>
 </dl>
 </dd></dl>
@@ -216,7 +247,7 @@ node_id, edge_id, attr_dict</p>
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2019, Yiran Wang
+        &copy; Copyright 2019, Y. Cao, K. Kang, X. Huang, Y. Huang, Y. Wang
 
     </p>
   </div>

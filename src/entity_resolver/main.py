@@ -17,7 +17,8 @@ Tip:
     ``'person_entity'`` and ``'text'`` as values, the effects of this argument
     is restricted to certain preprocessing, default attribute similarity
     function, and deciding what values are passed when computing attribute
-    similarities.
+    similarities (thus affecting inputs if users are passing functions to
+    ``attr_strategy``).
 
     If an unsupported type is input, then no preprocessings are done and their
     original values are passed to computation of attribute similarity
@@ -57,13 +58,19 @@ class EntityResolver(WithLogger):
             attribute similarities. The ratio should sum to 1. If it is
             ``None`` (default), each attribute is assigned equal weight.
         attr_strategy: Mapping attribute names to similarity strategy names.
-            Valid values are ``'stfidf'``, ``'jaro_winkler'``, and ``'jaro'``.
-            Refer to :doc:`../advanced_guide` for more details.
+            Valid values are either strings including ``'stfidf'``,
+            ``'jaro_winkler'``, and ``'jaro'``. or a callable that takes two
+            attribute values and return their similarity score. If not
+            specified, a default strategy will be employed depending on the
+            attribute type: ``'text'`` for soft-tfidf, and ``person_entity``
+            for Jaro-Winkler. Refer to :doc:`../advanced_guide` for more
+            details.
         rel_strategy: Name of the strategy to compute relational similarity.
             Valid values are ``'jaccard_coef'``, ``'jaraccard_coef_fr'``,
-            ``'adar_neighbor'``, ``'adar_neighbor_fr'``, ``'adar_attr'``,
-            ``'adar_attr_fr'``. Refer to :doc:`../advanced_guide` for more
-            details.
+            ``'adar_neighbor'``, ``'adar_neighbor_fr'``, ``'adar_attr'``, and
+            ``'adar_attr_fr'``. If it is ``None``, ``'jaccard_coef'`` for
+            Jaccard Coefficient will be used. Refer to :doc:`../advanced_guide`
+            for more details.
         blocking_threshold: The threshold for allowing two references to be put
             in one bucket during blocking. Only references with distance
             (computed by ``blocking_strategy``) **strictly less than** this
@@ -102,9 +109,12 @@ class EntityResolver(WithLogger):
         similarity_threshold: When the entry with the largest similarity in the
             priority queue is less than this value, the algorithm stops.
         evaluator_strategy: The strategy name to be used for evaluation when
-            needed. Valid values are ``'precision_recall'``, ``'ami'``, and
-            ``'v_measure'``. Refer to :doc:`../advanced_guide` for more
-            details.
+            needed. Valid values are either strings including
+            ``'precision_recall'``, ``'ami'``, and ``'v_measure'``, or a
+            callable that follows the signatures of class methods in
+            `~entity_resolver.core.utils.ClusteringMetrics` (two
+            `~collections.OrderedDict` as inputs and any performance indicator
+            as output). Refer to :doc:`../advanced_guide` for more details.
         seed: The random seed to be used in blocking, which is the only source
             of randomness in this algorithm. If it is ``None`` (default), the
             current system time is used as the seed.
@@ -157,10 +167,6 @@ class EntityResolver(WithLogger):
         of precision and recall scores to plot the curve. It is recommended to
         store it for further usage.
 
-    Todo:
-        * Add support for custom similarity functions.
-        * Add support for custome evaluation functions.
-
     Attributes:
         _attr_types (`~typing.Mapping`\ [`str`, `str`]): Omitted.
         _blocking_strategy (`~typing.Callable`\ [[`~typing.Mapping`\ [`str`, `str`], `~typing.Mapping`\ [`str`, `str`]], `float`]):
@@ -169,8 +175,8 @@ class EntityResolver(WithLogger):
         _alpha (`~typing.Union`\ [`float`, `int`]): Omitted.
         _weights (`~typing.Optional`\ [`~typing.Mapping`\ [`str`, `float`]]):
             Omitted.
-        _attr_strategy (`~typing.Mapping`\ [`str`, `str`]): Omitted.
-        _rel_strategy (`~typing.Optional`\ [`str`]): Omitted.
+        _attr_strategy (`~typing.Mapping`\ [`str`, `~typing.Union`\ [`str`, `~typing.Callable`]]): Omitted.
+        _rel_strategy (`~typing.Optional`\ [`~typing.Union`\ [`str`, `~typing.Callable`]]): Omitted.
         _blocking_threshold (`~typing.Union`\ [`float`, `int`]): Omitted.
         _bootstrapping_strategy (`~typing.Optional`\ [`~typing.Callable`\ [[`~typing.Mapping`\ [`str`, `str`], `~typing.Mapping`\ [`str`, `str`]], `bool`]]): Omitted.
         _raw_bootstrap (`bool`):
@@ -208,7 +214,7 @@ class EntityResolver(WithLogger):
         raw_blocking: bool = False,
         alpha: Union[float, int] = 0,
         weights: Optional[Mapping[str, float]] = None,
-        attr_strategy: Mapping[str, str] = dict(),
+        attr_strategy: Mapping[str, Union[str, Callable]] = dict(),
         rel_strategy: Optional[str] = None,
         blocking_threshold: Union[float, int] = 3,
         bootstrap_strategy: Optional[
@@ -222,7 +228,7 @@ class EntityResolver(WithLogger):
         second_attr_raw: bool = False,
         linkage: str = 'max',
         similarity_threshold: float = 0.935,
-        evaluator_strategy: str = 'precision_recall',
+        evaluator_strategy: Union[str, Callable] = 'precision_recall',
         seed: Optional[int] = None,
         plot_prc: bool = False,
         verbose: int = 0,
@@ -285,8 +291,7 @@ class EntityResolver(WithLogger):
 
     @property
     def blocking_strategy(self):
-        """ `~typing.Callable`\ [[`~typing.Mapping`\ [`str`, `str`], `~typing.Mapping`\ [`str`, `str`]],`float`]: Omitted.
-        """
+        """ `~typing.Callable`\ [[`~typing.Mapping`\ [`str`, `str`], `~typing.Mapping`\ [`str`, `str`]], `float`]: Omitted."""
         return self._blocking_strategy
 
     @blocking_strategy.setter
@@ -348,11 +353,26 @@ class EntityResolver(WithLogger):
 
     @property
     def rel_strategy(self):
-        """ `~typing.Optional`\ [`str`\ ]: Omitted."""
+        """ `~typing.Optional`\ [`str`\ ]: Omitted.
+        
+        Raises:
+            ValueError: If set to any value other than ``'jaccard_coef'``,
+                ``'jaraccard_coef_fr'``, ``'adar_neighbor'``,
+                ``'adar_neighbor_fr'``, ``'adar_attr'``, or ``'adar_attr_fr'``.
+        """
         return self._rel_strategy
 
     @rel_strategy.setter
     def rel_strategy(self, value):
+        if value is not None and value not in [
+            'jaccard_coef', 'jaraccard_coef_fr', 'adar_neighbor',
+            'adar_neighbor_fr', 'adar_attr', 'adar_attr_fr'
+        ]:
+            raise ValueError(
+                'rel_strategy must be one of \'jaccard_coef\', '
+                '\'jaraccard_coef_fr\', \'adar_neighbor\', '
+                '\'adar_neighbor_fr\', \'adar_attr\', or \'adar_attr_fr\''
+            )
         self._rel_strategy = value
         self._resolver.rel_strategy = value
 
@@ -368,8 +388,7 @@ class EntityResolver(WithLogger):
 
     @property
     def bootstrap_strategy(self):
-        """ `~typing.Optional`\ [`~typing.Callable`\ [[`~typing.Mapping`\ [`str`, `str`], `~typing.Mapping`\ [`str`, `str`]], `bool`]]: Omitted.
-        """
+        """ `~typing.Optional`\ [`~typing.Callable`\ [[`~typing.Mapping`\ [`str`, `str`], `~typing.Mapping`\ [`str`, `str`]], `bool`]]: Omitted."""
         return self._bootstrap_strategy
 
     @bootstrap_strategy.setter
@@ -399,8 +418,7 @@ class EntityResolver(WithLogger):
 
     @property
     def first_attr(self):
-        """ `~typing.Optional`\ [`~typing.Callable`\ [[`~typing.Mapping`\ [`str`, `str`]], `str`]]: Omitted.
-        """
+        """ `~typing.Optional`\ [`~typing.Callable`\ [[`~typing.Mapping`\ [`str`, `str`]], `str`]]: Omitted."""
         return self._first_attr
 
     @first_attr.setter
@@ -420,8 +438,7 @@ class EntityResolver(WithLogger):
 
     @property
     def second_attr(self):
-        """ `~typing.Optional`\ [`~typing.Callable`\ [[`~typing.Mapping`\ [`str`, `str`]], `str`]]: Omitted.
-        """
+        """ `~typing.Optional`\ [`~typing.Callable`\ [[`~typing.Mapping`\ [`str`, `str`]], `str`]]: Omitted."""
         return self._second_attr
 
     @second_attr.setter
@@ -473,14 +490,17 @@ class EntityResolver(WithLogger):
         """ `str`: Omitted
 
         Raises:
-            ValueError: If set to any value other than ``'precision_recall'``,
-                ``'ami'``, or ``'v_measure'``.
+            ValueError: If set to any value other than a callable,
+                ``'precision_recall'``, ``'ami'``, or ``'v_measure'``.
         """
         return self._evaluator_strategy
 
     @evaluator_strategy.setter
     def evaluator_strategy(self, value):
-        if value not in ['precision_recall', 'ami', 'v_measure']:
+        if (
+            not callable(value)
+            and value not in ['precision_recall', 'ami', 'v_measure']
+        ):
             raise ValueError(
                 'evaluator_strategy must be one of '
                 '\'precision_recall\', \'ami\', or \'v_measure\'.'

@@ -51,13 +51,19 @@ class Resolver(WithLogger):
             attribute similarities. The ratio should sum to 1. If it is
             ``None`` (default), each attribute is assigned equal weight.
         attr_strategy: Mapping attribute names to similarity strategy names.
-            Valid values are ``'stfidf'``, ``'jaro_winkler'``, and ``'jaro'``.
-            Refer to :doc:`../advanced_guide` for more details.
+            Valid values are either strings including ``'stfidf'``,
+            ``'jaro_winkler'``, and ``'jaro'``. or a callable that takes two
+            attribute values and return their similarity score. If not
+            specified, a default strategy will be employed depending on the
+            attribute type: ``'text'`` for soft-tfidf, and ``person_entity``
+            for Jaro-Winkler. Refer to :doc:`../advanced_guide` for more
+            details.
         rel_strategy: Name of the strategy to compute relational similarity.
             Valid values are ``'jaccard_coef'``, ``'jaraccard_coef_fr'``,
-            ``'adar_neighbor'``, ``'adar_neighbor_fr'``, ``'adar_attr'``,
-            ``'adar_attr_fr'``. Refer to :doc:`../advanced_guide` for more
-            details.
+            ``'adar_neighbor'``, ``'adar_neighbor_fr'``, ``'adar_attr'``, and
+            ``'adar_attr_fr'``. If it is ``None``, ``'jaccard_coef'`` for
+            Jaccard Coefficient will be used. Refer to :doc:`../advanced_guide`
+            for more details.
         blocking_threshold: The threshold for allowing two references to be put
             in one bucket during blocking. Only references with distance
             (computed by ``blocking_strategy``) **strictly less than** this
@@ -140,17 +146,14 @@ class Resolver(WithLogger):
           'cluster id' and 'cluster' may be used interchangeably throughout
           this module's documentation
 
-    Todo:
-        Remove all cached attributes at the end of the ``resolve`` method.
-
     Attributes:
         blocking_strategy (`~typing.Callable`\ [[`~typing.Mapping`\ [`str`, `str`], `~typing.Mapping`\ [`str`, `str`]], `float`]):            Omitted.
         raw_blocking (`bool`): Omitted.
         alpha (`~typing.Union`\ [`float`, `int`]): Omitted.
         weights (`~typing.Optional`\ [`~typing.Mapping`\ [`str`, `float`]]):
             Omitted.
-        attr_strategy (`~typing.Mapping`\ [`str`, `str`]): Omitted.
-        rel_strategy (`~typing.Optional`\ [`str`]): Omitted.
+        attr_strategy (`~typing.Mapping`\ [`str`, `~typing.Union`\ [`str`, `~typing.Callable`]]): Omitted.
+        rel_strategy (`~typing.Optional`\ [`~typing.Union`\ [`str`, `~typing.Callable`]]): Omitted.
         blocking_threshold (`~typing.Union`\ [`float`, `int`]): Omitted.
         bootstrapping_strategy (`~typing.Optional`\ [`~typing.Callable`\ [[`~typing.Mapping`\ [`str`, `str`], `~typing.Mapping`\ [`str`, `str`]], `bool`]]):
             Omitted.
@@ -195,7 +198,7 @@ class Resolver(WithLogger):
         _attr_funcs (`~typing.Dict`\ [`str`, `~typing.Callable`]): *(cache)*.
             Mapping attribute names to functions that compute the similarities
             of two values in the attributes.
-        _rel_func (`~typing.Callable`\ [[`~typing.Collection`, `~typing.Collection`, `~typing.Callable`\ [[`~typing.Hashable`], `float`]], `float`]`):
+        _rel_func (`~typing.Callable`\ [[`~typing.Collection`, `~typing.Collection`, `~typing.Callable`\ [[`~typing.Hashable`], `float`]], `float`]):
             *(cache)*. The relational similarity function used to compute the
             relational similarity between two clusters.
         _ambiguities (`~typing.Dict`\ [`~entity_resolver.core.graph.Node`, float]):
@@ -232,8 +235,8 @@ class Resolver(WithLogger):
         raw_blocking: bool = False,
         alpha: Union[float, int] = 0,
         weights: Optional[Mapping[str, float]] = None,
-        attr_strategy: Mapping[str, str] = dict(),
-        rel_strategy: Optional[str] = None,
+        attr_strategy: Mapping[str, Union[str, Callable]] = dict(),
+        rel_strategy: Optional[Union[str, Callable]] = None,
         blocking_threshold: Union[float, int] = 3,
         bootstrap_strategy: Optional[
             Callable[[Mapping[str, str], Mapping[str, str]], bool]
@@ -868,7 +871,8 @@ class Resolver(WithLogger):
         Raises:
             ValueError: If an attribute with type not being ``'text'`` or
                 ``'person_entity'`` does not have its name registered with an
-                attribute similarity strategy in the ``attr_strategy`` attribute.
+                attribute similarity strategy in the ``attr_strategy``
+                attribute.
 
         Returns:
             Mapping attribute names to functions that compute the similarities
@@ -893,10 +897,15 @@ class Resolver(WithLogger):
                         f'{attr_type}'
                     )
                 attr_strategy = self._default_strategies[attr_type]
-            attr_sim_producer = self._sim_func_producers[attr_strategy]
-            attr_sim_funcs[name] = attr_sim_producer(
-                weight, self._graph.attr_vals[name], **self.kwargs
-            )
+            if callable(attr_strategy):
+                attr_sim_funcs[name] = (
+                    lambda *args: weight * attr_strategy(*args)
+                )
+            else:
+                attr_sim_producer = self._sim_func_producers[attr_strategy]
+                attr_sim_funcs[name] = attr_sim_producer(
+                    weight, self._graph.attr_vals[name], **self.kwargs
+                )
         return attr_sim_funcs
 
     def _parse_rel_strat(self) -> Callable[
@@ -1029,7 +1038,7 @@ class Resolver(WithLogger):
     def _init_ambiguities(self) -> None:
         """ Initialize amgibuity values of each reference.
 
-        Raies:
+        Raises:
             ValueError: If either ``first_attr`` or ``second_attr`` attribute
                 is None.
         """

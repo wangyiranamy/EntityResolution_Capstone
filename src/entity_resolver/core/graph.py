@@ -13,7 +13,10 @@ Note:
 
 import re
 import collections
-from typing import Any, List, Tuple, Hashable, Iterable, Dict, Callable
+from typing import (
+    Any, List, Tuple, Hashable,
+    Iterable, Dict, Callable, Mapping
+)
 
 
 class Attribute:
@@ -114,6 +117,10 @@ class Node:
         node_id: A unique identifier for a reference. Distinct node object must
             have distinct ``node_id``.
         attrs: All attributes of this reference.
+
+    Important:
+        In order for the whole entity resolution to function as expected, the
+        ``node_id`` should also be **comparable** besides being **hashable**.
     
     Attributes:
         _id (`~typing.Hashable`): Same as ``node_id`` in the parameters
@@ -223,7 +230,7 @@ class Graph:
             the graph.
         _node_to_edge (`~typing.Dict`\ [`Node`, `Edge`]): Mapping references
             to the hyper-edges they are contained in.
-        _attr_types (`~typing.Dict`\ [`str`, `str`]): Same as ``attr_types``
+        _attr_types (`~typing.Mapping`\ [`str`, `str`]): Same as ``attr_types``
             in the above parameters section.
         _attr_vals (`~typing.Dict`\ [`str`, `~typing.List`]): Mapping attribute
             names to a list of preprocessed attribute values of all references
@@ -233,7 +240,7 @@ class Graph:
             values of all references with the corresponding names.
     """
 
-    def __init__(self, edges: Iterable[Edge], attr_types: Dict[str, str]):
+    def __init__(self, edges: Iterable[Edge], attr_types: Mapping[str, str]):
         self._edges = list()
         self._node_to_edge = dict()
         for edge in edges:
@@ -266,7 +273,7 @@ class Graph:
 
     @property
     def attr_types(self):
-        """ `~typing.Dict`\ [`str`, `str`]: Omitted."""
+        """ `~typing.Mapping`\ [`str`, `str`]: Omitted."""
         return self._attr_types
 
     @property

@@ -20,8 +20,8 @@ sys.path.insert(0, os.path.abspath('../src/entity_resolver'))
 # -- Project information -----------------------------------------------------
 
 project = 'entity-resolver'
-copyright = '2019, Yiran Wang'
-author = 'Yiran Wang'
+copyright = '2019, Y. Cao, K. Kang, X. Huang, Y. Huang, Y. Wang'
+author = 'Yijie Cao, Kai Kang, Xinxin Huang, Yiming Huang, Yiran Wang'
 
 
 # -- General configuration ---------------------------------------------------

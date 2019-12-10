@@ -52,6 +52,10 @@ class TestEntityResolver:
             )
         with pytest.raises(ValueError):
             entity_resolver.weights = {'a': 0.5, 'b': 1}
+        with pytest.raises(ValueError):
+            entity_resolver = EntityResolver(None, None, rel_strategy='boz')
+        with pytest.raises(ValueError):
+            entity_resolver.rel_strategy = 'boz'
 
     def test_setters(self):
         entity_resolver = EntityResolver(None, None)
@@ -75,40 +79,42 @@ class TestEntityResolver:
                 setattr(entity_resolver, attr, 'jaro')
             elif attr == 'average_method':
                 setattr(entity_resolver, attr, 'min')
+            elif attr == 'rel_strategy':
+                setattr(entity_resolver, attr, 'adar_neighbor')
             else:
                 setattr(entity_resolver, attr, 0.001)
-        for attr in attr_list:
-            if attr == 'weights':
-                assert getattr(entity_resolver, attr) == {1: 1}
-            elif attr == 'linkage':
-                assert getattr(entity_resolver, attr) == 'min'
-            elif attr == 'evaluator_strategy':
-                assert getattr(entity_resolver, attr) == 'ami'
-            elif attr == 'second_sim':
-                assert getattr(entity_resolver, attr) == 'jaro'
-            elif attr == 'average_method':
-                assert getattr(entity_resolver, attr) == 'min'
-            else:
-                assert getattr(entity_resolver, attr) == 0.001
-            if attr == 'second_sim':
-                assert entity_resolver._resolver.kwargs[attr] == 'jaro'
-                assert entity_resolver._evaluator.kwargs[attr] == 'jaro'
-            elif attr == 'average_method':
-                assert entity_resolver._resolver.kwargs[attr] == 'min'
-                assert entity_resolver._evaluator.kwargs[attr] == 'min'
-            elif attr in ['stfidf_threshold', 'jw_prefix_weight']:
-                assert entity_resolver._resolver.kwargs[attr] == 0.001
-                assert entity_resolver._evaluator.kwargs[attr] == 0.001
-            elif attr not in [
-                'evaluator_strategy', 'attr_types',
-                'verbose', 'weights', 'linkage'
-            ]:
-                assert getattr(entity_resolver._resolver, attr) == 0.001
-            assert entity_resolver._evaluator.strategy == 'ami'
-            assert entity_resolver._graph_parser.attr_types == 0.001
-            assert entity_resolver._graph_parser.verbose == 0.001
-            assert entity_resolver._ground_truth_parser.verbose == 0.001
-            assert entity_resolver._resolver.verbose == 0.001
-            assert entity_resolver._evaluator.verbose == 0.001
-            assert entity_resolver._resolver.weights == {1: 1}
-            assert entity_resolver._resolver.linkage == 'min'
+        regular_attr_list = [
+            'weights', 'linkage', 'evaluator_strategy', 'attr_types',
+            'jw_prefix_weight', 'stfidf_threshold', 'second_sim',
+            'average_method', 'rel_strategy', 'verbose'
+        ]
+        for attr in (set(attr_list) - set(regular_attr_list)):
+            assert getattr(entity_resolver, attr) == 0.001
+            assert getattr(entity_resolver._resolver, attr) == 0.001
+        assert entity_resolver.weights == {1: 1}
+        assert entity_resolver.linkage == 'min'
+        assert entity_resolver.evaluator_strategy == 'ami'
+        assert entity_resolver.attr_types == 0.001
+        assert entity_resolver.jw_prefix_weight == 0.001
+        assert entity_resolver.stfidf_threshold == 0.001
+        assert entity_resolver.second_sim == 'jaro'
+        assert entity_resolver.average_method == 'min'
+        assert entity_resolver.rel_strategy == 'adar_neighbor'
+        assert entity_resolver.verbose == 0.001
+        assert entity_resolver._resolver.kwargs['second_sim'] == 'jaro'
+        assert entity_resolver._evaluator.kwargs['second_sim'] == 'jaro'
+        assert entity_resolver._resolver.kwargs['average_method'] == 'min'
+        assert entity_resolver._evaluator.kwargs['average_method'] == 'min'
+        assert entity_resolver._resolver.kwargs['stfidf_threshold'] == 0.001
+        assert entity_resolver._evaluator.kwargs['stfidf_threshold'] == 0.001
+        assert entity_resolver._resolver.kwargs['jw_prefix_weight'] == 0.001
+        assert entity_resolver._evaluator.kwargs['jw_prefix_weight'] == 0.001
+        assert entity_resolver._evaluator.strategy == 'ami'
+        assert entity_resolver._graph_parser.attr_types == 0.001
+        assert entity_resolver._graph_parser.verbose == 0.001
+        assert entity_resolver._ground_truth_parser.verbose == 0.001
+        assert entity_resolver._resolver.verbose == 0.001
+        assert entity_resolver._evaluator.verbose == 0.001
+        assert entity_resolver._resolver.weights == {1: 1}
+        assert entity_resolver._resolver.linkage == 'min'
+        assert entity_resolver._resolver.rel_strategy == 'adar_neighbor'

@@ -1,26 +1,51 @@
+""" Contains only one parser class to be used by the main module.
+
+Example:
+
+    >>> from entity_resolver.parser import GraphParser
+    >>> parser = GraphParser(attr_types={'name': 'person_entity'})
+    >>> graph = parser.parse('graph.json')
+"""
+
 import time
+import json
+from typing import Mapping
 import pandas as pd
 import numpy as np
-import json
 from collections import defaultdict
 from ..core import Attribute, Node, Edge, Graph
 from ..core.utils import WithLogger
 
 
 class GraphParser(WithLogger):
+    """ A parser class to parse graph data file.
 
-    def __init__(self, attr_types, verbose=0):
-        """
-        :param attr_types: e.g {'title': 'text', 'name': 'person_entity'}
-        """
+    Args:
+        attr_types: Mapping attribute names to the attribute type. Refer to the
+            ``attr_type`` attribute of `~entity_resolver.core.graph.Attribute`
+            for details on attribute types.
+        verbose: Indicate how much information to be logged/printed in the
+            console during the program execution. Same as in the
+            `~entity_resolver.main.EntityResolver` class.
+    
+    Attributes:
+        attr_types: Same as in the above parameters section.
+    """
+
+    def __init__(self, attr_types: Mapping[str, str], verbose: int = 0):
         self.attr_types = attr_types
         super().__init__(verbose)
 
-    def parse(self, graph_data_path):
-        """
-        :param graph_data_path: table with three columns:
-            node_id, edge_id, attr_dict
-        :return: Graph object
+    def parse(self, graph_data_path: str) -> Graph:
+        """ Parse the graph data into a Graph object.
+
+        Args:
+            graph_data_path: The path to the graph data. The data file has to
+                **strictly follow** the format as described in
+                :doc:`../quickstart`.
+        
+        Returns:
+            The parsed Graph object.
         """
         start_time = time.time()
         with open(graph_data_path, 'r') as f:
