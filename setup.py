@@ -5,7 +5,7 @@ with open('README.md', 'r') as fh:
 
 setup(
     name='entity-resolver',
-    version='0.1.3',
+    version='0.2.0',
     author='Yiran Wang',
     author_email='yw3201@columbia.edu',
     description='A python package for collective entity resolution',
@@ -21,9 +21,9 @@ setup(
             'entity-resolver=entity_resolver.scripts:main',
         ]
     },
-    python_requires='>=3.6',
+    python_requires='>=3.6.5',
     install_requires=[
         'pandas>=0.25.1', 'numpy>=1.17.2', 'scikit-learn>=0.21.3',
-        'nltk>=3.4.5', 'py-stringmatching>=0.4.1', 'matplotlib>=3.1.2'
+        'py-stringmatching>=0.4.1', 'matplotlib>=3.1.2'
     ]
 )

@@ -174,24 +174,1191 @@
             
   <div class="section" id="module-entity_resolver.core.resolver">
 <span id="entity-resolver-core-resolver-module"></span><h1>entity_resolver.core.resolver module<a class="headerlink" href="#module-entity_resolver.core.resolver" title="Permalink to this headline">¶</a></h1>
+<p>Contains a single class that implements the entity resolution algorithm.</p>
+<p>Related hyperparameters are inputs to the <a class="reference internal" href="#entity_resolver.core.resolver.Resolver" title="entity_resolver.core.resolver.Resolver"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Resolver</span></code></a> object during
+instantiation. That object will execute the core entity resolution algorithm
+if its <code class="docutils literal notranslate"><span class="pre">resolve</span></code> method is called, which includes blocking, relational
+bootstrapping, and clustering. For details of the algorithm and the
+hyperparameters, please refer to <a class="reference internal" href="../advanced_guide.html"><span class="doc">Advanced Guide</span></a>.</p>
+<p class="rubric">Example</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">entity_resolver.core</span> <span class="kn">import</span> <span class="n">Resolver</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">resolver1</span> <span class="o">=</span> <span class="n">Resolver</span><span class="p">(</span><span class="n">plot_prc</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>  <span class="c1"># No plot</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">resolver</span><span class="o">.</span><span class="n">resolve</span><span class="p">(</span><span class="n">graph</span><span class="p">)</span>  <span class="c1"># graph is a Graph object</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">resolver2</span> <span class="o">=</span> <span class="n">Resolver</span><span class="p">(</span><span class="n">plot_prc</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>  <span class="c1"># Plot</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">resolver2</span><span class="o">.</span><span class="n">resolve</span><span class="p">(</span><span class="n">graph</span><span class="p">,</span> <span class="n">ground_truth</span><span class="p">)</span>  <span class="c1"># Need ground_truth to plot</span>
+</pre></div>
+</div>
 <dl class="class">
 <dt id="entity_resolver.core.resolver.Resolver">
 <em class="property">class </em><code class="sig-prename descclassname">entity_resolver.core.resolver.</code><code class="sig-name descname">Resolver</code><span class="sig-paren">(</span><em class="sig-param">blocking_strategy</em>, <em class="sig-param">raw_blocking=False</em>, <em class="sig-param">alpha=0</em>, <em class="sig-param">weights=None</em>, <em class="sig-param">attr_strategy={}</em>, <em class="sig-param">rel_strategy=None</em>, <em class="sig-param">blocking_threshold=3</em>, <em class="sig-param">bootstrap_strategy=None</em>, <em class="sig-param">raw_bootstrap=False</em>, <em class="sig-param">edge_match_threshold=1</em>, <em class="sig-param">first_attr=None</em>, <em class="sig-param">first_attr_raw=False</em>, <em class="sig-param">second_attr=None</em>, <em class="sig-param">second_attr_raw=False</em>, <em class="sig-param">linkage='max'</em>, <em class="sig-param">similarity_threshold=0.935</em>, <em class="sig-param">seed=None</em>, <em class="sig-param">plot_prc=False</em>, <em class="sig-param">verbose=0</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/wangyiranamy/EntityResolution_Capstone/blob/master/src/entity_resolver/core/resolver.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#entity_resolver.core.resolver.Resolver" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="entity_resolver.core.utils.html#entity_resolver.core.utils.WithLogger" title="entity_resolver.core.utils.WithLogger"><code class="xref py py-class docutils literal notranslate"><span class="pre">entity_resolver.core.utils.WithLogger</span></code></a></p>
+<p>Execute the core entity resolution program.</p>
+<p>Most of the arguments and paramters are duplicates of those in
+<a class="reference internal" href="entity_resolver.main.html"><span class="doc">entity_resolver.main module</span></a>. Their descriptions are simply copied below.
+However, these attributes are not encapsulated using <code class="docutils literal notranslate"><span class="pre">&#64;property</span></code> and
+hence not protected against invalid attribute assignments.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>blocking_strategy</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/typing.html#typing.Callable" title="(in Python v3.6)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Callable</span></code></a>[[<a class="reference external" href="https://docs.python.org/3.6/library/typing.html#typing.Mapping" title="(in Python v3.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Mapping</span></code></a>[<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>, <a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>], <a class="reference external" href="https://docs.python.org/3.6/library/typing.html#typing.Mapping" title="(in Python v3.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Mapping</span></code></a>[<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>, <a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>]], <a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a>]) – Describe the strategy for blocking. It should accept
+two dictionaries as reference attributes and return their
+distance.</p></li>
+<li><p><strong>raw_blocking</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#bool" title="(in Python v3.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a>) – Indicate if raw values of reference attributes are to be
+used in blocking. It affects the input of <code class="docutils literal notranslate"><span class="pre">blocking</span> <span class="pre">strategy</span></code>.</p></li>
+<li><p><strong>alpha</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/typing.html#typing.Union" title="(in Python v3.6)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code></a>[<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a>, <a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a>]) – The ratio of relational similarity involved in calculating
+cluster similarities. It should be between 0 and 1 (inclusive).</p></li>
+<li><p><strong>weights</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/typing.html#typing.Optional" title="(in Python v3.6)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code></a>[<a class="reference external" href="https://docs.python.org/3.6/library/typing.html#typing.Mapping" title="(in Python v3.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Mapping</span></code></a>[<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>, <a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a>]]) – Mapping attribute names to their ratio when calculating
+attribute similarities. The ratio should sum to 1. If it is
+<code class="docutils literal notranslate"><span class="pre">None</span></code> (default), each attribute is assigned equal weight.</p></li>
+<li><p><strong>attr_strategy</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/typing.html#typing.Mapping" title="(in Python v3.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Mapping</span></code></a>[<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>, <a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>]) – Mapping attribute names to similarity strategy names.
+Valid values are <code class="docutils literal notranslate"><span class="pre">'stfidf'</span></code>, <code class="docutils literal notranslate"><span class="pre">'jaro_winkler'</span></code>, and <code class="docutils literal notranslate"><span class="pre">'jaro'</span></code>.
+Refer to <a class="reference internal" href="../advanced_guide.html"><span class="doc">Advanced Guide</span></a> for more details.</p></li>
+<li><p><strong>rel_strategy</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/typing.html#typing.Optional" title="(in Python v3.6)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code></a>[<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>]) – Name of the strategy to compute relational similarity.
+Valid values are <code class="docutils literal notranslate"><span class="pre">'jaccard_coef'</span></code>, <code class="docutils literal notranslate"><span class="pre">'jaraccard_coef_fr'</span></code>,
+<code class="docutils literal notranslate"><span class="pre">'adar_neighbor'</span></code>, <code class="docutils literal notranslate"><span class="pre">'adar_neighbor_fr'</span></code>, <code class="docutils literal notranslate"><span class="pre">'adar_attr'</span></code>,
+<code class="docutils literal notranslate"><span class="pre">'adar_attr_fr'</span></code>. Refer to <a class="reference internal" href="../advanced_guide.html"><span class="doc">Advanced Guide</span></a> for more
+details.</p></li>
+<li><p><strong>blocking_threshold</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/typing.html#typing.Union" title="(in Python v3.6)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code></a>[<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a>, <a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a>]) – The threshold for allowing two references to be put
+in one bucket during blocking. Only references with distance
+(computed by <code class="docutils literal notranslate"><span class="pre">blocking_strategy</span></code>) <strong>strictly less than</strong> this
+threshold are put in the same bucket.</p></li>
+<li><p><strong>bootstrap_strategy</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/typing.html#typing.Optional" title="(in Python v3.6)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code></a>[<a class="reference external" href="https://docs.python.org/3.6/library/typing.html#typing.Callable" title="(in Python v3.6)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Callable</span></code></a>[[<a class="reference external" href="https://docs.python.org/3.6/library/typing.html#typing.Mapping" title="(in Python v3.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Mapping</span></code></a>[<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>, <a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>], <a class="reference external" href="https://docs.python.org/3.6/library/typing.html#typing.Mapping" title="(in Python v3.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Mapping</span></code></a>[<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>, <a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>]], <a class="reference external" href="https://docs.python.org/3.6/library/functions.html#bool" title="(in Python v3.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a>]]) – Describe the strategy for bootstrapping. It should
+accept two dictionaries as reference attributes and return if they
+can be a bootstrap candidate pair. If it is <code class="docutils literal notranslate"><span class="pre">None</span></code> (default),
+only two references with all attributes being exactly the same can
+be bootstrap a candidate pair. See also <code class="docutils literal notranslate"><span class="pre">edge_match_threshold</span></code>.</p></li>
+<li><p><strong>raw_bootstrap</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#bool" title="(in Python v3.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a>) – Indicate if raw values of reference attributes are to be
+used in bootstrapping. It affects the input of
+<code class="docutils literal notranslate"><span class="pre">bootstrap_strategy</span></code>.</p></li>
+<li><p><strong>edge_match_threshold</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a>) – The number of extra
+(<strong>greater than or equal to</strong>) neighboring reference pairs needed
+to pass <code class="docutils literal notranslate"><span class="pre">bootstrap_strategy</span></code> check for a bootstrap candidate pair
+to be finally put in the same cluster during bootstrapping.</p></li>
+<li><p><strong>first_attr</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/typing.html#typing.Optional" title="(in Python v3.6)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code></a>[<a class="reference external" href="https://docs.python.org/3.6/library/typing.html#typing.Callable" title="(in Python v3.6)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Callable</span></code></a>[[<a class="reference external" href="https://docs.python.org/3.6/library/typing.html#typing.Mapping" title="(in Python v3.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Mapping</span></code></a>[<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>, <a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>]], <a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>]]) – Describe how to obtain the first attribute value in
+computation of a reference ambiguity. It should either be <code class="docutils literal notranslate"><span class="pre">None</span></code>
+(default) or a function accepting one dictionary as reference
+attributes and return a hashable value. If <code class="docutils literal notranslate"><span class="pre">rel_strategy</span></code> is
+<code class="docutils literal notranslate"><span class="pre">'adar_attr'</span></code> or <code class="docutils literal notranslate"><span class="pre">'adar_attr_fr'</span></code>, this must be a valid
+function and cannot be <code class="docutils literal notranslate"><span class="pre">None</span></code>. Refer to <a class="reference internal" href="../advanced_guide.html"><span class="doc">Advanced Guide</span></a>
+for more details.</p></li>
+<li><p><strong>first_attr_raw</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#bool" title="(in Python v3.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a>) – Indicate if raw values of reference attributes are to
+be used in calculating reference ambiguity. It affects the input of
+<code class="docutils literal notranslate"><span class="pre">first_attr</span></code>.</p></li>
+<li><p><strong>second_attr</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/typing.html#typing.Optional" title="(in Python v3.6)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code></a>[<a class="reference external" href="https://docs.python.org/3.6/library/typing.html#typing.Callable" title="(in Python v3.6)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Callable</span></code></a>[[<a class="reference external" href="https://docs.python.org/3.6/library/typing.html#typing.Mapping" title="(in Python v3.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Mapping</span></code></a>[<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>, <a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>]], <a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>]]) – Similar to <code class="docutils literal notranslate"><span class="pre">first_attr</span></code>. Describe how to obtain the
+second attribute value in computation of a reference ambiguity
+instead. Refer to <a class="reference internal" href="../advanced_guide.html"><span class="doc">Advanced Guide</span></a> for more details.</p></li>
+<li><p><strong>second_attr_raw</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#bool" title="(in Python v3.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a>) – Similar to <code class="docutils literal notranslate"><span class="pre">first_attr_raw</span></code>. It affects the input of
+<code class="docutils literal notranslate"><span class="pre">second_attr</span></code> instead.</p></li>
+<li><p><strong>linkage</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>) – Describe how to compute cluster attribute similarities based
+on reference attribute similarities. Valid values are <code class="docutils literal notranslate"><span class="pre">'min'</span></code>,
+<code class="docutils literal notranslate"><span class="pre">'max'</span></code>, and <code class="docutils literal notranslate"><span class="pre">'average'</span></code>. Refer to <a class="reference internal" href="../advanced_guide.html"><span class="doc">Advanced Guide</span></a> for
+more details.</p></li>
+<li><p><strong>similarity_threshold</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a>) – When the entry with the largest similarity in the
+priority queue is less than this value, the algorithm stops.</p></li>
+<li><p><strong>seed</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/typing.html#typing.Optional" title="(in Python v3.6)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code></a>[<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a>]) – The random seed to be used in blocking, which is the only source
+of randomness in this algorithm. If it is <code class="docutils literal notranslate"><span class="pre">None</span></code> (default), the
+current system time is used as the seed.</p></li>
+<li><p><strong>plot_prc</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#bool" title="(in Python v3.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a>) – Indicate whether to plot a precision-recall curve at the end
+of evaluation if <code class="docutils literal notranslate"><span class="pre">resolve_and_eval</span></code> method is called. It also
+affects the output of <code class="docutils literal notranslate"><span class="pre">resolve_and_eval</span></code> method. Note that
+setting this to <code class="docutils literal notranslate"><span class="pre">True</span></code> will <strong>significantly increase</strong> the time
+taken for the program to complete.</p></li>
+<li><p><strong>verbose</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a>) – <p>Indicate how much information to be logged/printed in the
+console during the program execution.</p>
+<ul>
+<li><p>0 or smaller: no logging</p></li>
+<li><p>1: Some meta information are logged. This includes the input
+data, built graph, evaluation results, and time taken for major
+steps of the program.</p></li>
+<li><p>2 or larger: All messages are logged, most of them are used for
+debugging purpose.</p></li>
+</ul>
+</p></li>
+<li><p><strong>**kwargs</strong> – <p>Additional keyword arguments that are only used in specific
+cases. Refer to <a class="reference internal" href="../advanced_guide.html"><span class="doc">Advanced Guide</span></a> for more details. Valid
+arguments are:</p>
+<ul>
+<li><p>second_sim (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">str</span></code></a>): Indicate the secondary similarity
+measure used for SoftTfIdf similarity computation if it is set
+in <code class="docutils literal notranslate"><span class="pre">attr_strategy</span></code>. Valid values are <code class="docutils literal notranslate"><span class="pre">'jaro_winkler'</span></code>,
+<code class="docutils literal notranslate"><span class="pre">'jaro'</span></code> and <code class="docutils literal notranslate"><span class="pre">'scaled_lev'</span></code>. Default is <code class="docutils literal notranslate"><span class="pre">'jaro_winkler'</span></code>.</p></li>
+<li><p>stfidf_threshold (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">float</span></code></a>): Indicate the threshold of
+secondary similarity used in SoftTfIdf similarity computation if
+it is set in <code class="docutils literal notranslate"><span class="pre">attr_strategy</span></code>. Default is <code class="docutils literal notranslate"><span class="pre">0.5</span></code>.</p></li>
+<li><p>jw_prefix_weight (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">float</span></code></a>): Indicate the prefix weight used
+in Jaro-winkler similarity computation if it, or SoftTfIdf with
+Jaro-winkler as secondary similarity is set in <code class="docutils literal notranslate"><span class="pre">attr_strategy</span></code>.
+Default is <code class="docutils literal notranslate"><span class="pre">0.1</span></code>.</p></li>
+</ul>
+</p></li>
+</ul>
+</dd>
+</dl>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<ul class="simple">
+<li><p>All attributes below which have the same names as in the above
+parameters section are essentially the same. Besides, the <code class="docutils literal notranslate"><span class="pre">_kwargs</span></code>
+attribute is also the same as the <code class="docutils literal notranslate"><span class="pre">kwrags</span></code> parameter. Their
+documentations are therefore omitted.</p></li>
+<li><p>Some attributes are initialized during the process of the entity
+resolution algorithm as cached values for furture use. They are
+marked as ‘<em>(cache)</em>’ in the following attribute documentations.</p></li>
+<li><p>Since clusters are simply represented by their ids, the phrase
+‘cluster id’ and ‘cluster’ may be used interchangeably throughout
+this module’s documentation</p></li>
+</ul>
+</div>
+<div class="admonition-todo admonition" id="id1">
+<p class="admonition-title">Todo</p>
+<p>Remove all cached attributes at the end of the <code class="docutils literal notranslate"><span class="pre">resolve</span></code> method.</p>
+</div>
+<dl class="attribute">
+<dt id="entity_resolver.core.resolver.Resolver.blocking_strategy">
+<code class="sig-name descname">blocking_strategy</code><a class="reference external" href="https://github.com/wangyiranamy/EntityResolution_Capstone/blob/master/src/entity_resolver/core/resolver.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#entity_resolver.core.resolver.Resolver.blocking_strategy" title="Permalink to this definition">¶</a></dt>
+<dd><p>Omitted.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.6/library/typing.html#typing.Callable" title="(in Python v3.6)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Callable</span></code></a>[[<a class="reference external" href="https://docs.python.org/3.6/library/typing.html#typing.Mapping" title="(in Python v3.6)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Mapping</span></code></a>[<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">str</span></code></a>, <a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">str</span></code></a>], <a class="reference external" href="https://docs.python.org/3.6/library/typing.html#typing.Mapping" title="(in Python v3.6)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Mapping</span></code></a>[<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">str</span></code></a>, <a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">str</span></code></a>]], <a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">float</span></code></a>]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="entity_resolver.core.resolver.Resolver.raw_blocking">
+<code class="sig-name descname">raw_blocking</code><a class="reference external" href="https://github.com/wangyiranamy/EntityResolution_Capstone/blob/master/src/entity_resolver/core/resolver.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#entity_resolver.core.resolver.Resolver.raw_blocking" title="Permalink to this definition">¶</a></dt>
+<dd><p>Omitted.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#bool" title="(in Python v3.6)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">bool</span></code></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="entity_resolver.core.resolver.Resolver.alpha">
+<code class="sig-name descname">alpha</code><a class="reference external" href="https://github.com/wangyiranamy/EntityResolution_Capstone/blob/master/src/entity_resolver/core/resolver.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#entity_resolver.core.resolver.Resolver.alpha" title="Permalink to this definition">¶</a></dt>
+<dd><p>Omitted.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.6/library/typing.html#typing.Union" title="(in Python v3.6)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Union</span></code></a>[<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">float</span></code></a>, <a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">int</span></code></a>]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="entity_resolver.core.resolver.Resolver.weights">
+<code class="sig-name descname">weights</code><a class="reference external" href="https://github.com/wangyiranamy/EntityResolution_Capstone/blob/master/src/entity_resolver/core/resolver.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#entity_resolver.core.resolver.Resolver.weights" title="Permalink to this definition">¶</a></dt>
+<dd><p>Omitted.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.6/library/typing.html#typing.Optional" title="(in Python v3.6)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Optional</span></code></a>[<a class="reference external" href="https://docs.python.org/3.6/library/typing.html#typing.Mapping" title="(in Python v3.6)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Mapping</span></code></a>[<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">str</span></code></a>, <a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">float</span></code></a>]]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="entity_resolver.core.resolver.Resolver.attr_strategy">
+<code class="sig-name descname">attr_strategy</code><a class="reference external" href="https://github.com/wangyiranamy/EntityResolution_Capstone/blob/master/src/entity_resolver/core/resolver.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#entity_resolver.core.resolver.Resolver.attr_strategy" title="Permalink to this definition">¶</a></dt>
+<dd><p>Omitted.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.6/library/typing.html#typing.Mapping" title="(in Python v3.6)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Mapping</span></code></a>[<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">str</span></code></a>, <a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">str</span></code></a>]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="entity_resolver.core.resolver.Resolver.rel_strategy">
+<code class="sig-name descname">rel_strategy</code><a class="reference external" href="https://github.com/wangyiranamy/EntityResolution_Capstone/blob/master/src/entity_resolver/core/resolver.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#entity_resolver.core.resolver.Resolver.rel_strategy" title="Permalink to this definition">¶</a></dt>
+<dd><p>Omitted.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.6/library/typing.html#typing.Optional" title="(in Python v3.6)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Optional</span></code></a>[<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">str</span></code></a>]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="entity_resolver.core.resolver.Resolver.blocking_threshold">
+<code class="sig-name descname">blocking_threshold</code><a class="reference external" href="https://github.com/wangyiranamy/EntityResolution_Capstone/blob/master/src/entity_resolver/core/resolver.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#entity_resolver.core.resolver.Resolver.blocking_threshold" title="Permalink to this definition">¶</a></dt>
+<dd><p>Omitted.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.6/library/typing.html#typing.Union" title="(in Python v3.6)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Union</span></code></a>[<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">float</span></code></a>, <a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">int</span></code></a>]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="entity_resolver.core.resolver.Resolver.bootstrapping_strategy">
+<code class="sig-name descname">bootstrapping_strategy</code><a class="reference external" href="https://github.com/wangyiranamy/EntityResolution_Capstone/blob/master/src/entity_resolver/core/resolver.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#entity_resolver.core.resolver.Resolver.bootstrapping_strategy" title="Permalink to this definition">¶</a></dt>
+<dd><p>Omitted.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.6/library/typing.html#typing.Optional" title="(in Python v3.6)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Optional</span></code></a>[<a class="reference external" href="https://docs.python.org/3.6/library/typing.html#typing.Callable" title="(in Python v3.6)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Callable</span></code></a>[[<a class="reference external" href="https://docs.python.org/3.6/library/typing.html#typing.Mapping" title="(in Python v3.6)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Mapping</span></code></a>[<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">str</span></code></a>, <a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">str</span></code></a>], <a class="reference external" href="https://docs.python.org/3.6/library/typing.html#typing.Mapping" title="(in Python v3.6)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Mapping</span></code></a>[<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">str</span></code></a>, <a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">str</span></code></a>]], <a class="reference external" href="https://docs.python.org/3.6/library/functions.html#bool" title="(in Python v3.6)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">bool</span></code></a>]]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="entity_resolver.core.resolver.Resolver.raw_bootstrap">
+<code class="sig-name descname">raw_bootstrap</code><a class="reference external" href="https://github.com/wangyiranamy/EntityResolution_Capstone/blob/master/src/entity_resolver/core/resolver.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#entity_resolver.core.resolver.Resolver.raw_bootstrap" title="Permalink to this definition">¶</a></dt>
+<dd><p>Omitted.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#bool" title="(in Python v3.6)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">bool</span></code></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="entity_resolver.core.resolver.Resolver.edge_match_threshold">
+<code class="sig-name descname">edge_match_threshold</code><a class="reference external" href="https://github.com/wangyiranamy/EntityResolution_Capstone/blob/master/src/entity_resolver/core/resolver.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#entity_resolver.core.resolver.Resolver.edge_match_threshold" title="Permalink to this definition">¶</a></dt>
+<dd><p>Omitted.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">int</span></code></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="entity_resolver.core.resolver.Resolver.first_attr">
+<code class="sig-name descname">first_attr</code><a class="reference external" href="https://github.com/wangyiranamy/EntityResolution_Capstone/blob/master/src/entity_resolver/core/resolver.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#entity_resolver.core.resolver.Resolver.first_attr" title="Permalink to this definition">¶</a></dt>
+<dd><p>Omitted.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.6/library/typing.html#typing.Optional" title="(in Python v3.6)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Optional</span></code></a>[<a class="reference external" href="https://docs.python.org/3.6/library/typing.html#typing.Callable" title="(in Python v3.6)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Callable</span></code></a>[[<a class="reference external" href="https://docs.python.org/3.6/library/typing.html#typing.Mapping" title="(in Python v3.6)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Mapping</span></code></a>[<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">str</span></code></a>, <a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">str</span></code></a>]], <a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">str</span></code></a>]]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="entity_resolver.core.resolver.Resolver.first_attr_raw">
+<code class="sig-name descname">first_attr_raw</code><a class="reference external" href="https://github.com/wangyiranamy/EntityResolution_Capstone/blob/master/src/entity_resolver/core/resolver.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#entity_resolver.core.resolver.Resolver.first_attr_raw" title="Permalink to this definition">¶</a></dt>
+<dd><p>Omitted.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#bool" title="(in Python v3.6)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">bool</span></code></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="entity_resolver.core.resolver.Resolver.second_attr">
+<code class="sig-name descname">second_attr</code><a class="reference external" href="https://github.com/wangyiranamy/EntityResolution_Capstone/blob/master/src/entity_resolver/core/resolver.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#entity_resolver.core.resolver.Resolver.second_attr" title="Permalink to this definition">¶</a></dt>
+<dd><p>Omitted.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.6/library/typing.html#typing.Optional" title="(in Python v3.6)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Optional</span></code></a>[<a class="reference external" href="https://docs.python.org/3.6/library/typing.html#typing.Callable" title="(in Python v3.6)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Callable</span></code></a>[[<a class="reference external" href="https://docs.python.org/3.6/library/typing.html#typing.Mapping" title="(in Python v3.6)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Mapping</span></code></a>[<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">str</span></code></a>, <a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">str</span></code></a>]], <a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">str</span></code></a>]]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="entity_resolver.core.resolver.Resolver.second_attr_raw">
+<code class="sig-name descname">second_attr_raw</code><a class="reference external" href="https://github.com/wangyiranamy/EntityResolution_Capstone/blob/master/src/entity_resolver/core/resolver.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#entity_resolver.core.resolver.Resolver.second_attr_raw" title="Permalink to this definition">¶</a></dt>
+<dd><p>Omitted.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#bool" title="(in Python v3.6)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">bool</span></code></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="entity_resolver.core.resolver.Resolver.linkage">
+<code class="sig-name descname">linkage</code><a class="reference external" href="https://github.com/wangyiranamy/EntityResolution_Capstone/blob/master/src/entity_resolver/core/resolver.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#entity_resolver.core.resolver.Resolver.linkage" title="Permalink to this definition">¶</a></dt>
+<dd><p>Omitted.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">str</span></code></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="entity_resolver.core.resolver.Resolver.similarity_threshold">
+<code class="sig-name descname">similarity_threshold</code><a class="reference external" href="https://github.com/wangyiranamy/EntityResolution_Capstone/blob/master/src/entity_resolver/core/resolver.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#entity_resolver.core.resolver.Resolver.similarity_threshold" title="Permalink to this definition">¶</a></dt>
+<dd><p>Omitted.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">float</span></code></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="entity_resolver.core.resolver.Resolver.seed">
+<code class="sig-name descname">seed</code><a class="reference external" href="https://github.com/wangyiranamy/EntityResolution_Capstone/blob/master/src/entity_resolver/core/resolver.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#entity_resolver.core.resolver.Resolver.seed" title="Permalink to this definition">¶</a></dt>
+<dd><p>Omitted.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.6/library/typing.html#typing.Optional" title="(in Python v3.6)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Optional</span></code></a>[<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">int</span></code></a>]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="entity_resolver.core.resolver.Resolver.plot_prc">
+<code class="sig-name descname">plot_prc</code><a class="reference external" href="https://github.com/wangyiranamy/EntityResolution_Capstone/blob/master/src/entity_resolver/core/resolver.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#entity_resolver.core.resolver.Resolver.plot_prc" title="Permalink to this definition">¶</a></dt>
+<dd><p>Omitted.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#bool" title="(in Python v3.6)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">bool</span></code></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="entity_resolver.core.resolver.Resolver.verbose">
+<code class="sig-name descname">verbose</code><a class="reference external" href="https://github.com/wangyiranamy/EntityResolution_Capstone/blob/master/src/entity_resolver/core/resolver.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#entity_resolver.core.resolver.Resolver.verbose" title="Permalink to this definition">¶</a></dt>
+<dd><p>Omitted.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">int</span></code></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="entity_resolver.core.resolver.Resolver.time_dict">
+<code class="sig-name descname">time_dict</code><a class="reference external" href="https://github.com/wangyiranamy/EntityResolution_Capstone/blob/master/src/entity_resolver/core/resolver.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#entity_resolver.core.resolver.Resolver.time_dict" title="Permalink to this definition">¶</a></dt>
+<dd><p>A <a class="reference external" href="https://docs.python.org/3.6/library/collections.html#collections.defaultdict" title="(in Python v3.6)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">defaultdict</span></code></a> object mapping method names to a list
+of two entries:</p>
+<p>[&lt;number of times called&gt;, &lt;total time spent by all calls&gt;].</p>
+<p>It is used to store the time statistics of methods decorated with
+<a class="reference internal" href="entity_resolver.core.utils.html#entity_resolver.core.utils.timeit" title="entity_resolver.core.utils.timeit"><code class="xref py py-obj docutils literal notranslate"><span class="pre">timeit</span></code></a>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.6/library/typing.html#typing.Dict" title="(in Python v3.6)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Dict</span></code></a>[<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">str</span></code></a>, <a class="reference external" href="https://docs.python.org/3.6/library/typing.html#typing.List" title="(in Python v3.6)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">List</span></code></a>[<a class="reference external" href="https://docs.python.org/3.6/library/typing.html#typing.Union" title="(in Python v3.6)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Union</span></code></a>[<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">float</span></code></a>, <a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">int</span></code></a>]]]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="entity_resolver.core.resolver.Resolver.kwargs">
+<code class="sig-name descname">kwargs</code><a class="reference external" href="https://github.com/wangyiranamy/EntityResolution_Capstone/blob/master/src/entity_resolver/core/resolver.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#entity_resolver.core.resolver.Resolver.kwargs" title="Permalink to this definition">¶</a></dt>
+<dd><p>Omitted.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="entity_resolver.core.resolver.Resolver._sim_func_producers">
+<code class="sig-name descname">_sim_func_producers</code><a class="reference external" href="https://github.com/wangyiranamy/EntityResolution_Capstone/blob/master/src/entity_resolver/core/resolver.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#entity_resolver.core.resolver.Resolver._sim_func_producers" title="Permalink to this definition">¶</a></dt>
+<dd><p>Mapping from strategy strings to corresponding similarity functions
+producers.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.6/library/typing.html#typing.Callable" title="(in Python v3.6)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Callable</span></code></a>[<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">str</span></code></a>, <a class="reference external" href="https://docs.python.org/3.6/library/typing.html#typing.Callable" title="(in Python v3.6)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Callable</span></code></a>]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="entity_resolver.core.resolver.Resolver._default_strategies">
+<code class="sig-name descname">_default_strategies</code><a class="reference external" href="https://github.com/wangyiranamy/EntityResolution_Capstone/blob/master/src/entity_resolver/core/resolver.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#entity_resolver.core.resolver.Resolver._default_strategies" title="Permalink to this definition">¶</a></dt>
+<dd><p>Mapping
+attribute types to default strategy strings. The default strategy
+strings are used if no strategy strings are specified in
+<code class="docutils literal notranslate"><span class="pre">attr_strategy</span></code>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.6/library/typing.html#typing.Callable" title="(in Python v3.6)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Callable</span></code></a>[<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">str</span></code></a>, <a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">str</span></code></a>]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="entity_resolver.core.resolver.Resolver._prc_list">
+<code class="sig-name descname">_prc_list</code><a class="reference external" href="https://github.com/wangyiranamy/EntityResolution_Capstone/blob/master/src/entity_resolver/core/resolver.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#entity_resolver.core.resolver.Resolver._prc_list" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>(cache)</em>. It is used to store the precision and recall scores
+computed during the entity resolution algorithm if <code class="docutils literal notranslate"><span class="pre">plot_prc</span></code> is
+set to <code class="docutils literal notranslate"><span class="pre">True</span></code>. Each item of the list is (precision, recall). It
+is not initialized if <code class="docutils literal notranslate"><span class="pre">plot_prc</span></code> is <code class="docutils literal notranslate"><span class="pre">False</span></code>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.6/library/typing.html#typing.List" title="(in Python v3.6)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">List</span></code></a>[<a class="reference external" href="https://docs.python.org/3.6/library/typing.html#typing.Tuple" title="(in Python v3.6)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Tuple</span></code></a>[<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">float</span></code></a>, <a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">float</span></code></a>]]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="entity_resolver.core.resolver.Resolver._graph">
+<code class="sig-name descname">_graph</code><a class="reference external" href="https://github.com/wangyiranamy/EntityResolution_Capstone/blob/master/src/entity_resolver/core/resolver.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#entity_resolver.core.resolver.Resolver._graph" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>(cache)</em>. The graph used
+for the entity resolution.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="entity_resolver.core.graph.html#entity_resolver.core.graph.Graph" title="entity_resolver.core.graph.Graph"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Graph</span></code></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="entity_resolver.core.resolver.Resolver._attr_weights">
+<code class="sig-name descname">_attr_weights</code><a class="reference external" href="https://github.com/wangyiranamy/EntityResolution_Capstone/blob/master/src/entity_resolver/core/resolver.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#entity_resolver.core.resolver.Resolver._attr_weights" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>(cache)</em>. Mapping
+attribute names to their ratio in computing attribute similarities.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.6/library/typing.html#typing.Dict" title="(in Python v3.6)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Dict</span></code></a>[<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">str</span></code></a>, <a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">float</span></code></a>]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="entity_resolver.core.resolver.Resolver._attr_funcs">
+<code class="sig-name descname">_attr_funcs</code><a class="reference external" href="https://github.com/wangyiranamy/EntityResolution_Capstone/blob/master/src/entity_resolver/core/resolver.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#entity_resolver.core.resolver.Resolver._attr_funcs" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>(cache)</em>.
+Mapping attribute names to functions that compute the similarities
+of two values in the attributes.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.6/library/typing.html#typing.Dict" title="(in Python v3.6)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Dict</span></code></a>[<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">str</span></code></a>, <a class="reference external" href="https://docs.python.org/3.6/library/typing.html#typing.Callable" title="(in Python v3.6)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Callable</span></code></a>]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="entity_resolver.core.resolver.Resolver._rel_func">
+<code class="sig-name descname">_rel_func</code><a class="reference external" href="https://github.com/wangyiranamy/EntityResolution_Capstone/blob/master/src/entity_resolver/core/resolver.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#entity_resolver.core.resolver.Resolver._rel_func" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>(cache)</em>. The relational similarity function used to compute the
+relational similarity between two clusters.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.6/library/typing.html#typing.Callable" title="(in Python v3.6)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Callable</span></code></a>[[<a class="reference external" href="https://docs.python.org/3.6/library/typing.html#typing.Collection" title="(in Python v3.6)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Collection</span></code></a>, <a class="reference external" href="https://docs.python.org/3.6/library/typing.html#typing.Collection" title="(in Python v3.6)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Collection</span></code></a>, <a class="reference external" href="https://docs.python.org/3.6/library/typing.html#typing.Callable" title="(in Python v3.6)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Callable</span></code></a>[[<a class="reference external" href="https://docs.python.org/3.6/library/typing.html#typing.Hashable" title="(in Python v3.6)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Hashable</span></code></a>], <a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">float</span></code></a>]], <a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">float</span></code></a>]`</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="entity_resolver.core.resolver.Resolver._ambiguities">
+<code class="sig-name descname">_ambiguities</code><a class="reference external" href="https://github.com/wangyiranamy/EntityResolution_Capstone/blob/master/src/entity_resolver/core/resolver.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#entity_resolver.core.resolver.Resolver._ambiguities" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>(cache)</em>. Mapping references to their attribute ambiguities.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.6/library/typing.html#typing.Dict" title="(in Python v3.6)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Dict</span></code></a>[<a class="reference internal" href="entity_resolver.core.graph.html#entity_resolver.core.graph.Node" title="entity_resolver.core.graph.Node"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Node</span></code></a>, float]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="entity_resolver.core.resolver.Resolver._use_nbr_cache">
+<code class="sig-name descname">_use_nbr_cache</code><a class="reference external" href="https://github.com/wangyiranamy/EntityResolution_Capstone/blob/master/src/entity_resolver/core/resolver.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#entity_resolver.core.resolver.Resolver._use_nbr_cache" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>(cache)</em>. Indicate if the cached
+<code class="docutils literal notranslate"><span class="pre">_cluster_neighbors</span></code> should be used during computation of
+relational similarities. It can only be used when the computation
+does not need to count multiplicities of neighboring clusters.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#bool" title="(in Python v3.6)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">bool</span></code></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="entity_resolver.core.resolver.Resolver._use_amb_type">
+<code class="sig-name descname">_use_amb_type</code><a class="reference external" href="https://github.com/wangyiranamy/EntityResolution_Capstone/blob/master/src/entity_resolver/core/resolver.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#entity_resolver.core.resolver.Resolver._use_amb_type" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>(cache)</em>. Indicate which
+type of ambiguity values are required during computation of
+similarities. Valid values are <code class="docutils literal notranslate"><span class="pre">'neighbor'</span></code>, <code class="docutils literal notranslate"><span class="pre">'attr'</span></code>, and
+<code class="docutils literal notranslate"><span class="pre">None</span></code>, which refer to neighbor ambiguities, attribute
+ambiguities, and not used respectively.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.6/library/typing.html#typing.Optional" title="(in Python v3.6)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Optional</span></code></a>[<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">str</span></code></a>]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="entity_resolver.core.resolver.Resolver._use_ambiguities">
+<code class="sig-name descname">_use_ambiguities</code><a class="reference external" href="https://github.com/wangyiranamy/EntityResolution_Capstone/blob/master/src/entity_resolver/core/resolver.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#entity_resolver.core.resolver.Resolver._use_ambiguities" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>(cache)</em>. Indicate if the similarity
+computation requires computation of attribute ambiguities.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#bool" title="(in Python v3.6)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">bool</span></code></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="entity_resolver.core.resolver.Resolver._clusters">
+<code class="sig-name descname">_clusters</code><a class="reference external" href="https://github.com/wangyiranamy/EntityResolution_Capstone/blob/master/src/entity_resolver/core/resolver.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#entity_resolver.core.resolver.Resolver._clusters" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>(cache)</em>. A <a class="reference external" href="https://docs.python.org/3.6/library/collections.html#collections.defaultdict" title="(in Python v3.6)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">defaultdict</span></code></a> mapping cluster ids to sets
+of references belonging to the clusters.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.6/library/typing.html#typing.Dict" title="(in Python v3.6)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Dict</span></code></a>[<a class="reference external" href="https://docs.python.org/3.6/library/typing.html#typing.Hashable" title="(in Python v3.6)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Hashable</span></code></a>, <a class="reference external" href="https://docs.python.org/3.6/library/typing.html#typing.Set" title="(in Python v3.6)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Set</span></code></a>[<a class="reference internal" href="entity_resolver.core.graph.html#entity_resolver.core.graph.Node" title="entity_resolver.core.graph.Node"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Node</span></code></a>]]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="entity_resolver.core.resolver.Resolver._inv_clusters">
+<code class="sig-name descname">_inv_clusters</code><a class="reference external" href="https://github.com/wangyiranamy/EntityResolution_Capstone/blob/master/src/entity_resolver/core/resolver.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#entity_resolver.core.resolver.Resolver._inv_clusters" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>(cache)</em>. An <a class="reference external" href="https://docs.python.org/3.6/library/collections.html#collections.OrderedDict" title="(in Python v3.6)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">OrderedDict</span></code></a> mapping references to the
+cluster ids they belong to. The dictionary is sorted (key-value
+pairs are inserted) in ascending order of reference ids.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.6/library/typing.html#typing.Dict" title="(in Python v3.6)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Dict</span></code></a>[<a class="reference internal" href="entity_resolver.core.graph.html#entity_resolver.core.graph.Node" title="entity_resolver.core.graph.Node"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Node</span></code></a>, <a class="reference external" href="https://docs.python.org/3.6/library/typing.html#typing.Hashable" title="(in Python v3.6)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Hashable</span></code></a>]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="entity_resolver.core.resolver.Resolver._cluster_neighbors">
+<code class="sig-name descname">_cluster_neighbors</code><a class="reference external" href="https://github.com/wangyiranamy/EntityResolution_Capstone/blob/master/src/entity_resolver/core/resolver.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#entity_resolver.core.resolver.Resolver._cluster_neighbors" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>(cache)</em>. Mapping cluster ids to its neighboring cluster ids.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.6/library/typing.html#typing.Dict" title="(in Python v3.6)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Dict</span></code></a>[<a class="reference external" href="https://docs.python.org/3.6/library/typing.html#typing.Hashable" title="(in Python v3.6)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Hashable</span></code></a>, <a class="reference external" href="https://docs.python.org/3.6/library/typing.html#typing.Set" title="(in Python v3.6)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Set</span></code></a>]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="entity_resolver.core.resolver.Resolver._sim_clusters_pool">
+<code class="sig-name descname">_sim_clusters_pool</code><a class="reference external" href="https://github.com/wangyiranamy/EntityResolution_Capstone/blob/master/src/entity_resolver/core/resolver.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#entity_resolver.core.resolver.Resolver._sim_clusters_pool" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>(cache)</em>. A set of potentially similar pairs of clusters.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.6/library/typing.html#typing.Set" title="(in Python v3.6)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Set</span></code></a>[<a class="reference external" href="https://docs.python.org/3.6/library/typing.html#typing.Tuple" title="(in Python v3.6)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Tuple</span></code></a>[<a class="reference external" href="https://docs.python.org/3.6/library/typing.html#typing.Hashable" title="(in Python v3.6)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Hashable</span></code></a>, <a class="reference external" href="https://docs.python.org/3.6/library/typing.html#typing.Hashable" title="(in Python v3.6)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Hashable</span></code></a>]]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="entity_resolver.core.resolver.Resolver._add_pr">
+<code class="sig-name descname">_add_pr</code><span class="sig-paren">(</span><em class="sig-param">ground_truth</em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/wangyiranamy/EntityResolution_Capstone/blob/master/src/entity_resolver/core/resolver.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#entity_resolver.core.resolver.Resolver._add_pr" title="Permalink to this definition">¶</a></dt>
+<dd><p>Compute and add (precision, recall) to the <code class="docutils literal notranslate"><span class="pre">_prc_list</span></code> attribute.</p>
+<p>This method is called each fixed times an entry is popped from the
+priority queue if <code class="docutils literal notranslate"><span class="pre">plot_prc</span></code> is <code class="docutils literal notranslate"><span class="pre">True</span></code>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>ground_truth</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/collections.html#collections.OrderedDict" title="(in Python v3.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">OrderedDict</span></code></a>) – Mapping reference ids to ground truth cluster ids.
+The dictionary is sorted (key-value pairs are inserted) in
+ascending order of reference ids.</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><code class="docutils literal notranslate"><span class="pre">None</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="entity_resolver.core.resolver.Resolver._add_sim_entries">
+<code class="sig-name descname">_add_sim_entries</code><span class="sig-paren">(</span><em class="sig-param">cluster</em>, <em class="sig-param">pqueue</em>, <em class="sig-param">cluster_entries</em>, <em class="sig-param">sim_clusters</em>, <em class="sig-param">added_pairs</em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/wangyiranamy/EntityResolution_Capstone/blob/master/src/entity_resolver/core/resolver.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#entity_resolver.core.resolver.Resolver._add_sim_entries" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add new entries to the priority queue after merging two clusters.</p>
+<p>The added entries are clusters potentially similar to the original two
+clusters before merging paired with the merged cluster. Their
+similarities are re-computed as well.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>cluster</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/collections.abc.html#collections.abc.Hashable" title="(in Python v3.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Hashable</span></code></a>) – The merged cluster.</p></li>
+<li><p><strong>pqueue</strong> (<a class="reference internal" href="entity_resolver.core.utils.html#entity_resolver.core.utils.PriorityQueue" title="entity_resolver.core.utils.PriorityQueue"><code class="xref py py-class docutils literal notranslate"><span class="pre">PriorityQueue</span></code></a>) – The priority queue of
+<a class="reference internal" href="entity_resolver.core.utils.html#entity_resolver.core.utils.SimilarityEntry" title="entity_resolver.core.utils.SimilarityEntry"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SimilarityEntry</span></code></a> objects.</p></li>
+<li><p><strong>cluster_entries</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/typing.html#typing.Mapping" title="(in Python v3.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Mapping</span></code></a>[<a class="reference external" href="https://docs.python.org/3.6/library/collections.abc.html#collections.abc.Hashable" title="(in Python v3.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Hashable</span></code></a>, <a class="reference external" href="https://docs.python.org/3.6/library/typing.html#typing.Mapping" title="(in Python v3.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Mapping</span></code></a>[<a class="reference external" href="https://docs.python.org/3.6/library/collections.abc.html#collections.abc.Hashable" title="(in Python v3.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Hashable</span></code></a>, <a class="reference internal" href="entity_resolver.core.utils.html#entity_resolver.core.utils.SimilarityEntry" title="entity_resolver.core.utils.SimilarityEntry"><code class="xref py py-class docutils literal notranslate"><span class="pre">SimilarityEntry</span></code></a>]]) – A two-dimensional mapping that maps cluster pairs
+to their corresponding
+<a class="reference internal" href="entity_resolver.core.utils.html#entity_resolver.core.utils.SimilarityEntry" title="entity_resolver.core.utils.SimilarityEntry"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SimilarityEntry</span></code></a> objects. Same as
+in the <code class="docutils literal notranslate"><span class="pre">_init_queue_entries</span></code> method.</p></li>
+<li><p><strong>sim_clusters</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/typing.html#typing.Mapping" title="(in Python v3.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Mapping</span></code></a>[<a class="reference external" href="https://docs.python.org/3.6/library/collections.abc.html#collections.abc.Hashable" title="(in Python v3.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Hashable</span></code></a>, <a class="reference external" href="https://docs.python.org/3.6/library/typing.html#typing.Set" title="(in Python v3.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Set</span></code></a>]) – Mapping cluster ids to a set of clusters that are
+potentially similar to them. Same as in the
+<code class="docutils literal notranslate"><span class="pre">_init_queue_entries</span></code> method.</p></li>
+<li><p><strong>added_pairs</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/typing.html#typing.Set" title="(in Python v3.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Set</span></code></a>[<a class="reference external" href="https://docs.python.org/3.6/library/typing.html#typing.Tuple" title="(in Python v3.6)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Tuple</span></code></a>[<a class="reference external" href="https://docs.python.org/3.6/library/collections.abc.html#collections.abc.Hashable" title="(in Python v3.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Hashable</span></code></a>, <a class="reference external" href="https://docs.python.org/3.6/library/collections.abc.html#collections.abc.Hashable" title="(in Python v3.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Hashable</span></code></a>]]) – Store pairs of clusters that have already been added
+into the priority queue to avoid duplicates. Each time an entry
+is added into the priority queue, the tuple of the two clusters
+with both permutations are added into it.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><code class="docutils literal notranslate"><span class="pre">None</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="entity_resolver.core.resolver.Resolver._blocking">
+<code class="sig-name descname">_blocking</code><span class="sig-paren">(</span><em class="sig-param">graph</em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/wangyiranamy/EntityResolution_Capstone/blob/master/src/entity_resolver/core/resolver.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#entity_resolver.core.resolver.Resolver._blocking" title="Permalink to this definition">¶</a></dt>
+<dd><p>Find potentially similar reference pairs via blocking.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>graph</strong> (<a class="reference internal" href="entity_resolver.core.graph.html#entity_resolver.core.graph.Graph" title="entity_resolver.core.graph.Graph"><code class="xref py py-class docutils literal notranslate"><span class="pre">Graph</span></code></a>) – The reference graph for entity resolution.</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3.6/library/typing.html#typing.List" title="(in Python v3.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code></a>[<a class="reference external" href="https://docs.python.org/3.6/library/typing.html#typing.List" title="(in Python v3.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code></a>[<a class="reference internal" href="entity_resolver.core.graph.html#entity_resolver.core.graph.Node" title="entity_resolver.core.graph.Node"><code class="xref py py-class docutils literal notranslate"><span class="pre">Node</span></code></a>]]</p>
+</dd>
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>Each item in the list is a bucket contained references that has
+the potential to end up being the same entity.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="entity_resolver.core.resolver.Resolver._calc_attr_sim">
+<code class="sig-name descname">_calc_attr_sim</code><span class="sig-paren">(</span><em class="sig-param">cluster1</em>, <em class="sig-param">cluster2</em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/wangyiranamy/EntityResolution_Capstone/blob/master/src/entity_resolver/core/resolver.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#entity_resolver.core.resolver.Resolver._calc_attr_sim" title="Permalink to this definition">¶</a></dt>
+<dd><p>Compute the attribute similarity between two clusters.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>cluster1</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/collections.abc.html#collections.abc.Hashable" title="(in Python v3.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Hashable</span></code></a>) – One of the clusters for computation.</p></li>
+<li><p><strong>cluster2</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/collections.abc.html#collections.abc.Hashable" title="(in Python v3.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Hashable</span></code></a>) – One of the clusters for computation.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a></p>
+</dd>
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>The attribute similarity score between two clusters.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="entity_resolver.core.resolver.Resolver._calc_cluster_uniq">
+<code class="sig-name descname">_calc_cluster_uniq</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference external" href="https://github.com/wangyiranamy/EntityResolution_Capstone/blob/master/src/entity_resolver/core/resolver.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#entity_resolver.core.resolver.Resolver._calc_cluster_uniq" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a function which can compute a cluster uniqueness.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.6/library/typing.html#typing.Optional" title="(in Python v3.6)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code></a>[<a class="reference external" href="https://docs.python.org/3.6/library/typing.html#typing.Callable" title="(in Python v3.6)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Callable</span></code></a>[[<a class="reference external" href="https://docs.python.org/3.6/library/collections.abc.html#collections.abc.Hashable" title="(in Python v3.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Hashable</span></code></a>], <a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a>]]</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>This returned function returns the uniqueness score given a cluster
+id. If such function is not required during computation of
+similarities, <code class="docutils literal notranslate"><span class="pre">None</span></code> is returned. Only a function is returned
+because most of cluster uniqueness values needed to be computed, so
+computing on demand vastly improves program efficiency.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="entity_resolver.core.resolver.Resolver._calc_node_attr_sim">
+<code class="sig-name descname">_calc_node_attr_sim</code><span class="sig-paren">(</span><em class="sig-param">node1</em>, <em class="sig-param">node2</em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/wangyiranamy/EntityResolution_Capstone/blob/master/src/entity_resolver/core/resolver.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#entity_resolver.core.resolver.Resolver._calc_node_attr_sim" title="Permalink to this definition">¶</a></dt>
+<dd><p>Compute the attribute similarity between two references.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>node1</strong> (<a class="reference internal" href="entity_resolver.core.graph.html#entity_resolver.core.graph.Node" title="entity_resolver.core.graph.Node"><code class="xref py py-class docutils literal notranslate"><span class="pre">Node</span></code></a>) – One of the two references for computation.</p></li>
+<li><p><strong>node2</strong> (<a class="reference internal" href="entity_resolver.core.graph.html#entity_resolver.core.graph.Node" title="entity_resolver.core.graph.Node"><code class="xref py py-class docutils literal notranslate"><span class="pre">Node</span></code></a>) – One of the two references for computation.</p></li>
+</ul>
+</dd>
+</dl>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>If the type of the attribute is <code class="docutils literal notranslate"><span class="pre">'person_entity'</span></code>, its raw value
+is put into the attribute similarity function. Otherwise, the
+processed value is used.</p>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a></p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The attribute similarity score between two references.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="entity_resolver.core.resolver.Resolver._calc_rel_sim">
+<code class="sig-name descname">_calc_rel_sim</code><span class="sig-paren">(</span><em class="sig-param">cluster1</em>, <em class="sig-param">cluster2</em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/wangyiranamy/EntityResolution_Capstone/blob/master/src/entity_resolver/core/resolver.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#entity_resolver.core.resolver.Resolver._calc_rel_sim" title="Permalink to this definition">¶</a></dt>
+<dd><p>Compute the relational similarity between two clusters.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>cluster1</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/collections.abc.html#collections.abc.Hashable" title="(in Python v3.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Hashable</span></code></a>) – One of the clusters for computation.</p></li>
+<li><p><strong>cluster2</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/collections.abc.html#collections.abc.Hashable" title="(in Python v3.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Hashable</span></code></a>) – One of the clusters for computation.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a></p>
+</dd>
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>The attribute similarity score between two clusters.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="entity_resolver.core.resolver.Resolver._calc_similarity">
+<code class="sig-name descname">_calc_similarity</code><span class="sig-paren">(</span><em class="sig-param">cluster1</em>, <em class="sig-param">cluster2</em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/wangyiranamy/EntityResolution_Capstone/blob/master/src/entity_resolver/core/resolver.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#entity_resolver.core.resolver.Resolver._calc_similarity" title="Permalink to this definition">¶</a></dt>
+<dd><p>Compute similarity between two clusters.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>cluster1</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/collections.abc.html#collections.abc.Hashable" title="(in Python v3.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Hashable</span></code></a>) – One of the clusters for computation.</p></li>
+<li><p><strong>cluster2</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/collections.abc.html#collections.abc.Hashable" title="(in Python v3.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Hashable</span></code></a>) – One of the clusters for computation.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a></p>
+</dd>
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>The similarity score between two clusters (a weighted average
+between attribute and relational similarities).</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="entity_resolver.core.resolver.Resolver._check_edge_match">
+<code class="sig-name descname">_check_edge_match</code><span class="sig-paren">(</span><em class="sig-param">node1</em>, <em class="sig-param">node2</em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/wangyiranamy/EntityResolution_Capstone/blob/master/src/entity_resolver/core/resolver.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#entity_resolver.core.resolver.Resolver._check_edge_match" title="Permalink to this definition">¶</a></dt>
+<dd><p>Check if edges of the two nodes pass the matching threshold.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>node1</strong> (<a class="reference internal" href="entity_resolver.core.graph.html#entity_resolver.core.graph.Node" title="entity_resolver.core.graph.Node"><code class="xref py py-class docutils literal notranslate"><span class="pre">Node</span></code></a>) – One of the two nodes to be compared.</p></li>
+<li><p><strong>node2</strong> (<a class="reference internal" href="entity_resolver.core.graph.html#entity_resolver.core.graph.Node" title="entity_resolver.core.graph.Node"><code class="xref py py-class docutils literal notranslate"><span class="pre">Node</span></code></a>) – One of the two nodes to be compared.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#bool" title="(in Python v3.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a></p>
+</dd>
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>If edges of the two input nodes pass the matching threshold.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="entity_resolver.core.resolver.Resolver._check_exact_match">
+<code class="sig-name descname">_check_exact_match</code><span class="sig-paren">(</span><em class="sig-param">node1</em>, <em class="sig-param">node2</em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/wangyiranamy/EntityResolution_Capstone/blob/master/src/entity_resolver/core/resolver.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#entity_resolver.core.resolver.Resolver._check_exact_match" title="Permalink to this definition">¶</a></dt>
+<dd><p>Check if attributes of two nodes match exactly.</p>
+<ul class="simple">
+<li><p>If <code class="docutils literal notranslate"><span class="pre">bootstrap_strategy</span></code> is <strong>not</strong> <code class="docutils literal notranslate"><span class="pre">None</span></code>, then the strategy
+function is called to check if the references match exactly.
+Otherwise two references are considered a exact match if and only if
+all attributes are exactly the same.</p></li>
+<li><p>If <code class="docutils literal notranslate"><span class="pre">raw_bootstrap</span></code> is <code class="docutils literal notranslate"><span class="pre">True</span></code>, then the raw values of attributes
+of each node is compared. Otherwise the processed values are
+compared.</p></li>
+</ul>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>node1</strong> (<a class="reference internal" href="entity_resolver.core.graph.html#entity_resolver.core.graph.Node" title="entity_resolver.core.graph.Node"><code class="xref py py-class docutils literal notranslate"><span class="pre">Node</span></code></a>) – One of the two nodes to be compared.</p></li>
+<li><p><strong>node2</strong> (<a class="reference internal" href="entity_resolver.core.graph.html#entity_resolver.core.graph.Node" title="entity_resolver.core.graph.Node"><code class="xref py py-class docutils literal notranslate"><span class="pre">Node</span></code></a>) – One of the two nodes to be compared.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#bool" title="(in Python v3.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a></p>
+</dd>
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>If attributes of the two input nodes should be considered as an
+exact match.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="entity_resolver.core.resolver.Resolver._clear_cache">
+<code class="sig-name descname">_clear_cache</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference external" href="https://github.com/wangyiranamy/EntityResolution_Capstone/blob/master/src/entity_resolver/core/resolver.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#entity_resolver.core.resolver.Resolver._clear_cache" title="Permalink to this definition">¶</a></dt>
+<dd><p>Clear cache attributes not needed after <code class="docutils literal notranslate"><span class="pre">resolve</span></code> finishes.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="docutils literal notranslate"><span class="pre">None</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="entity_resolver.core.resolver.Resolver._cluster_nodes">
+<code class="sig-name descname">_cluster_nodes</code><span class="sig-paren">(</span><em class="sig-param">ground_truth=None</em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/wangyiranamy/EntityResolution_Capstone/blob/master/src/entity_resolver/core/resolver.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#entity_resolver.core.resolver.Resolver._cluster_nodes" title="Permalink to this definition">¶</a></dt>
+<dd><p>Execute the main clustering algorithm.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>ground_truth</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/typing.html#typing.Optional" title="(in Python v3.6)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code></a>[<a class="reference external" href="https://docs.python.org/3.6/library/collections.html#collections.OrderedDict" title="(in Python v3.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">OrderedDict</span></code></a>]) – Mapping reference ids to ground truth cluster ids.
+The dictionary is sorted (key-value pairs are inserted) in
+ascending order of reference ids.</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><code class="docutils literal notranslate"><span class="pre">None</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="entity_resolver.core.resolver.Resolver._get_cluster_neighbors">
+<code class="sig-name descname">_get_cluster_neighbors</code><span class="sig-paren">(</span><em class="sig-param">cluster</em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/wangyiranamy/EntityResolution_Capstone/blob/master/src/entity_resolver/core/resolver.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#entity_resolver.core.resolver.Resolver._get_cluster_neighbors" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a list of neighboring clusters of the input cluster.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>cluster</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/collections.abc.html#collections.abc.Hashable" title="(in Python v3.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Hashable</span></code></a>) – The neighboring clusters of this cluster is to be
+returned.</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3.6/library/typing.html#typing.List" title="(in Python v3.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code></a>[<a class="reference external" href="https://docs.python.org/3.6/library/collections.abc.html#collections.abc.Hashable" title="(in Python v3.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Hashable</span></code></a>]</p>
+</dd>
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>A list of neighboring clusters of the input cluster. It includes
+neighbors with multiplicities because some relational similarity
+functions are based on multisets.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="entity_resolver.core.resolver.Resolver._init_ambiguities">
+<code class="sig-name descname">_init_ambiguities</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference external" href="https://github.com/wangyiranamy/EntityResolution_Capstone/blob/master/src/entity_resolver/core/resolver.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#entity_resolver.core.resolver.Resolver._init_ambiguities" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initialize amgibuity values of each reference.</p>
+<dl class="simple">
+<dt>Raies:</dt><dd><dl class="simple">
+<dt>ValueError: If either <code class="docutils literal notranslate"><span class="pre">first_attr</span></code> or <code class="docutils literal notranslate"><span class="pre">second_attr</span></code> attribute</dt><dd><p>is None.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="docutils literal notranslate"><span class="pre">None</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="entity_resolver.core.resolver.Resolver._init_cache">
+<code class="sig-name descname">_init_cache</code><span class="sig-paren">(</span><em class="sig-param">graph</em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/wangyiranamy/EntityResolution_Capstone/blob/master/src/entity_resolver/core/resolver.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#entity_resolver.core.resolver.Resolver._init_cache" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initialize some cache attributes.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>graph</strong> (<a class="reference internal" href="entity_resolver.core.graph.html#entity_resolver.core.graph.Graph" title="entity_resolver.core.graph.Graph"><code class="xref py py-class docutils literal notranslate"><span class="pre">Graph</span></code></a>) – The reference graph for entity resolution.</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><code class="docutils literal notranslate"><span class="pre">None</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="entity_resolver.core.resolver.Resolver._init_clusters">
+<code class="sig-name descname">_init_clusters</code><span class="sig-paren">(</span><em class="sig-param">buckets</em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/wangyiranamy/EntityResolution_Capstone/blob/master/src/entity_resolver/core/resolver.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#entity_resolver.core.resolver.Resolver._init_clusters" title="Permalink to this definition">¶</a></dt>
+<dd><p>Merge references in the same buckets to the same cluster.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>buckets</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/typing.html#typing.List" title="(in Python v3.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code></a>[<a class="reference external" href="https://docs.python.org/3.6/library/typing.html#typing.List" title="(in Python v3.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code></a>[<a class="reference internal" href="entity_resolver.core.graph.html#entity_resolver.core.graph.Node" title="entity_resolver.core.graph.Node"><code class="xref py py-class docutils literal notranslate"><span class="pre">Node</span></code></a>]]) – The list of buckets containing potentially similar
+references. This is the return of the <code class="docutils literal notranslate"><span class="pre">_blocking</span></code> method.</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><code class="docutils literal notranslate"><span class="pre">None</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="entity_resolver.core.resolver.Resolver._init_queue_entries">
+<code class="sig-name descname">_init_queue_entries</code><span class="sig-paren">(</span><em class="sig-param">cluster_entries</em>, <em class="sig-param">sim_clusters</em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/wangyiranamy/EntityResolution_Capstone/blob/master/src/entity_resolver/core/resolver.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#entity_resolver.core.resolver.Resolver._init_queue_entries" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initialize a priority queue with potentially similar cluster pairs.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>cluster_entries</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/typing.html#typing.Mapping" title="(in Python v3.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Mapping</span></code></a>[<a class="reference external" href="https://docs.python.org/3.6/library/collections.abc.html#collections.abc.Hashable" title="(in Python v3.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Hashable</span></code></a>, <a class="reference external" href="https://docs.python.org/3.6/library/typing.html#typing.Mapping" title="(in Python v3.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Mapping</span></code></a>[<a class="reference external" href="https://docs.python.org/3.6/library/collections.abc.html#collections.abc.Hashable" title="(in Python v3.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Hashable</span></code></a>, <a class="reference internal" href="entity_resolver.core.utils.html#entity_resolver.core.utils.SimilarityEntry" title="entity_resolver.core.utils.SimilarityEntry"><code class="xref py py-class docutils literal notranslate"><span class="pre">SimilarityEntry</span></code></a>]]) – A two-dimensional mapping that maps cluster pairs
+to their corresponding
+<a class="reference internal" href="entity_resolver.core.utils.html#entity_resolver.core.utils.SimilarityEntry" title="entity_resolver.core.utils.SimilarityEntry"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SimilarityEntry</span></code></a> objects. For
+example, <code class="docutils literal notranslate"><span class="pre">cluster_entries[1][2]</span></code> is a
+<a class="reference internal" href="entity_resolver.core.utils.html#entity_resolver.core.utils.SimilarityEntry" title="entity_resolver.core.utils.SimilarityEntry"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SimilarityEntry</span></code></a> object that
+contains the similarity of cluster with id <code class="docutils literal notranslate"><span class="pre">1</span></code> and cluster
+with id  <code class="docutils literal notranslate"><span class="pre">2</span></code>. It is used to keep track of all entries in the
+priority queue for update or removal.</p></li>
+<li><p><strong>sim_clusters</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/typing.html#typing.Mapping" title="(in Python v3.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Mapping</span></code></a>[<a class="reference external" href="https://docs.python.org/3.6/library/collections.abc.html#collections.abc.Hashable" title="(in Python v3.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Hashable</span></code></a>, <a class="reference external" href="https://docs.python.org/3.6/library/typing.html#typing.Set" title="(in Python v3.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Set</span></code></a>]) – Mapping cluster ids to a set of clusters that are
+potentially similar to them.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference internal" href="entity_resolver.core.utils.html#entity_resolver.core.utils.PriorityQueue" title="entity_resolver.core.utils.PriorityQueue"><code class="xref py py-class docutils literal notranslate"><span class="pre">PriorityQueue</span></code></a></p>
+</dd>
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>A priority queue consisting all the
+<a class="reference internal" href="entity_resolver.core.utils.html#entity_resolver.core.utils.SimilarityEntry" title="entity_resolver.core.utils.SimilarityEntry"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SimilarityEntry</span></code></a> objects of
+potentially similar cluster pairs.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="entity_resolver.core.resolver.Resolver._init_sim_clusters_pool">
+<code class="sig-name descname">_init_sim_clusters_pool</code><span class="sig-paren">(</span><em class="sig-param">buckets</em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/wangyiranamy/EntityResolution_Capstone/blob/master/src/entity_resolver/core/resolver.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#entity_resolver.core.resolver.Resolver._init_sim_clusters_pool" title="Permalink to this definition">¶</a></dt>
+<dd><p>Put pairs of potentially similar clusters in a set.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>buekcts</strong> – The list of buckets containing potentially similar
+references. This is the return of the <code class="docutils literal notranslate"><span class="pre">_blocking</span></code> method.</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><code class="docutils literal notranslate"><span class="pre">None</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="entity_resolver.core.resolver.Resolver._merge_clusters">
+<code class="sig-name descname">_merge_clusters</code><span class="sig-paren">(</span><em class="sig-param">cluster1</em>, <em class="sig-param">cluster2</em>, <em class="sig-param">sim_clusters</em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/wangyiranamy/EntityResolution_Capstone/blob/master/src/entity_resolver/core/resolver.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#entity_resolver.core.resolver.Resolver._merge_clusters" title="Permalink to this definition">¶</a></dt>
+<dd><p>Merge <code class="docutils literal notranslate"><span class="pre">cluster2</span></code> into <code class="docutils literal notranslate"><span class="pre">cluster1</span></code>.</p>
+<p>This method also modifies related entries in <code class="docutils literal notranslate"><span class="pre">sim_clusters</span></code> and the
+cached <code class="docutils literal notranslate"><span class="pre">_cluster_neighbors</span></code> attribute.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>cluster1</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/collections.abc.html#collections.abc.Hashable" title="(in Python v3.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Hashable</span></code></a>) – The cluster to be merged into.</p></li>
+<li><p><strong>cluster2</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/collections.abc.html#collections.abc.Hashable" title="(in Python v3.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Hashable</span></code></a>) – The cluster to be merged.</p></li>
+<li><p><strong>sim_clusters</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/typing.html#typing.Mapping" title="(in Python v3.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Mapping</span></code></a>[<a class="reference external" href="https://docs.python.org/3.6/library/collections.abc.html#collections.abc.Hashable" title="(in Python v3.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Hashable</span></code></a>, <a class="reference external" href="https://docs.python.org/3.6/library/typing.html#typing.Set" title="(in Python v3.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Set</span></code></a>]) – Mapping cluster ids to a set of clusters that are
+potentially similar to them. Same as in the
+<code class="docutils literal notranslate"><span class="pre">_init_queue_entries</span></code> method.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><code class="docutils literal notranslate"><span class="pre">None</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="entity_resolver.core.resolver.Resolver._parse_attr_strats">
+<code class="sig-name descname">_parse_attr_strats</code><span class="sig-paren">(</span><em class="sig-param">attr_weights</em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/wangyiranamy/EntityResolution_Capstone/blob/master/src/entity_resolver/core/resolver.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#entity_resolver.core.resolver.Resolver._parse_attr_strats" title="Permalink to this definition">¶</a></dt>
+<dd><p>Parse the <code class="docutils literal notranslate"><span class="pre">attr_strategy</span></code> attribute.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>attr_weights</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/typing.html#typing.Mapping" title="(in Python v3.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Mapping</span></code></a>[<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>, <a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a>]) – Mapping attribute names to their ratio in computing
+attribute similarities. It is the result returned by the
+<code class="docutils literal notranslate"><span class="pre">_parse_weights</span></code> method.</p>
+</dd>
+<dt class="field-even">Raises</dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3.6/library/exceptions.html#ValueError" title="(in Python v3.6)"><strong>ValueError</strong></a> – If an attribute with type not being <code class="docutils literal notranslate"><span class="pre">'text'</span></code> or
+    <code class="docutils literal notranslate"><span class="pre">'person_entity'</span></code> does not have its name registered with an
+    attribute similarity strategy in the <code class="docutils literal notranslate"><span class="pre">attr_strategy</span></code> attribute.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.6/library/typing.html#typing.Dict" title="(in Python v3.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dict</span></code></a>[<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>, <a class="reference external" href="https://docs.python.org/3.6/library/typing.html#typing.Callable" title="(in Python v3.6)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Callable</span></code></a>]</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Mapping attribute names to functions that compute the similarities
+of two values in the attributes. If the strategy string of an
+attribute is specified in <code class="docutils literal notranslate"><span class="pre">attr_strategy</span></code>, then create the
+corresponding similarity function and add the pair in the resulting
+dictionary. Otherwise, use strategies specified in the
+<code class="docutils literal notranslate"><span class="pre">_default_strategies</span></code> depending on the attribute types.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="entity_resolver.core.resolver.Resolver._parse_rel_strat">
+<code class="sig-name descname">_parse_rel_strat</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference external" href="https://github.com/wangyiranamy/EntityResolution_Capstone/blob/master/src/entity_resolver/core/resolver.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#entity_resolver.core.resolver.Resolver._parse_rel_strat" title="Permalink to this definition">¶</a></dt>
+<dd><p>Parse the <code class="docutils literal notranslate"><span class="pre">rel_strategy</span></code> attribute.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.6/library/typing.html#typing.Callable" title="(in Python v3.6)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Callable</span></code></a>[[<a class="reference external" href="https://docs.python.org/3.6/library/typing.html#typing.Collection" title="(in Python v3.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Collection</span></code></a>, <a class="reference external" href="https://docs.python.org/3.6/library/typing.html#typing.Collection" title="(in Python v3.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Collection</span></code></a>, <a class="reference external" href="https://docs.python.org/3.6/library/typing.html#typing.Callable" title="(in Python v3.6)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Callable</span></code></a>[[<a class="reference external" href="https://docs.python.org/3.6/library/collections.abc.html#collections.abc.Hashable" title="(in Python v3.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Hashable</span></code></a>], <a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a>]], <a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a>]</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>A similarity function used to compute the relational similarity
+between two clusters. Its inputs are two collections of
+ids of neighboring clusters (of the two clusters one intend to
+compute similarity on) and a function which outputs the uniqueness
+of given a cluster id. It returns the similarity score as a
+<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">float</span></code></a>. Also set some flags about uniqueness calculation.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="entity_resolver.core.resolver.Resolver._parse_strategy">
+<code class="sig-name descname">_parse_strategy</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference external" href="https://github.com/wangyiranamy/EntityResolution_Capstone/blob/master/src/entity_resolver/core/resolver.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#entity_resolver.core.resolver.Resolver._parse_strategy" title="Permalink to this definition">¶</a></dt>
+<dd><p>Parse weights and strategy attributes to create relevant functions.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.6/library/typing.html#typing.Tuple" title="(in Python v3.6)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Tuple</span></code></a>[<a class="reference external" href="https://docs.python.org/3.6/library/typing.html#typing.Dict" title="(in Python v3.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dict</span></code></a>[<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>, <a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a>], <a class="reference external" href="https://docs.python.org/3.6/library/typing.html#typing.Dict" title="(in Python v3.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dict</span></code></a>[<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>, <a class="reference external" href="https://docs.python.org/3.6/library/typing.html#typing.Callable" title="(in Python v3.6)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Callable</span></code></a>], <a class="reference external" href="https://docs.python.org/3.6/library/typing.html#typing.Callable" title="(in Python v3.6)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Callable</span></code></a>[[<a class="reference external" href="https://docs.python.org/3.6/library/typing.html#typing.Collection" title="(in Python v3.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Collection</span></code></a>, <a class="reference external" href="https://docs.python.org/3.6/library/typing.html#typing.Collection" title="(in Python v3.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Collection</span></code></a>, <a class="reference external" href="https://docs.python.org/3.6/library/typing.html#typing.Callable" title="(in Python v3.6)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Callable</span></code></a>[[<a class="reference external" href="https://docs.python.org/3.6/library/collections.abc.html#collections.abc.Hashable" title="(in Python v3.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Hashable</span></code></a>], <a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a>]], <a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a>]]</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><p>A tuple of three items in the following order</p>
+<ol class="arabic simple">
+<li><p>Mapping attribute names to their ratio in computing
+attribute similarities.</p></li>
+<li><p>Mapping attribute names to functions that compute the
+similarities of two values in the attributes.</p></li>
+<li><p>The relational similarity function used to compute the
+relational similarity between two clusters.</p></li>
+</ol>
+<p>These three values are cached in <code class="docutils literal notranslate"><span class="pre">_attr_weights</span></code>,
+<code class="docutils literal notranslate"><span class="pre">_attr_funcs</span></code>, and <code class="docutils literal notranslate"><span class="pre">_rel_func</span></code> attributes respectively after
+parsing.</p>
+</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="entity_resolver.core.resolver.Resolver._parse_weights">
+<code class="sig-name descname">_parse_weights</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference external" href="https://github.com/wangyiranamy/EntityResolution_Capstone/blob/master/src/entity_resolver/core/resolver.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#entity_resolver.core.resolver.Resolver._parse_weights" title="Permalink to this definition">¶</a></dt>
+<dd><p>Parse the <code class="docutils literal notranslate"><span class="pre">weights</span></code> attribute.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.6/library/typing.html#typing.Dict" title="(in Python v3.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dict</span></code></a>[<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>, <a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a>]</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Mapping attribute names to their ratio in computing attribute
+similarities. If <code class="docutils literal notranslate"><span class="pre">weights</span></code> is <code class="docutils literal notranslate"><span class="pre">None</span></code>, then assign equal weights
+to each of the attributes and return it. Otherwise, return the
+<code class="docutils literal notranslate"><span class="pre">weights</span></code> attribute.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="entity_resolver.core.resolver.Resolver._relational_boostrapping">
+<code class="sig-name descname">_relational_boostrapping</code><span class="sig-paren">(</span><em class="sig-param">buckets</em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/wangyiranamy/EntityResolution_Capstone/blob/master/src/entity_resolver/core/resolver.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#entity_resolver.core.resolver.Resolver._relational_boostrapping" title="Permalink to this definition">¶</a></dt>
+<dd><p>Relational bootstrap by merging highly similar reference pairs.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>buckets</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/typing.html#typing.List" title="(in Python v3.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code></a>[<a class="reference external" href="https://docs.python.org/3.6/library/typing.html#typing.List" title="(in Python v3.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code></a>[<a class="reference internal" href="entity_resolver.core.graph.html#entity_resolver.core.graph.Node" title="entity_resolver.core.graph.Node"><code class="xref py py-class docutils literal notranslate"><span class="pre">Node</span></code></a>]]) – The list of buckets containing potentially similar
+references. This is the return of the <code class="docutils literal notranslate"><span class="pre">_blocking</span></code> method.</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><code class="docutils literal notranslate"><span class="pre">None</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="entity_resolver.core.resolver.Resolver._update_adj_set">
+<code class="sig-name descname">_update_adj_set</code><span class="sig-paren">(</span><em class="sig-param">cluster1</em>, <em class="sig-param">cluster2</em>, <em class="sig-param">adjacency_set</em>, <em class="sig-param">remove_self</em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/wangyiranamy/EntityResolution_Capstone/blob/master/src/entity_resolver/core/resolver.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#entity_resolver.core.resolver.Resolver._update_adj_set" title="Permalink to this definition">¶</a></dt>
+<dd><p>Help update related entries when merging clusters.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>cluster1</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/collections.abc.html#collections.abc.Hashable" title="(in Python v3.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Hashable</span></code></a>) – The cluster to be merged into.</p></li>
+<li><p><strong>cluster2</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/collections.abc.html#collections.abc.Hashable" title="(in Python v3.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Hashable</span></code></a>) – The cluster to be merged.</p></li>
+<li><p><strong>adjacency_set</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/typing.html#typing.Mapping" title="(in Python v3.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Mapping</span></code></a>[<a class="reference external" href="https://docs.python.org/3.6/library/collections.abc.html#collections.abc.Hashable" title="(in Python v3.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Hashable</span></code></a>, <a class="reference external" href="https://docs.python.org/3.6/library/typing.html#typing.Set" title="(in Python v3.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Set</span></code></a>]) – an abstraction of <code class="docutils literal notranslate"><span class="pre">sim_clusters</span></code> and the
+<code class="docutils literal notranslate"><span class="pre">_cluster_neighbors</span></code> attribute, mapping a cluster to a set of
+clusters.</p></li>
+<li><p><strong>remove_self</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#bool" title="(in Python v3.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a>) – If the cluster itself should be removed from the set
+it is mapped to. Moreover, if it is <code class="docutils literal notranslate"><span class="pre">False</span></code>, it means that
+each cluster is guaranteed to be contained in the set it is
+mapped to. This differentiates the behaviors of
+<code class="docutils literal notranslate"><span class="pre">sim_clusters</span></code> and <code class="docutils literal notranslate"><span class="pre">_cluster_neighbors</span></code>.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><code class="docutils literal notranslate"><span class="pre">None</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="entity_resolver.core.resolver.Resolver._update_nbr_entries">
+<code class="sig-name descname">_update_nbr_entries</code><span class="sig-paren">(</span><em class="sig-param">cluster</em>, <em class="sig-param">pqueue</em>, <em class="sig-param">cluster_entries</em>, <em class="sig-param">sim_clusters</em>, <em class="sig-param">added_pairs</em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/wangyiranamy/EntityResolution_Capstone/blob/master/src/entity_resolver/core/resolver.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#entity_resolver.core.resolver.Resolver._update_nbr_entries" title="Permalink to this definition">¶</a></dt>
+<dd><p>Update entries in the priority queue after merging two clusters.</p>
+<p>An entry is updated if it consists of a pair of a neighboring cluster
+of the merged cluster and a cluster potentially similar to that
+neighbor. Neighboring clusters of the merged cluster are neighbors of
+one of the original two clusters before merging.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>cluster</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/collections.abc.html#collections.abc.Hashable" title="(in Python v3.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Hashable</span></code></a>) – The merged cluster.</p></li>
+<li><p><strong>pqueue</strong> (<a class="reference internal" href="entity_resolver.core.utils.html#entity_resolver.core.utils.PriorityQueue" title="entity_resolver.core.utils.PriorityQueue"><code class="xref py py-class docutils literal notranslate"><span class="pre">PriorityQueue</span></code></a>) – The priority queue of
+<a class="reference internal" href="entity_resolver.core.utils.html#entity_resolver.core.utils.SimilarityEntry" title="entity_resolver.core.utils.SimilarityEntry"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SimilarityEntry</span></code></a> objects.</p></li>
+<li><p><strong>cluster_entries</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/typing.html#typing.Mapping" title="(in Python v3.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Mapping</span></code></a>[<a class="reference external" href="https://docs.python.org/3.6/library/collections.abc.html#collections.abc.Hashable" title="(in Python v3.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Hashable</span></code></a>, <a class="reference external" href="https://docs.python.org/3.6/library/typing.html#typing.Mapping" title="(in Python v3.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Mapping</span></code></a>[<a class="reference external" href="https://docs.python.org/3.6/library/collections.abc.html#collections.abc.Hashable" title="(in Python v3.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Hashable</span></code></a>, <a class="reference internal" href="entity_resolver.core.utils.html#entity_resolver.core.utils.SimilarityEntry" title="entity_resolver.core.utils.SimilarityEntry"><code class="xref py py-class docutils literal notranslate"><span class="pre">SimilarityEntry</span></code></a>]]) – A two-dimensional mapping that maps cluster pairs
+to their corresponding
+<a class="reference internal" href="entity_resolver.core.utils.html#entity_resolver.core.utils.SimilarityEntry" title="entity_resolver.core.utils.SimilarityEntry"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SimilarityEntry</span></code></a> objects. Same as
+in the <code class="docutils literal notranslate"><span class="pre">_init_queue_entries</span></code> method.</p></li>
+<li><p><strong>sim_clusters</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/typing.html#typing.Mapping" title="(in Python v3.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Mapping</span></code></a>[<a class="reference external" href="https://docs.python.org/3.6/library/collections.abc.html#collections.abc.Hashable" title="(in Python v3.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Hashable</span></code></a>, <a class="reference external" href="https://docs.python.org/3.6/library/typing.html#typing.Set" title="(in Python v3.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Set</span></code></a>]) – Mapping cluster ids to a set of clusters that are
+potentially similar to them. Same as in the
+<code class="docutils literal notranslate"><span class="pre">_init_queue_entries</span></code> method.</p></li>
+<li><p><strong>added_pairs</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/typing.html#typing.Set" title="(in Python v3.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Set</span></code></a>[<a class="reference external" href="https://docs.python.org/3.6/library/typing.html#typing.Tuple" title="(in Python v3.6)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Tuple</span></code></a>[<a class="reference external" href="https://docs.python.org/3.6/library/collections.abc.html#collections.abc.Hashable" title="(in Python v3.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Hashable</span></code></a>, <a class="reference external" href="https://docs.python.org/3.6/library/collections.abc.html#collections.abc.Hashable" title="(in Python v3.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Hashable</span></code></a>]]) – Store pairs of clusters that have already been added
+into the priority queue to avoid duplicates. Each time an entry
+is added into the priority queue, the tuple of the two clusters
+with both permutations are added into it.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><code class="docutils literal notranslate"><span class="pre">None</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="entity_resolver.core.resolver.Resolver._update_pqueue">
+<code class="sig-name descname">_update_pqueue</code><span class="sig-paren">(</span><em class="sig-param">cluster1</em>, <em class="sig-param">cluster2</em>, <em class="sig-param">pqueue</em>, <em class="sig-param">cluster_entries</em>, <em class="sig-param">sim_clusters</em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/wangyiranamy/EntityResolution_Capstone/blob/master/src/entity_resolver/core/resolver.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#entity_resolver.core.resolver.Resolver._update_pqueue" title="Permalink to this definition">¶</a></dt>
+<dd><p>Update entries in the priority queue after merge two clusters.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>cluster1</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/collections.abc.html#collections.abc.Hashable" title="(in Python v3.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Hashable</span></code></a>) – The cluster to be merged into.</p></li>
+<li><p><strong>cluster2</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/collections.abc.html#collections.abc.Hashable" title="(in Python v3.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Hashable</span></code></a>) – The cluster to be merged.</p></li>
+<li><p><strong>pqueue</strong> (<a class="reference internal" href="entity_resolver.core.utils.html#entity_resolver.core.utils.PriorityQueue" title="entity_resolver.core.utils.PriorityQueue"><code class="xref py py-class docutils literal notranslate"><span class="pre">PriorityQueue</span></code></a>) – The priority queue of
+<a class="reference internal" href="entity_resolver.core.utils.html#entity_resolver.core.utils.SimilarityEntry" title="entity_resolver.core.utils.SimilarityEntry"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SimilarityEntry</span></code></a> objects.</p></li>
+<li><p><strong>cluster_entries</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/typing.html#typing.Mapping" title="(in Python v3.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Mapping</span></code></a>[<a class="reference external" href="https://docs.python.org/3.6/library/collections.abc.html#collections.abc.Hashable" title="(in Python v3.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Hashable</span></code></a>, <a class="reference external" href="https://docs.python.org/3.6/library/typing.html#typing.Mapping" title="(in Python v3.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Mapping</span></code></a>[<a class="reference external" href="https://docs.python.org/3.6/library/collections.abc.html#collections.abc.Hashable" title="(in Python v3.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Hashable</span></code></a>, <a class="reference internal" href="entity_resolver.core.utils.html#entity_resolver.core.utils.SimilarityEntry" title="entity_resolver.core.utils.SimilarityEntry"><code class="xref py py-class docutils literal notranslate"><span class="pre">SimilarityEntry</span></code></a>]]) – A two-dimensional mapping that maps cluster pairs
+to their corresponding
+<a class="reference internal" href="entity_resolver.core.utils.html#entity_resolver.core.utils.SimilarityEntry" title="entity_resolver.core.utils.SimilarityEntry"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SimilarityEntry</span></code></a> objects. Same as
+in the <code class="docutils literal notranslate"><span class="pre">_init_queue_entries</span></code> method.</p></li>
+<li><p><strong>sim_clusters</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/typing.html#typing.Mapping" title="(in Python v3.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Mapping</span></code></a>[<a class="reference external" href="https://docs.python.org/3.6/library/collections.abc.html#collections.abc.Hashable" title="(in Python v3.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Hashable</span></code></a>, <a class="reference external" href="https://docs.python.org/3.6/library/typing.html#typing.Set" title="(in Python v3.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Set</span></code></a>]) – Mapping cluster ids to a set of clusters that are
+potentially similar to them. Same as in the
+<code class="docutils literal notranslate"><span class="pre">_init_queue_entries</span></code> method.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><code class="docutils literal notranslate"><span class="pre">None</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
 <dl class="method">
 <dt id="entity_resolver.core.resolver.Resolver.log_time">
 <code class="sig-name descname">log_time</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference external" href="https://github.com/wangyiranamy/EntityResolution_Capstone/blob/master/src/entity_resolver/core/resolver.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#entity_resolver.core.resolver.Resolver.log_time" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Log the <code class="docutils literal notranslate"><span class="pre">time_dict</span></code> attribute.</p>
+<p>It also computes average execution time for each method by dividing
+total time spent by total number of times called, and reset the
+<code class="docutils literal notranslate"><span class="pre">time_dict</span></code> attribute after logging.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="docutils literal notranslate"><span class="pre">None</span></code></p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="method">
 <dt id="entity_resolver.core.resolver.Resolver.resolve">
 <code class="sig-name descname">resolve</code><span class="sig-paren">(</span><em class="sig-param">graph</em>, <em class="sig-param">ground_truth=None</em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/wangyiranamy/EntityResolution_Capstone/blob/master/src/entity_resolver/core/resolver.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#entity_resolver.core.resolver.Resolver.resolve" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="entity_resolver.core.resolver.Resolver.time_dict">
-<em class="property">property </em><code class="sig-name descname">time_dict</code><a class="reference external" href="https://github.com/wangyiranamy/EntityResolution_Capstone/blob/master/src/entity_resolver/core/resolver.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#entity_resolver.core.resolver.Resolver.time_dict" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Resolve the entities in given graph.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>graph</strong> (<a class="reference internal" href="entity_resolver.core.graph.html#entity_resolver.core.graph.Graph" title="entity_resolver.core.graph.Graph"><code class="xref py py-class docutils literal notranslate"><span class="pre">Graph</span></code></a>) – The reference graph for entity resolution.</p></li>
+<li><p><strong>ground_truth</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/typing.html#typing.Optional" title="(in Python v3.6)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code></a>[<a class="reference external" href="https://docs.python.org/3.6/library/collections.html#collections.OrderedDict" title="(in Python v3.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">OrderedDict</span></code></a>]) – The parsed ground truth data corresponding to the
+graph. It maps reference ids to ground truth cluster ids. The
+dictionary is sorted (key-value pairs are inserted) in
+ascending order of reference ids. It must be present and is
+only used when <code class="docutils literal notranslate"><span class="pre">plot_prc</span></code> attribute is set to <code class="docutils literal notranslate"><span class="pre">True</span></code>. It is
+used to plot the precison-recall graph by computing the scores
+during the entity resolution process.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Raises</dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3.6/library/exceptions.html#ValueError" title="(in Python v3.6)"><strong>ValueError</strong></a> – If <code class="docutils literal notranslate"><span class="pre">ground_truth</span></code> is <code class="docutils literal notranslate"><span class="pre">None</span></code> while <code class="docutils literal notranslate"><span class="pre">plot_prc</span></code> is
+    <code class="docutils literal notranslate"><span class="pre">True</span></code>.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.6/library/typing.html#typing.Union" title="(in Python v3.6)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code></a>[<a class="reference external" href="https://docs.python.org/3.6/library/collections.html#collections.OrderedDict" title="(in Python v3.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">OrderedDict</span></code></a>, <a class="reference external" href="https://docs.python.org/3.6/library/typing.html#typing.Tuple" title="(in Python v3.6)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Tuple</span></code></a>[<a class="reference external" href="https://docs.python.org/3.6/library/collections.html#collections.OrderedDict" title="(in Python v3.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">OrderedDict</span></code></a>, <a class="reference external" href="https://docs.python.org/3.6/library/typing.html#typing.List" title="(in Python v3.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code></a>[<a class="reference external" href="https://docs.python.org/3.6/library/typing.html#typing.Tuple" title="(in Python v3.6)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Tuple</span></code></a>[<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a>, <a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a>]]]]</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><ul class="simple">
+<li><p>If <code class="docutils literal notranslate"><span class="pre">plot_prc</span></code> is <code class="docutils literal notranslate"><span class="pre">False</span></code>, the return is the mapping from
+reference ids to cluster ids.</p></li>
+<li><p>If <code class="docutils literal notranslate"><span class="pre">plot_prc</span></code> is <code class="docutils literal notranslate"><span class="pre">True</span></code>, the return is a tuple of two items.
+The first item is a mapping from reference ids to cluster ids,
+same as in <code class="docutils literal notranslate"><span class="pre">plot_prc</span></code> is <code class="docutils literal notranslate"><span class="pre">False</span></code> case. The second item is a
+list of (precision, recall) scores computed during the entity
+resolution process for plotting the precision-recall curve.</p></li>
+</ul>
+</p>
+</dd>
+</dl>
+</dd></dl>
 
 </dd></dl>
 

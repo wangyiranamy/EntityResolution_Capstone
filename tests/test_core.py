@@ -10,11 +10,11 @@ class TestEvaluator:
 
     @pytest.fixture
     def ground_truth(self):
-        return {1: 1, 2: 1, 3: 2, 4: 3, 5: 3}
+        return collections.OrderedDict({1: 1, 2: 1, 3: 2, 4: 3, 5: 3})
 
     @pytest.fixture
     def resolved_mapping(self):
-        return {1: 1000, 2: 1000, 3: 1000, 4: 1001, 5: 1010}
+        return {4: 1001, 3: 1000, 1: 1000, 2: 1000, 5: 1010}
 
     def test_ami(self, ground_truth, resolved_mapping):
         ami_evaluator = Evaluator(strategy='ami')
@@ -191,4 +191,14 @@ class TestResolver:
         assert round(adar_neighbor_fr_resolver._calc_rel_sim(1, 2), 2) == 0.23
         round(adar_attr_resolver._calc_rel_sim(1, 2), 2) == 1.00
         round(adar_attr_fr_resolver._calc_rel_sim(1, 2), 2) == 1.00
+        cleanup()
+
+    def test_parse_error(self, simple_graph_suite):
+        graph, cleanup = simple_graph_suite
+        resolver = Resolver(None)
+        graph._attr_types['text1'] = 'int'
+        graph._attr_types['text2'] = 'int'
+        resolver._graph = graph
+        with pytest.raises(ValueError):
+            resolver._parse_strategy()
         cleanup()

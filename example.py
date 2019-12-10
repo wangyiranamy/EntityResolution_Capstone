@@ -27,7 +27,7 @@ def exact_match(attrs1, attrs2):
 file_path = 'data/citeseer/citeseer-mrdm05.dat'
 graph_path = 'graph.json'
 ground_truth_path = 'ground_truth.json'
-cmd_args = ['entity-resolver', 'norm-citeseer']
+cmd_args = ['entity-resolver', 'prep-citeseer']
 subprocess.call(cmd_args)
 entity_resolver = EntityResolver(
     attr_types={'name': 'person_entity'}, blocking_strategy=edit_distance,
@@ -36,9 +36,10 @@ entity_resolver = EntityResolver(
     raw_bootstrap=False, first_attr=None, first_attr_raw=False,
     second_attr=None, second_attr_raw=False, linkage='max',
     similarity_threshold=0.8, seed=None, plot_prc=False,
-    evaluator_strategy='precision-recall', verbose=1, jw_prefix_weight=0.1,
-    soft_tfidf_threshold=0.5, average_method='max'
+    evaluator_strategy='precision_recall', verbose=2, jw_prefix_weight=0.1,
+    stfidf_threshold=0.5, average_method='max'
 )
+entity_resolver.verbose = 1
 entity_resolver.resolve_and_eval(graph_path, ground_truth_path)
 os.remove(graph_path)
 os.remove(ground_truth_path)

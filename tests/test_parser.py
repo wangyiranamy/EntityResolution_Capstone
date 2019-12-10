@@ -10,7 +10,7 @@ class TestParser:
         graph_output_path = 'testdata.json'
         ground_truth_output_path = 'testtruth.json'
         run([
-            'norm-citeseer',
+            'prep-citeseer',
             '--data', file_path,
             '--graph', graph_output_path,
             '--ground_truth', ground_truth_output_path

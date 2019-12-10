@@ -92,6 +92,10 @@ def linkcode_resolve(domain, info):
 
 default_role = 'py:obj'
 
+autodoc_default_options = {
+    'private-members': True
+}
+
 napoleon_include_special_with_doc = True
 
 napoleon_include_private_with_doc = True

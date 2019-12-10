@@ -10,7 +10,7 @@ class TestScripts:
         graph_path = 'testgraph.json'
         ground_truth_path = 'testtruth.json'
         run([
-            'norm-citeseer',
+            'prep-citeseer',
             '--data', file_path,
             '--graph', graph_path,
             '--ground_truth', ground_truth_path
@@ -33,7 +33,7 @@ class TestScripts:
         graph_path = 'testgraph.json'
         ground_truth_path = 'testtruth.json'
         run([
-            'norm-citeseer',
+            'prep-citeseer',
             '--data', file_path,
             '--graph', graph_path,
             '--ground_truth', ground_truth_path,
@@ -48,5 +48,41 @@ class TestScripts:
         assert graph[0]['edge_id'] == 2
         assert ground_truth[0]['node_id'] == 0
         assert ground_truth[0]['cluster_id'] == 34481
+        os.remove(graph_path)
+        os.remove(ground_truth_path)
+
+    def test_default(self):
+        file_path = 'data/citeseer/citeseer-mrdm05.dat'
+        graph_path = 'graph.json'
+        ground_truth_path = 'ground_truth.json'
+        run(['prep-citeseer'])
+        with open(graph_path, 'r') as f:
+            graph = json.load(f)
+        with open(ground_truth_path, 'r') as f:
+            ground_truth = json.load(f)
+
+        assert graph[0]['attr_dict']['name'] == 'aamodt_a'
+        assert graph[0]['node_id'] == 0
+        assert graph[0]['edge_id'] == 1019
+        assert ground_truth[0]['node_id'] == 0
+        assert ground_truth[0]['cluster_id'] == 10
+        os.remove(graph_path)
+        os.remove(ground_truth_path)
+
+    def test_partial_args(self):
+        file_path = 'data/citeseer/citeseer-mrdm05.dat'
+        graph_path = 'different_graph.json'
+        ground_truth_path = 'ground_truth.json'
+        run(['prep-citeseer', '--graph', graph_path])
+        with open(graph_path, 'r') as f:
+            graph = json.load(f)
+        with open(ground_truth_path, 'r') as f:
+            ground_truth = json.load(f)
+
+        assert graph[0]['attr_dict']['name'] == 'aamodt_a'
+        assert graph[0]['node_id'] == 0
+        assert graph[0]['edge_id'] == 1019
+        assert ground_truth[0]['node_id'] == 0
+        assert ground_truth[0]['cluster_id'] == 10
         os.remove(graph_path)
         os.remove(ground_truth_path)

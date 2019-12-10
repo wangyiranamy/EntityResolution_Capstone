@@ -12,6 +12,18 @@ Example:
     >>> label_path = 'path/to/your/ground_truth'
     >>> score = entity_resolver.resolve_and_eval(data_path, label_path)
 
+Tip:
+    Although currently the ``attr_types`` argument only support
+    ``'person_entity'`` and ``'text'`` as values, the effects of this argument
+    is restricted to certain preprocessing, default attribute similarity
+    function, and deciding what values are passed when computing attribute
+    similarities.
+
+    If an unsupported type is input, then no preprocessings are done and their
+    original values are passed to computation of attribute similarity
+    functions. The attribute name with an unsupported type **must** be mapped
+    to an attribute similarity strategy in ``attr_strategy`` as well.
+
 See Also:
 
     * Detailed explanation for the above example can be found in
@@ -21,10 +33,8 @@ See Also:
 """
 
 import logging
-from typing import (
-    Optional, NoReturn, Any, Union,
-    Callable, Dict, Mapping, Tuple, List
-)
+import collections
+from typing import Optional, Any, Union, Callable, Mapping, Tuple, List
 from matplotlib import pyplot as plt
 from .core import Resolver, Evaluator
 from .core.utils import WithLogger, logtime
@@ -136,8 +146,8 @@ class EntityResolver(WithLogger):
         All protected attributes below which have corresponding parameters in
         the above section without prefix underscores are essentially the same.
         They are encapsulated by corresponding properties (without underscore)
-        to be protected against invalid value assignments. Their documentations
-        are therefore omitted.
+        using ``@property`` to be protected against invalid value assignments.
+        Their documentations are therefore omitted.
 
     Tip:
         Although setting ``plot_prc`` to ``True`` will automatically plot a
@@ -148,49 +158,44 @@ class EntityResolver(WithLogger):
         store it for further usage.
 
     Todo:
-        Add support for custom similarity functions.
+        * Add support for custom similarity functions.
+        * Add support for custome evaluation functions.
 
     Attributes:
-        _attr_types (`~typing.Mapping`\ [`str`, `str`\ ]): Omitted.
-        _blocking_strategy (`~typing.Callable`\ [[\
-                `~typing.Mapping`\ [`str`, `str`\ ],\
-                `~typing.Mapping`\ [`str`, `str`\ ]],\
-                `float`]): Omitted.
+        _attr_types (`~typing.Mapping`\ [`str`, `str`]): Omitted.
+        _blocking_strategy (`~typing.Callable`\ [[`~typing.Mapping`\ [`str`, `str`], `~typing.Mapping`\ [`str`, `str`]], `float`]):
+            Omitted.
         _raw_blocking (`bool`): Omitted.
-        _alpha (`~typing.Union`\ [`float`, `int`\ ]): Omitted.
-        _weights (`~typing.Optional`\ [\
-            `~typing.Mapping`\ [`str`, `float`\ ]]): Omitted.
-        _attr_strategy (`~typing.Mapping`\ [`str`, `str`\ ]): Omitted.
-        _rel_strategy (`~typing.Optional`\ [`str`\ ]): Omitted.
-        _blocking_threshold (`~typing.Union`\ [`float`, `int`\ ]): Omitted.
-        _bootstrapping_strategy (`~typing.Optional`\ [`~typing.Callable`\ [[\
-                `~typing.Mapping`\ [`str`, `str`\ ],\
-                `~typing.Mapping`\ [`str`, `str`\ ]], `bool`]]): Omitted.
-        _raw_bootstrap (`bool`): Omitted.
+        _alpha (`~typing.Union`\ [`float`, `int`]): Omitted.
+        _weights (`~typing.Optional`\ [`~typing.Mapping`\ [`str`, `float`]]):
+            Omitted.
+        _attr_strategy (`~typing.Mapping`\ [`str`, `str`]): Omitted.
+        _rel_strategy (`~typing.Optional`\ [`str`]): Omitted.
+        _blocking_threshold (`~typing.Union`\ [`float`, `int`]): Omitted.
+        _bootstrapping_strategy (`~typing.Optional`\ [`~typing.Callable`\ [[`~typing.Mapping`\ [`str`, `str`], `~typing.Mapping`\ [`str`, `str`]], `bool`]]): Omitted.
+        _raw_bootstrap (`bool`):
+            Omitted.
         _edge_match_threshold (`int`): Omitted.
-        _first_attr (`~typing.Optional`\ [`~typing.Callable`\ [[\
-                `~typing.Mapping`\ [`str`, `str`\ ]], `str`\ ]]): Omitted.
+        _first_attr (`~typing.Optional`\ [`~typing.Callable`\ [[`~typing.Mapping`\ [`str`, `str`]], `str`]]):
+            Omitted.
         _first_attr_raw (`bool`): Omitted.
-        _second_attr (`~typing.Optional`\ [`~typing.Callable`\ [[\
-                `~typing.Mapping`\ [`str`, `str`\ ]], `str`\ ]]): Omitted.
+        _second_attr (`~typing.Optional`\ [`~typing.Callable`\ [[`~typing.Mapping`\ [`str`, `str`]], `str`]]):
+            Omitted.
         _second_attr_raw (`bool`): Omitted.
         _linkage (`str`): Omitted.
         _similarity_threshold (`float`): Omitted.
         _evaluator_strategy (`str`): Omitted.
-        _seed (`~typing.Optional`\ [`int`\ ]): Omitted.
+        _seed (`~typing.Optional`\ [`int`]): Omitted.
         _plot_prc (`bool`): Omitted.
-        _verbose (`int`): Omitted.
-        _kwargs (`~typing.Mapping`\ [`str`, `~typing.Any`\ ]): Omitted.
-        _graph_parser (`entity_resolver.parser.graph_parser.GraphParser`):\
+        _kwargs: Omitted.
+        _graph_parser (`~entity_resolver.parser.graph_parser.GraphParser`):
             Created based on input parameters to parse the graph data.
-        _ground_truth_parser (\
-            `entity_resolver.parser.ground_truth_parser.GroundTruthParser`\
-            ): Created based on input parameters to parse the ground truth
-            data.
-        _resolver (`entity_resolver.core.resolver.Resolver`): Created based on
+        _ground_truth_parser (`~entity_resolver.parser.ground_truth_parser.GroundTruthParser`):
+            Created based on input parameters to parse the ground truth data.
+        _resolver (`~entity_resolver.core.resolver.Resolver`): Created based on
             input parameters to execute the main collective entity resolution
             algorithm. It is the core part of this whole project.
-        _evaluator (`entity_resolver.core.evaluator.Evaluator`): Created based
+        _evaluator (`~entity_resolver.core.evaluator.Evaluator`): Created based
             on input parameters to evaluate the results of entity resolution.
 """
 
@@ -222,7 +227,25 @@ class EntityResolver(WithLogger):
         plot_prc: bool = False,
         verbose: int = 0,
         **kwargs
-    ) -> NoReturn:
+    ):
+        self._graph_parser = GraphParser(attr_types, verbose=verbose)
+        self._ground_truth_parser = GroundTruthParser(verbose=verbose)
+        self._resolver = Resolver(
+            blocking_strategy, raw_blocking=raw_blocking, alpha=alpha,
+            weights=weights, attr_strategy=attr_strategy,
+            rel_strategy=rel_strategy, blocking_threshold=blocking_threshold,
+            bootstrap_strategy=bootstrap_strategy, raw_bootstrap=raw_bootstrap,
+            edge_match_threshold=edge_match_threshold, first_attr=first_attr,
+            first_attr_raw=first_attr_raw, second_attr=second_attr,
+            second_attr_raw=second_attr_raw, linkage=linkage,
+            similarity_threshold=similarity_threshold, seed=seed,
+            plot_prc=plot_prc, verbose=verbose, **kwargs
+        )
+        self._evaluator = Evaluator(
+            strategy=evaluator_strategy,
+            verbose=verbose, **kwargs
+        )
+        super().__init__(verbose=verbose)
         self.attr_types = attr_types
         self.blocking_strategy = blocking_strategy
         self.raw_blocking = raw_blocking
@@ -243,53 +266,33 @@ class EntityResolver(WithLogger):
         self.evaluator_strategy = evaluator_strategy
         self.seed = seed
         self.plot_prc = plot_prc
-        self.verbose: int = verbose
         self._kwargs = {
             'second_sim': 'jaro_winkler', 'stfidf_threshold': 0.5,
             'jw_prefix_weight': 0.1, 'average_method': 'max'
         }
         for key, value in kwargs.items():
             setattr(self, key, value)
-        self._graph_parser = GraphParser(attr_types, verbose=verbose)
-        self._ground_truth_parser = GroundTruthParser(verbose=verbose)
-        self._resolver = Resolver(
-            blocking_strategy, raw_blocking=raw_blocking, alpha=alpha,
-            weights=weights, attr_strategy=attr_strategy,
-            rel_strategy=rel_strategy, blocking_threshold=blocking_threshold,
-            bootstrap_strategy=bootstrap_strategy, raw_bootstrap=raw_bootstrap,
-            edge_match_threshold=edge_match_threshold, first_attr=first_attr,
-            first_attr_raw=first_attr_raw, second_attr=second_attr,
-            second_attr_raw=second_attr_raw, linkage=linkage,
-            similarity_threshold=similarity_threshold, seed=seed,
-            plot_prc=plot_prc, verbose=verbose, **kwargs
-        )
-        self._evaluator = Evaluator(
-            strategy=evaluator_strategy, plot_prc=plot_prc,
-            verbose=verbose, **kwargs
-        )
-        super().__init__(verbose=verbose)
 
     @property
     def attr_types(self):
-        """ `~typing.Mapping`\ [`str`, `str`\ ]: Omitted."""
+        """ `~typing.Mapping`\ [`str`, `str`]: Omitted."""
         return self._attr_types
 
     @attr_types.setter
     def attr_types(self, value):
         self._attr_types = value
+        self._graph_parser.attr_types = value
 
     @property
     def blocking_strategy(self):
-        """ `~typing.Callable`\ [[\
-            `~typing.Mapping`\ [`str`, `str`\ ],\
-            `~typing.Mapping`\ [`str`, `str`\ ]],\
-        `float`]: Omitted.
+        """ `~typing.Callable`\ [[`~typing.Mapping`\ [`str`, `str`], `~typing.Mapping`\ [`str`, `str`]],`float`]: Omitted.
         """
         return self._blocking_strategy
 
     @blocking_strategy.setter
     def blocking_strategy(self, value):
         self._blocking_strategy = value
+        self._resolver.blocking_strategy = value
 
     @property
     def raw_blocking(self):
@@ -299,10 +302,11 @@ class EntityResolver(WithLogger):
     @raw_blocking.setter
     def raw_blocking(self, value):
         self._raw_blocking = value
+        self._resolver.raw_blocking = value
 
     @property
     def alpha(self):
-        """ `~typing.Union`\ [`float`, `int`\ ]: Omitted.
+        """ `~typing.Union`\ [`float`, `int`]: Omitted.
 
         Raises:
             ValueError: If set to a value not between 0 and 1 (inclusive).
@@ -314,26 +318,33 @@ class EntityResolver(WithLogger):
         if value < 0 or value > 1:
             raise ValueError('alpha must be between 0 and 1 (inclusive).')
         self._alpha = value
+        self._resolver.alpha = value
 
     @property
     def weights(self):
-        """ `~typing.Optional`\ [\
-            `~typing.Mapping`\ [`str`, `float`\ ]]: Omitted.
+        """ `~typing.Optional`\ [`~typing.Mapping`\ [`str`, `float`]]: Omitted.
+
+        Raises:
+            ValueError: If set to a dictionary whose values do not sum to 1.
         """
         return self._weights
 
     @weights.setter
     def weights(self, value):
+        if value is not None and sum(value.values()) != 1:
+            raise ValueError('Weights must sum to 1 if it is not None.')
         self._weights = value
+        self._resolver.weights = value
 
     @property
     def attr_strategy(self):
-        """ `~typing.Mapping`\ [`str`, `str`\ ]: Omitted."""
+        """ `~typing.Mapping`\ [`str`, `str`]: Omitted."""
         return self._attr_strategy
 
     @attr_strategy.setter
     def attr_strategy(self, value):
         self._attr_strategy = value
+        self._resolver.attr_strategy = value
 
     @property
     def rel_strategy(self):
@@ -343,27 +354,28 @@ class EntityResolver(WithLogger):
     @rel_strategy.setter
     def rel_strategy(self, value):
         self._rel_strategy = value
+        self._resolver.rel_strategy = value
 
     @property
     def blocking_threshold(self):
-        """ `~typing.Union`\ [`float`, `int`\ ]: Omitted."""
+        """ `~typing.Union`\ [`float`, `int`]: Omitted."""
         return self._blocking_threshold
 
     @blocking_threshold.setter
     def blocking_threshold(self, value):
         self._blocking_threshold = value
+        self._resolver.blocking_threshold = value
 
     @property
     def bootstrap_strategy(self):
-        """ `~typing.Optional`\ [`~typing.Callable`\ [[\
-            `~typing.Mapping`\ [`str`, `str`\ ],\
-        `~typing.Mapping`\ [`str`, `str`\ ]], `bool`]]: Omitted.
+        """ `~typing.Optional`\ [`~typing.Callable`\ [[`~typing.Mapping`\ [`str`, `str`], `~typing.Mapping`\ [`str`, `str`]], `bool`]]: Omitted.
         """
         return self._bootstrap_strategy
 
     @bootstrap_strategy.setter
     def bootstrap_strategy(self, value):
         self._bootstrap_strategy = value
+        self._resolver.bootstrap_strategy = value
 
     @property
     def raw_bootstrap(self):
@@ -373,6 +385,7 @@ class EntityResolver(WithLogger):
     @raw_bootstrap.setter
     def raw_bootstrap(self, value):
         self._raw_bootstrap = value
+        self._resolver.raw_bootstrap = value
 
     @property
     def edge_match_threshold(self):
@@ -382,17 +395,18 @@ class EntityResolver(WithLogger):
     @edge_match_threshold.setter
     def edge_match_threshold(self, value):
         self._edge_match_threshold = value
+        self._resolver.edge_match_threshold = value
 
     @property
     def first_attr(self):
-        """ `~typing.Optional`\ [`~typing.Callable`\ [[\
-            `~typing.Mapping`\ [`str`, `str`\ ]], `str`\ ]]: Omitted.
+        """ `~typing.Optional`\ [`~typing.Callable`\ [[`~typing.Mapping`\ [`str`, `str`]], `str`]]: Omitted.
         """
         return self._first_attr
 
     @first_attr.setter
     def first_attr(self, value):
         self._first_attr = value
+        self._resolver.first_attr = value
 
     @property
     def first_attr_raw(self):
@@ -402,17 +416,18 @@ class EntityResolver(WithLogger):
     @first_attr_raw.setter
     def first_attr_raw(self, value):
         self._first_attr_raw = value
+        self._resolver.first_attr_raw = value
 
     @property
     def second_attr(self):
-        """ `~typing.Optional`\ [`~typing.Callable`\ [[\
-            `~typing.Mapping`\ [`str`, `str`\ ]], `str`\ ]]: Omitted.
+        """ `~typing.Optional`\ [`~typing.Callable`\ [[`~typing.Mapping`\ [`str`, `str`]], `str`]]: Omitted.
         """
         return self._second_attr
 
     @second_attr.setter
     def second_attr(self, value):
         self._second_attr = value
+        self._resolver.second_attr = value
 
     @property
     def second_attr_raw(self):
@@ -422,6 +437,7 @@ class EntityResolver(WithLogger):
     @second_attr_raw.setter
     def second_attr_raw(self, value):
         self._second_attr_raw = value
+        self._resolver.second_attr_raw = value
 
     @property
     def linkage(self):
@@ -440,6 +456,7 @@ class EntityResolver(WithLogger):
                 'linkage must be one of \'min\', \'max\', or \'average\'.'
             )
         self._linkage = value
+        self._resolver.linkage = value
 
     @property
     def similarity_threshold(self):
@@ -449,6 +466,7 @@ class EntityResolver(WithLogger):
     @similarity_threshold.setter
     def similarity_threshold(self, value):
         self._similarity_threshold = value
+        self._resolver.similarity_threshold = value
 
     @property
     def evaluator_strategy(self):
@@ -468,15 +486,17 @@ class EntityResolver(WithLogger):
                 '\'precision_recall\', \'ami\', or \'v_measure\'.'
             )
         self._evaluator_strategy = value
+        self._evaluator.strategy = value
 
     @property
     def seed(self):
-        """ `~typing.Optional`\ [`int`\ ]: Omitted."""
+        """ `~typing.Optional`\ [`int`]: Omitted."""
         return self._seed
 
     @seed.setter
     def seed(self, value):
         self._seed = value
+        self._resolver.seed = value
 
     @property
     def plot_prc(self):
@@ -486,15 +506,7 @@ class EntityResolver(WithLogger):
     @plot_prc.setter
     def plot_prc(self, value):
         self._plot_prc = value
-
-    @property
-    def verbose(self):
-        """ `int`: Omitted"""
-        return self._verbose
-
-    @verbose.setter
-    def verbose(self, value):
-        self._verbose = value
+        self._resolver.plot_prc = value
 
     @property
     def second_sim(self):
@@ -514,6 +526,8 @@ class EntityResolver(WithLogger):
                 '\'jaro_winkler\', \'jaro\', or \'scaled_lev\'.'
             )
         self._kwargs['second_sim'] = value
+        self._resolver.kwargs['second_sim'] = value
+        self._evaluator.kwargs['second_sim'] = value
 
     @property
     def stfidf_threshold(self):
@@ -523,6 +537,8 @@ class EntityResolver(WithLogger):
     @stfidf_threshold.setter
     def stfidf_threshold(self, value):
         self._kwargs['stfidf_threshold'] = value
+        self._resolver.kwargs['stfidf_threshold'] = value
+        self._evaluator.kwargs['stfidf_threshold'] = value
 
     @property
     def jw_prefix_weight(self):
@@ -532,6 +548,8 @@ class EntityResolver(WithLogger):
     @jw_prefix_weight.setter
     def jw_prefix_weight(self, value):
         self._kwargs['jw_prefix_weight'] = value
+        self._resolver.kwargs['jw_prefix_weight'] = value
+        self._evaluator.kwargs['jw_prefix_weight'] = value
 
     @property
     def average_method(self):
@@ -551,9 +569,25 @@ class EntityResolver(WithLogger):
                 '\'min\', \'geometric\', \'arithmetic\', \'max\'.'
             )
         self._kwargs['average_method'] = value
+        self._resolver.kwargs['average_method'] = value
+        self._evaluator.kwargs['average_method'] = value
+
+    def _set_verbose(self, value: int) -> None:
+        """ Override the parent verbose setter.
+
+        Update the ``verbose`` attributes of objectes contained in this class
+        when its own ``verbose`` attribute changes.
+
+        Args:
+            value: The verbose value to be set to.
+        """
+        self._graph_parser.verbose = value
+        self._ground_truth_parser.verbose = value
+        self._resolver.verbose = value
+        self._evaluator.verbose = value
 
     @logtime('Time taken for the whole resolution process')
-    def resolve(self, graph_path: str) -> Dict:
+    def resolve(self, graph_path: str) -> collections.OrderedDict:
         """ Resolve entities in the given data and return the entity mapping.
 
         Args:
@@ -562,9 +596,8 @@ class EntityResolver(WithLogger):
                 :doc:`../quickstart`.
 
         Returns:
-            A `collections.OrderedDict` object mapping reference ids to cluster
-            ids. The dictionary is sorted (key-value pairs are inserted) in
-            ascending order of node id.
+            Mapping reference ids to cluster ids. The dictionary is sorted
+            (key-value pairs are inserted) in ascending order of reference ids.
 
         Raises:
             ValueError: If ``plot_prc`` is set to ``True``.
@@ -581,7 +614,7 @@ class EntityResolver(WithLogger):
 
     def evaluate(
         self, ground_truth_path: str, resolved_mapping: Mapping
-    ) -> Union[Tuple[float, float, float], float]:
+    ) -> Any:
         """ Evaluate the resolved result using ground truth data.
 
         Args:
@@ -608,12 +641,7 @@ class EntityResolver(WithLogger):
 
     def resolve_and_eval(
         self, graph_path: str, ground_truth_path: str
-    ) -> Union[
-        Tuple[float, float, float],
-        Tuple[Tuple[float, float, float], List[Tuple[float, float]]],
-        float,
-        Tuple[float, List[Tuple[float, float]]],
-    ]:
+    ) -> Union[Any, Tuple[Any, List[Tuple[float, float]]]]:
         """ Resolve entities in the given data and evaluate the result.
 
         Args:
@@ -666,7 +694,9 @@ class EntityResolver(WithLogger):
             resolved_mapping = resolver_res
             return self._evaluator.evaluate(ground_truth, resolved_mapping)
 
-    def _parse_ground_truth(self, ground_truth_path: str) -> Dict:
+    def _parse_ground_truth(
+        self, ground_truth_path: str
+    ) -> collections.OrderedDict:
         """ A helper method for parsing the ground truth data.
 
         Args:
@@ -675,9 +705,9 @@ class EntityResolver(WithLogger):
                 :doc:`../quickstart`.
 
         Returns:
-            A `collections.OrderedDict` mapping reference ids to ground truth
-            cluster. The dictionary is sorted (key-value pairs are inserted) in
-            ascending order of node id.
+            Mapping reference ids to ground truth cluster ids. The dictionary
+            is sorted (key-value pairs are inserted) in ascending order of node
+            id.
 
         See Also:
             It ultimately calls the ``parse`` method of the
@@ -686,7 +716,7 @@ class EntityResolver(WithLogger):
         """
         return self._ground_truth_parser.parse(ground_truth_path)
 
-    def _plot(self, prc_list: List[Tuple[float, float]]) -> NoReturn:
+    def _plot(self, prc_list: List[Tuple[float, float]]) -> None:
         """ A helper method for plotting the precision-recall curve.
 
         Args:
