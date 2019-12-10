@@ -6,6 +6,10 @@
 Welcome to entity-resolver's documentation!
 ===========================================
 
+.. note::
+   Currently we only manage to complete :doc:`complete_doc` page. We are
+   working on the other two pages and they shall finish soon.
+
 .. toctree::
    :maxdepth: 1
    :caption: Table of Contents

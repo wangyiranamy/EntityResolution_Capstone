@@ -7,3 +7,5 @@ entity_resolver.egg-info
 .idea
 .DS_Store
 *.icloud
+docs/source
+docs/build
