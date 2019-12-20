@@ -6,6 +6,9 @@ Tutorial
    properly rendered in html in the `References`_ section. However, the
    reference content is correct and this effect is purely aesthetic.
 
+This is a starting tutorial that covers basic usage of this package. There is
+also a complete python example in the `A Complete Example`_ section.
+
 Introduction
 ------------
 This package implements the collective entity resolution algorithm as described
