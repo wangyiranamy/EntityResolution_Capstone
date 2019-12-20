@@ -719,8 +719,8 @@ class ClusteringMetrics:
             The V-measure score.
 
         See Also:
-            `V-measure explained <https://scikit-learn.org/stable/modules/\
-                clustering.html#homogeneity-completeness-and-v-measure>`_ by
+            `V-measure explained <https://scikit-learn.org/stable/modules/
+            clustering.html#homogeneity-completeness-and-v-measure>`_ by
             scikit-learn.
         """
         score = metrics.v_measure_score(labels, preds)
@@ -755,9 +755,8 @@ class ClusteringMetrics:
             The adjusted mutual information value.
 
         See Also:
-            `AMI explained <https://scikit-learn.org/stable/modules/\
-                clustering.html#mutual-information-based-scores>`_ by
-            scikit-learn.
+            `AMI explained <https://scikit-learn.org/stable/modules/clustering.
+            html#mutual-information-based-scores>`_ by scikit-learn.
         """
         cls._logger.debug(f'average_method: {average_method}')
         score = metrics.adjusted_mutual_info_score(
