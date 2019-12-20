@@ -1,7 +1,5 @@
 import os
-import time
 import subprocess
-import random
 from py_stringmatching.similarity_measure.levenshtein import Levenshtein
 from entity_resolver import EntityResolver
 
@@ -28,7 +26,8 @@ file_path = 'data/citeseer/citeseer-mrdm05.dat'
 graph_path = 'graph.json'
 ground_truth_path = 'ground_truth.json'
 cmd_args = ['entity-resolver', 'prep-citeseer']
-subprocess.call(cmd_args)
+subprocess.call(cmd_args)  # Use the command line tool
+
 entity_resolver = EntityResolver(
     attr_types={'name': 'person_entity'}, blocking_strategy=edit_distance,
     raw_blocking=False, alpha=0, attr_strategy={'name': 'jaro_winkler'},
@@ -36,10 +35,11 @@ entity_resolver = EntityResolver(
     raw_bootstrap=False, first_attr=None, first_attr_raw=False,
     second_attr=None, second_attr_raw=False, linkage='max',
     similarity_threshold=0.8, seed=None, plot_prc=False,
-    evaluator_strategy='precision_recall', verbose=2, jw_prefix_weight=0.1,
+    evaluator_strategy='precision_recall', verbose=1, jw_prefix_weight=0.1,
     stfidf_threshold=0.5, average_method='max'
-)
-entity_resolver.verbose = 1
-entity_resolver.resolve_and_eval(graph_path, ground_truth_path)
+)  # Most parameters are still set to their default values
+entity_resolver.resolve_and_eval(ground_truth_path, graph_path)
+
+# May remove the following two lines to keep the graph and ground truth files
 os.remove(graph_path)
 os.remove(ground_truth_path)
