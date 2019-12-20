@@ -153,7 +153,7 @@ class Resolver(WithLogger):
         weights (`~typing.Optional`\ [`~typing.Mapping`\ [`str`, `float`]]):
             Omitted.
         attr_strategy (`~typing.Mapping`\ [`str`, `~typing.Union`\ [`str`, `~typing.Callable`]]): Omitted.
-        rel_strategy (`~typing.Optional`\ [`~typing.Union`\ [`str`, `~typing.Callable`]]): Omitted.
+        rel_strategy (`str`): Omitted.
         blocking_threshold (`~typing.Union`\ [`float`, `int`]): Omitted.
         bootstrapping_strategy (`~typing.Optional`\ [`~typing.Callable`\ [[`~typing.Mapping`\ [`str`, `str`], `~typing.Mapping`\ [`str`, `str`]], `bool`]]):
             Omitted.
@@ -236,7 +236,7 @@ class Resolver(WithLogger):
         alpha: Union[float, int] = 0,
         weights: Optional[Mapping[str, float]] = None,
         attr_strategy: Mapping[str, Union[str, Callable]] = dict(),
-        rel_strategy: Optional[Union[str, Callable]] = None,
+        rel_strategy: str = 'jaccard_coef',
         blocking_threshold: Union[float, int] = 3,
         bootstrap_strategy: Optional[
             Callable[[Mapping[str, str], Mapping[str, str]], bool]
@@ -286,8 +286,7 @@ class Resolver(WithLogger):
         }
         self._default_strategies = {
             'text': 'stfidf',
-            'person_entity': 'jaro_winkler',
-            'relation': 'jaccard_coef'
+            'person_entity': 'jaro_winkler'
         }
         self.time_dict = collections.defaultdict(lambda: [0, 0])
         random.seed(seed)
@@ -922,10 +921,7 @@ class Resolver(WithLogger):
             of given a cluster id. It returns the similarity score as a
             `float`. Also set some flags about uniqueness calculation.
         """
-        if self.rel_strategy is None:
-            rel_strategy = self._default_strategies['relation']
-        else:
-            rel_strategy = self.rel_strategy
+        rel_strategy = self.rel_strategy
         rel_sim_producer = self._sim_func_producers[rel_strategy]
         if rel_strategy.endswith('fr'):
             self._use_nbr_cache = False

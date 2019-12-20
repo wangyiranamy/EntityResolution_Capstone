@@ -176,7 +176,7 @@ class EntityResolver(WithLogger):
         _weights (`~typing.Optional`\ [`~typing.Mapping`\ [`str`, `float`]]):
             Omitted.
         _attr_strategy (`~typing.Mapping`\ [`str`, `~typing.Union`\ [`str`, `~typing.Callable`]]): Omitted.
-        _rel_strategy (`~typing.Optional`\ [`~typing.Union`\ [`str`, `~typing.Callable`]]): Omitted.
+        _rel_strategy (`str`): Omitted.
         _blocking_threshold (`~typing.Union`\ [`float`, `int`]): Omitted.
         _bootstrapping_strategy (`~typing.Optional`\ [`~typing.Callable`\ [[`~typing.Mapping`\ [`str`, `str`], `~typing.Mapping`\ [`str`, `str`]], `bool`]]): Omitted.
         _raw_bootstrap (`bool`):
@@ -215,7 +215,7 @@ class EntityResolver(WithLogger):
         alpha: Union[float, int] = 0,
         weights: Optional[Mapping[str, float]] = None,
         attr_strategy: Mapping[str, Union[str, Callable]] = dict(),
-        rel_strategy: Optional[str] = None,
+        rel_strategy: str = 'jaccard_coef',
         blocking_threshold: Union[float, int] = 3,
         bootstrap_strategy: Optional[
             Callable[[Mapping[str, str], Mapping[str, str]], bool]
@@ -353,7 +353,7 @@ class EntityResolver(WithLogger):
 
     @property
     def rel_strategy(self):
-        """ `~typing.Optional`\ [`str`\ ]: Omitted.
+        """ `str`: Omitted.
 
         Raises:
             ValueError: If set to any value other than ``'jaccard_coef'``,
@@ -364,7 +364,7 @@ class EntityResolver(WithLogger):
 
     @rel_strategy.setter
     def rel_strategy(self, value):
-        if value is not None and value not in [
+        if value not in [
             'jaccard_coef', 'jaraccard_coef_fr', 'adar_neighbor',
             'adar_neighbor_fr', 'adar_attr', 'adar_attr_fr'
         ]:
