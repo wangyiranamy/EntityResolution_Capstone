@@ -2,7 +2,7 @@
 
 This is the implementaion file of command line tools
 ``entity-resolve prep-arxiv`` and ``entity-resolver prep-citeseer``. For usage
-of the tools, please refer to :doc:`../quickstart` or use with ``-h`` flag for
+of the tools, please refer to :doc:`../tutorial` or use with ``-h`` flag for
 help menu. It also includes a python API: the `run` function for such
 preprocessing tasks, though it is primarily implemented for testing purpose.
 
@@ -42,7 +42,7 @@ from .core.utils import subparser
 )
 def _norm_arxiv(
     data: str = 'data/arxiv/arxiv-mrdm05.dat',
-    graph: str= 'graph.json',
+    graph: str = 'graph.json',
     ground_truth: str = 'ground_truth.json'
 ) -> None:
     """ Preprocess the arxiv data to the desired format.

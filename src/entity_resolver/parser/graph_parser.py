@@ -27,7 +27,7 @@ class GraphParser(WithLogger):
         verbose: Indicate how much information to be logged/printed in the
             console during the program execution. Same as in the
             `~entity_resolver.main.EntityResolver` class.
-    
+
     Attributes:
         attr_types: Same as in the above parameters section.
     """
@@ -42,8 +42,8 @@ class GraphParser(WithLogger):
         Args:
             graph_data_path: The path to the graph data. The data file has to
                 **strictly follow** the format as described in
-                :doc:`../quickstart`.
-        
+                :doc:`../tutorial`.
+
         Returns:
             The parsed Graph object.
         """

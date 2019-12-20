@@ -63,6 +63,8 @@ class Evaluator(WithLogger):
           return type is `~typing.Tuple`\ [`float`, `float`, `float`]
           representing precision, recall, and f1 scores in the order. Refer to
           :doc:`../advanced_guide` for more details.
+        * If ``strategy`` is a user-defined function, the return is the same as
+          that function.
         """
         if callable(self.strategy):
             return self.strategy

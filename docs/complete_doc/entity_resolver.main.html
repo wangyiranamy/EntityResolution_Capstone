@@ -82,7 +82,28 @@
             
               <p class="caption"><span class="caption-text">Table of Contents</span></p>
 <ul class="current">
-<li class="toctree-l1"><a class="reference internal" href="../quickstart.html">Quickstart</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorial.html">Tutorial</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../tutorial.html#introduction">Introduction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../tutorial.html#installation">Installation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../tutorial.html#data-format">Data Format</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../tutorial.html#startup-guide">Startup Guide</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../tutorial.html#define-types">Define Types</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../tutorial.html#define-blocking-strategy">Define Blocking Strategy</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../tutorial.html#resolve">Resolve</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../tutorial.html#see-also">See Also</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../tutorial.html#basic-parameter-settings">Basic Parameter Settings</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../tutorial.html#plot-precision-recall">Plot Precision-Recall</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../tutorial.html#adjust-logging">Adjust Logging</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../tutorial.html#set-seed">Set Seed</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../tutorial.html#command-line-tools">Command Line Tools</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../tutorial.html#a-complete-example">A Complete Example</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../tutorial.html#references">References</a></li>
+</ul>
+</li>
 <li class="toctree-l1"><a class="reference internal" href="../advanced_guide.html">Advanced Guide</a></li>
 <li class="toctree-l1 current"><a class="reference internal" href="../complete_doc.html">Complete Documentation</a><ul class="current">
 <li class="toctree-l2 current"><a class="reference internal" href="entity_resolver.html">entity_resolver package</a><ul class="current">
@@ -178,10 +199,10 @@ only interface for users to apply the collective entity resolution algorithm
 to their data.</p>
 <p class="rubric">Example</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">entity_resolver</span> <span class="kn">import</span> <span class="n">EntityResolver</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">entity_resolver</span> <span class="o">=</span> <span class="n">EntityResolver</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">er</span> <span class="o">=</span> <span class="n">EntityResolver</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">data_path</span> <span class="o">=</span> <span class="s1">&#39;path/to/your/data&#39;</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">label_path</span> <span class="o">=</span> <span class="s1">&#39;path/to/your/ground_truth&#39;</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">score</span> <span class="o">=</span> <span class="n">entity_resolver</span><span class="o">.</span><span class="n">resolve_and_eval</span><span class="p">(</span><span class="n">data_path</span><span class="p">,</span> <span class="n">label_path</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">score</span> <span class="o">=</span> <span class="n">er</span><span class="o">.</span><span class="n">resolve_and_eval</span><span class="p">(</span><span class="n">label_path</span><span class="p">,</span> <span class="n">data_path</span><span class="p">)</span>
 </pre></div>
 </div>
 <div class="admonition tip">
@@ -201,7 +222,7 @@ to an attribute similarity strategy in <code class="docutils literal notranslate
 <p class="admonition-title">See also</p>
 <ul class="simple">
 <li><p>Detailed explanation for the above example can be found in
-<a class="reference internal" href="../quickstart.html"><span class="doc">Quickstart</span></a>.</p></li>
+<a class="reference internal" href="../tutorial.html"><span class="doc">Tutorial</span></a>.</p></li>
 <li><p>A more comprehensive explanation for the input parameters of this class
 can be found in <a class="reference internal" href="../advanced_guide.html"><span class="doc">Advanced Guide</span></a>.</p></li>
 </ul>
@@ -624,7 +645,7 @@ on input parameters to evaluate the results of entity resolution.</p>
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><p><strong>ground_truth_path</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>) – The path to ground truth data. The data file has
 to <strong>strictly follow</strong> the format as described in
-<a class="reference internal" href="../quickstart.html"><span class="doc">Quickstart</span></a>.</p>
+<a class="reference internal" href="../tutorial.html"><span class="doc">Tutorial</span></a>.</p>
 </dd>
 <dt class="field-even">Return type</dt>
 <dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3.6/library/collections.html#collections.OrderedDict" title="(in Python v3.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">OrderedDict</span></code></a></p>
@@ -743,7 +764,7 @@ when its own <code class="docutils literal notranslate"><span class="pre">verbos
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>ground_truth_path</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>) – The path to ground truth data used for
 evaluation. The data file has to <strong>strictly follow</strong> the format
-as described in <a class="reference internal" href="../quickstart.html"><span class="doc">Quickstart</span></a>.</p></li>
+as described in <a class="reference internal" href="../tutorial.html"><span class="doc">Tutorial</span></a>.</p></li>
 <li><p><strong>resolved_mapping</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/typing.html#typing.Mapping" title="(in Python v3.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Mapping</span></code></a>) – Mapping reference id to cluster id. The reference
 ids must correspond to those in ground truth data, while their
 cluster ids may differ.</p></li>
@@ -757,10 +778,16 @@ cluster ids may differ.</p></li>
 <li><p>If <code class="docutils literal notranslate"><span class="pre">evaluator_strategy</span></code> is set to <code class="docutils literal notranslate"><span class="pre">'precision_recall'</span></code>, the
 result is a tuple of three numbers representing precision,
 recall, and f1 in the order.</p></li>
-<li><p>Otherwise, the result is a single number representing the score
-computed as specified by <code class="docutils literal notranslate"><span class="pre">evaluator_strategy</span></code>.</p></li>
+<li><p>If <code class="docutils literal notranslate"><span class="pre">strategy</span></code> is set to <code class="docutils literal notranslate"><span class="pre">'ami'</span></code>, or <code class="docutils literal notranslate"><span class="pre">'v_measure'</span></code>, the
+result is a single number representing the score computed as
+specified by <code class="docutils literal notranslate"><span class="pre">evaluator_strategy</span></code>.</p></li>
+<li><p>If <code class="docutils literal notranslate"><span class="pre">strategy</span></code> is a user-defined function, the return is the
+same as that function.</p></li>
 </ul>
 </p>
+</dd>
+<dt class="field-even">Raises</dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3.6/library/exceptions.html#ValueError" title="(in Python v3.6)"><strong>ValueError</strong></a> – If <code class="docutils literal notranslate"><span class="pre">plot_prc</span></code> is set to <code class="docutils literal notranslate"><span class="pre">True</span></code>.</p>
 </dd>
 </dl>
 <div class="admonition seealso">
@@ -851,7 +878,7 @@ object in <a class="reference internal" href="entity_resolver.core.evaluator.htm
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><p><strong>graph_path</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>) – The path to the input data for entity resolution. The
 data file has to <strong>strictly follow</strong> the format as described in
-<a class="reference internal" href="../quickstart.html"><span class="doc">Quickstart</span></a>.</p>
+<a class="reference internal" href="../tutorial.html"><span class="doc">Tutorial</span></a>.</p>
 </dd>
 <dt class="field-even">Return type</dt>
 <dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3.6/library/collections.html#collections.OrderedDict" title="(in Python v3.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">OrderedDict</span></code></a></p>
@@ -868,17 +895,17 @@ data file has to <strong>strictly follow</strong> the format as described in
 
 <dl class="method">
 <dt id="entity_resolver.main.EntityResolver.resolve_and_eval">
-<code class="sig-name descname">resolve_and_eval</code><span class="sig-paren">(</span><em class="sig-param">graph_path</em>, <em class="sig-param">ground_truth_path</em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/Terry1004/EntityResolution_Capstone/blob/master/src/entity_resolver/main.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#entity_resolver.main.EntityResolver.resolve_and_eval" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">resolve_and_eval</code><span class="sig-paren">(</span><em class="sig-param">ground_truth_path</em>, <em class="sig-param">graph_path</em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/Terry1004/EntityResolution_Capstone/blob/master/src/entity_resolver/main.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#entity_resolver.main.EntityResolver.resolve_and_eval" title="Permalink to this definition">¶</a></dt>
 <dd><p>Resolve entities in the given data and evaluate the result.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>graph_path</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>) – The path to the input data for entity resolution. The
-data file has to <strong>strictly follow</strong> the format as described in
-<a class="reference internal" href="../quickstart.html"><span class="doc">Quickstart</span></a>.</p></li>
 <li><p><strong>ground_truth_path</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>) – The path to ground truth data used for
 evaulation. The data file has to <strong>strictly follow</strong> the format
-as described in <a class="reference internal" href="../quickstart.html"><span class="doc">Quickstart</span></a>.</p></li>
+as described in <a class="reference internal" href="../tutorial.html"><span class="doc">Tutorial</span></a>.</p></li>
+<li><p><strong>graph_path</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>) – The path to the input data for entity resolution. The
+data file has to <strong>strictly follow</strong> the format as described in
+<a class="reference internal" href="../tutorial.html"><span class="doc">Tutorial</span></a>.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Return type</dt>
@@ -908,7 +935,8 @@ algorithm (reflecting the behavior with different
 <ul>
 <li><p>If <code class="docutils literal notranslate"><span class="pre">plot_prc</span> <span class="pre">==</span> <span class="pre">False</span></code>, the result is a single number
 representing the score computed as specified by
-<code class="docutils literal notranslate"><span class="pre">evaluator_strategy</span></code>.</p></li>
+<code class="docutils literal notranslate"><span class="pre">evaluator_strategy</span></code> if the strategy is not a user-defined
+function, or the score returned by the user-defined function.</p></li>
 <li><p>If <code class="docutils literal notranslate"><span class="pre">plot_prc</span> <span class="pre">==</span> <span class="pre">True</span></code>, the result is a tuple of two objects:</p>
 <ul>
 <li><p>The first one is a single number same as in the

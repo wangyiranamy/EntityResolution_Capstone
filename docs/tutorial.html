@@ -1,0 +1,645 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Tutorial &mdash; entity-resolver  documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script type="text/javascript" src="_static/jquery.js"></script>
+        <script type="text/javascript" src="_static/underscore.js"></script>
+        <script type="text/javascript" src="_static/doctools.js"></script>
+        <script type="text/javascript" src="_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Advanced Guide" href="advanced_guide.html" />
+    <link rel="prev" title="Welcome to entity-resolver’s documentation!" href="index.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="index.html" class="icon icon-home"> entity-resolver
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Table of Contents</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Tutorial</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#introduction">Introduction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#installation">Installation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#data-format">Data Format</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#startup-guide">Startup Guide</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#define-types">Define Types</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#define-blocking-strategy">Define Blocking Strategy</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#resolve">Resolve</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#see-also">See Also</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#basic-parameter-settings">Basic Parameter Settings</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#plot-precision-recall">Plot Precision-Recall</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#adjust-logging">Adjust Logging</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#set-seed">Set Seed</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#command-line-tools">Command Line Tools</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#a-complete-example">A Complete Example</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#references">References</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="advanced_guide.html">Advanced Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="complete_doc.html">Complete Documentation</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="complete_doc/entity_resolver.html">entity_resolver package</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="complete_doc/entity_resolver.html#subpackages">Subpackages</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="complete_doc/entity_resolver.core.html">entity_resolver.core package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="complete_doc/entity_resolver.parser.html">entity_resolver.parser package</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="complete_doc/entity_resolver.html#submodules">Submodules</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="complete_doc/entity_resolver.main.html">entity_resolver.main module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="complete_doc/entity_resolver.scripts.html">entity_resolver.scripts module</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">entity-resolver</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html">Docs</a> &raquo;</li>
+        
+      <li>Tutorial</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            
+              <a href="https://github.com/Terry1004/EntityResolution_Capstone/blob/master/docs/source/tutorial.rst" class="fa fa-github"> Edit on GitHub</a>
+            
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="tutorial">
+<h1>Tutorial<a class="headerlink" href="#tutorial" title="Permalink to this headline">¶</a></h1>
+<div class="admonition error">
+<p class="admonition-title">Error</p>
+<p>Probably due to a bug with sphinx 2.0, the reference to the paper is not
+properly rendered in html in the <a class="reference internal" href="#references">References</a> section. However, the
+reference content is correct and this effect is purely aesthetic.</p>
+</div>
+<div class="section" id="introduction">
+<h2>Introduction<a class="headerlink" href="#introduction" title="Permalink to this headline">¶</a></h2>
+<p>This package implements the collective entity resolution algorithm as described
+in <a class="footnote-reference brackets" href="#id2" id="id1">1</a>.</p>
+<p>The objective of entity resolution is to identify among a collection of
+references of entities, which are referring to the same actual entity. For
+example, we have a set of names “Jim Doe”, “J Doe”, “Jason Doe”, where “Jason
+Doe” and “J Doe” are actually the same person while “Jim Doe” is a different
+one. The occurrence of each name is called a <em>reference</em>, while the person each
+name refers to in real world is called an <em>entity</em>.</p>
+<p>A <em>relation</em> means an co-occurrence in the context of this algorithm, and is
+modeld by a hyper-edge connecting multiple references. For example, if
+“Jim Doe”, “Jason Doe”, and “C. Wang” co-authored a paper, one may use a
+hyper-edge to connect them. The intuition is that if two references have
+co-authored with the same person, chances are higher that these two references
+are also the same entity. Any relation that is consistent with such intuition
+can be deemed as an appropriate relation.</p>
+</div>
+<div class="section" id="installation">
+<h2>Installation<a class="headerlink" href="#installation" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="data-format">
+<h2>Data Format<a class="headerlink" href="#data-format" title="Permalink to this headline">¶</a></h2>
+<p>This first step to using this package is to transform your data into a format
+that this package can understand. We define the format of the data file
+containing references and their relations as follows:</p>
+<blockquote>
+<div><ol class="arabic">
+<li><p>It should be a json file consisting of a single array of items.</p></li>
+<li><p>Each item contains information of one reference:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+  <span class="s2">&quot;node_id&quot;</span><span class="p">:</span> <span class="s2">&quot;&lt;unique identifier of the reference&gt;&quot;</span><span class="p">,</span>
+  <span class="s2">&quot;edge_id&quot;</span><span class="p">:</span> <span class="s2">&quot;&lt;unique identifier of the relation involving this reference&gt;&quot;</span><span class="p">,</span>
+  <span class="s2">&quot;attr_dict&quot;</span><span class="p">:</span> <span class="p">{</span>
+    <span class="s2">&quot;&lt;name of the first attribute&gt;&quot;</span><span class="p">:</span> <span class="s2">&quot;&lt;value of the first attribute&gt;&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;&lt;name of the second attribute&gt;&quot;</span><span class="p">:</span> <span class="s2">&quot;&lt;value of the second attribute&gt;&quot;</span><span class="p">,</span>
+    <span class="o">...</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>where users should substitute contents of format “&lt;…&gt;” with appropriate
+values as described in the angled brackets.</p>
+</li>
+</ol>
+</div></blockquote>
+<p>Note that each reference should appear in <strong>exactly one</strong> relation. Therefore
+each item in the list must have distinct “node_id”. This makes sense in most
+cases since each appearance of an object in data is considered a unique
+reference.</p>
+<p>If users wish to use a ground truth dataset to evaluate the performance of the
+entity resolution algorithm, they should convert their ground truth dataset to
+the following format:</p>
+<blockquote>
+<div><ol class="arabic">
+<li><p>It should be a json file consisting of a single array of items.</p></li>
+<li><p>Each item contains information about what entity each reference refers
+to.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+  <span class="s2">&quot;node_id&quot;</span><span class="p">:</span> <span class="s2">&quot;&lt;unique identifier of the reference&gt;&quot;</span><span class="p">,</span>
+  <span class="s2">&quot;cluster_id&quot;</span><span class="p">:</span> <span class="s2">&quot;&lt;unique identifier of the entity&gt;&quot;</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>Contents of format “&lt;…&gt;” should be replaced similarly.</p>
+</li>
+</ol>
+</div></blockquote>
+<p>It is important to keep the “node_id” in this ground truth data consistent with
+that in the reference and relation data.</p>
+<blockquote>
+<div><div class="admonition tip">
+<p class="admonition-title">Tip</p>
+<p>The person names are best to be normalized names to fully utilize the
+‘person_entity’ type as described in both <a class="reference internal" href="#define-types">Define Types</a> and
+<a class="reference internal" href="#define-blocking-strategy">Define Blocking Strategy</a>. A normalized name should consist only of
+lower case letters and underscores of the format: &lt;last name&gt;_&lt;first
+name&gt; &lt;middle name&gt;, where there should be no spaces in the last name,
+and spaces in first name should all be replaced by underscores. Other
+punctuational marks should be removed. For example, <code class="docutils literal notranslate"><span class="pre">'W.</span> <span class="pre">W.</span> <span class="pre">Wang'</span></code>
+should be transformed to <code class="docutils literal notranslate"><span class="pre">'wang_w_w'</span></code>.</p>
+</div>
+</div></blockquote>
+</div>
+<div class="section" id="startup-guide">
+<h2>Startup Guide<a class="headerlink" href="#startup-guide" title="Permalink to this headline">¶</a></h2>
+<p>After converting your data to the specified format(s) above, follow the steps
+below.</p>
+<div class="section" id="define-types">
+<h3>Define Types<a class="headerlink" href="#define-types" title="Permalink to this headline">¶</a></h3>
+<p>Firstly, you have to input the type of each attribute in your data. It should
+be a dictionary mapping attribute names to their types. For example,</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="p">{</span><span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;person_entity&#39;</span><span class="p">}</span>
+</pre></div>
+</div>
+<p>where <code class="docutils literal notranslate"><span class="pre">'name'</span></code> is the attribute name and <code class="docutils literal notranslate"><span class="pre">'person_entity'</span></code> is the attribute
+type. Currently we support <code class="docutils literal notranslate"><span class="pre">'text'</span></code> and <code class="docutils literal notranslate"><span class="pre">'person_entity'</span></code> as types. This
+type affects expected input arguments of input function parameters including
+<code class="docutils literal notranslate"><span class="pre">blocking_strategy</span></code>, <code class="docutils literal notranslate"><span class="pre">bootstrap_strategy</span></code>, <code class="docutils literal notranslate"><span class="pre">first_attr</span></code>, <code class="docutils literal notranslate"><span class="pre">second_attr</span></code>,
+and values of <code class="docutils literal notranslate"><span class="pre">attr_strategy</span></code>. The following section explains how it affects
+<code class="docutils literal notranslate"><span class="pre">blocking_strategy</span></code>. The effects on other parameters are similary. Users may
+refer to <a class="reference internal" href="advanced_guide.html"><span class="doc">Advanced Guide</span></a> for further details.</p>
+</div>
+<div class="section" id="define-blocking-strategy">
+<h3>Define Blocking Strategy<a class="headerlink" href="#define-blocking-strategy" title="Permalink to this headline">¶</a></h3>
+<p>Because it is impossible to calculate pairwise distances of all points during
+clustering even for moderate size data, a pre-screening is done to find out
+groups of references that are potentially the same entities. This process is
+called “blocking”.</p>
+<p><code class="docutils literal notranslate"><span class="pre">blocking_strategy</span></code> is a required argument to specify
+how pre-screening is done. It should be a function that takes in two
+dictionaries and returns the distance between them. The two dictionaries map
+attribute names to values of two references. For example,</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="p">{</span><span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="p">(</span><span class="s1">&#39;doe&#39;</span><span class="p">,</span> <span class="s1">&#39;jim&#39;</span><span class="p">)}</span>
+</pre></div>
+</div>
+<p>This function should be fast to compute, and using an appropriate threshold
+specified by the <code class="docutils literal notranslate"><span class="pre">blocking_threshold</span></code> parameter (default 3), it is almost
+certain that any pair of references with distance greater than this threshold
+are definitely not the same entity. For example, edit distance of last names
+can be used when resolving paper authors.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">py_stringmatching.similarity_measure.levenshtein</span> <span class="kn">import</span> <span class="n">Levenshtein</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">def</span> <span class="nf">edit_distance</span><span class="p">(</span><span class="n">attrs1</span><span class="p">,</span> <span class="n">attrs2</span><span class="p">):</span>
+<span class="gp">... </span>    <span class="n">levenshtein</span> <span class="o">=</span> <span class="n">Levenshtein</span><span class="p">()</span>
+<span class="gp">... </span>    <span class="n">last_name1</span> <span class="o">=</span> <span class="n">attrs1</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+<span class="gp">... </span>    <span class="n">last_name2</span> <span class="o">=</span> <span class="n">attrs2</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+<span class="gp">... </span>    <span class="n">dist</span> <span class="o">=</span> <span class="n">levenshtein</span><span class="o">.</span><span class="n">get_raw_score</span><span class="p">(</span><span class="n">last_name1</span><span class="p">,</span> <span class="n">last_name2</span><span class="p">)</span>
+<span class="gp">... </span>    <span class="k">return</span> <span class="n">dist</span>
+</pre></div>
+</div>
+<p>As described in the previsous section, <code class="docutils literal notranslate"><span class="pre">attr_types</span></code> affect the expected input
+of <code class="docutils literal notranslate"><span class="pre">blocking_strategy</span></code>.</p>
+<blockquote>
+<div><dl class="field-list simple">
+<dt class="field-odd">person_entity</dt>
+<dd class="field-odd"><p>The value corresponding to the attribute name of this type
+will be a tuple of (last name, first name) parsed from its raw value of
+normalized name described in the tip of <a class="reference internal" href="#data-format">Data Format</a> section. For
+example, the normalized name ‘doe_jim’ will be <code class="docutils literal notranslate"><span class="pre">('doe',</span> <span class="pre">'jim')</span></code> in the
+value.</p>
+</dd>
+<dt class="field-even">text</dt>
+<dd class="field-even"><p>The value corresponding to the attribute name of this type will be a
+list of tokenized words with any non-alphanumeric characters as breaking
+points. For example, ‘this is a sentence’ will be <code class="docutils literal notranslate"><span class="pre">['this',</span> <span class="pre">'is',</span> <span class="pre">'a',</span>
+<span class="pre">'sentence']</span></code> in the value.</p>
+</dd>
+<dt class="field-odd">other</dt>
+<dd class="field-odd"><p>If the specified type is neither of the above two strings, the value
+will be the same as its value in the input data.</p>
+</dd>
+</dl>
+</div></blockquote>
+<p>Moreover, users may set <code class="docutils literal notranslate"><span class="pre">raw_blocking</span></code> to <code class="docutils literal notranslate"><span class="pre">True</span></code> if they want to use
+supported types (‘person_entity’, ‘text’) but their raw values as inputs to
+their own <code class="docutils literal notranslate"><span class="pre">blocking_strategy</span></code> function.</p>
+</div>
+<div class="section" id="resolve">
+<h3>Resolve<a class="headerlink" href="#resolve" title="Permalink to this headline">¶</a></h3>
+<p>Now both <code class="docutils literal notranslate"><span class="pre">attr_types</span></code> and <code class="docutils literal notranslate"><span class="pre">blocking_strategy</span></code> have been defined. For
+example,</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">attr_types</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;person_entity&#39;</span><span class="p">}</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">blocking_strategy</span> <span class="o">=</span> <span class="n">edit_distance</span>  <span class="c1"># defined in the previsous section</span>
+</pre></div>
+</div>
+<p>There are three main APIs:</p>
+<blockquote>
+<div><ul>
+<li><p>If you wish to resolve entities in the reference relation dataset, follow
+the example below:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">entity_resolver</span> <span class="kn">import</span> <span class="n">EntityResolver</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">er</span> <span class="o">=</span> <span class="n">EntityResolver</span><span class="p">()</span>  <span class="c1"># May pass in different hyperparameters</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">resolved_mapping</span> <span class="o">=</span> <span class="n">er</span><span class="o">.</span><span class="n">resolve</span><span class="p">(</span><span class="s1">&#39;path/to/your/data&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>The resulting <code class="docutils literal notranslate"><span class="pre">resolved_mapping</span></code> object is an <a class="reference external" href="https://docs.python.org/3.6/library/collections.html#collections.OrderedDict" title="(in Python v3.6)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">OrderedDict</span></code></a>
+object mapping reference ids to cluster (entity) ids. The reference ids
+correspond to those in ground truth data, while their cluster ids may
+differ. This dictionary is sorted (key-value pairs are inserted) in
+ascending order of reference ids.</p>
+</li>
+<li><p>If you wish to resolve entities in the reference relation dataset and also
+use a ground truth dataset to evaluate the performance, follow the example
+below:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">entity_resolver</span> <span class="kn">import</span> <span class="n">EntityResolver</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">er</span> <span class="o">=</span> <span class="n">EntityResolver</span><span class="p">()</span>  <span class="c1"># May pass in different hyperparameters</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">score</span> <span class="o">=</span> <span class="n">er</span><span class="o">.</span><span class="n">resolve_and_eval</span><span class="p">(</span>
+<span class="gp">... </span>    <span class="s1">&#39;path/to/your/ground_truth&#39;</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="s1">&#39;path/to/your/data&#39;</span>
+<span class="gp">... </span><span class="p">)</span>
+</pre></div>
+</div>
+<blockquote>
+<div><p>Depending on different evaluation strategy, the resulting <code class="docutils literal notranslate"><span class="pre">socre</span></code> may
+differ. The default is a tuple of (precision, recall, f1) scores. Refer
+to <a class="reference internal" href="advanced_guide.html"><span class="doc">Advanced Guide</span></a> for further information on different
+evaluation metrics and <a class="reference internal" href="#plot-precision-recall">Plot Precision-Recall</a> below for how
+<code class="docutils literal notranslate"><span class="pre">plot_prc</span></code> flag might affect the return of this function.</p>
+</div></blockquote>
+</li>
+<li><p>If you wish to do extra work between entity resolution and evaluation, you
+may follow the example below:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">entity_resolver</span> <span class="kn">import</span> <span class="n">EntityResolver</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">er</span> <span class="o">=</span> <span class="n">EntityResolver</span><span class="p">()</span> <span class="c1"># May pass in different hyperparameters</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">resolved_mapping</span> <span class="o">=</span> <span class="n">er</span><span class="o">.</span><span class="n">resolve</span><span class="p">(</span><span class="s1">&#39;path/to/your/data/&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">do_extra_work</span><span class="p">(</span><span class="n">resolved_mapping</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">score</span> <span class="o">=</span> <span class="n">er</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span><span class="s1">&#39;path/to/your/ground_truth&#39;</span><span class="p">,</span> <span class="n">resolved_mapping</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>The resulting <code class="docutils literal notranslate"><span class="pre">score</span></code> is the same as desribed in the above bullet point
+as long as it is not altered.</p>
+</li>
+</ul>
+</div></blockquote>
+</div>
+<div class="section" id="see-also">
+<h3>See Also<a class="headerlink" href="#see-also" title="Permalink to this headline">¶</a></h3>
+<p>And now we are done! If you wish to further customize the resolver’s runtime
+behavior, please refer to the next section <a class="reference internal" href="#basic-parameter-settings">Basic Parameter Settings</a>. If you
+wish to use command line tools shipped with this package, please refer to the
+section <a class="reference internal" href="#command-line-tools">Command Line Tools</a>.  If you wish to understand the details of the
+algorithm and what each of the hyperparameters means, please refer to
+<a class="reference internal" href="advanced_guide.html"><span class="doc">Advanced Guide</span></a>.</p>
+</div>
+</div>
+<div class="section" id="basic-parameter-settings">
+<h2>Basic Parameter Settings<a class="headerlink" href="#basic-parameter-settings" title="Permalink to this headline">¶</a></h2>
+<p>The following three sections explain three parameters users may set to help
+with different purpose when using this package.</p>
+<div class="section" id="plot-precision-recall">
+<h3>Plot Precision-Recall<a class="headerlink" href="#plot-precision-recall" title="Permalink to this headline">¶</a></h3>
+<p>The <code class="docutils literal notranslate"><span class="pre">plot_prc</span></code> parameter is default to <code class="docutils literal notranslate"><span class="pre">False</span></code>, meaning no precision-recall
+curve will be plotted. This parameter may be set to <code class="docutils literal notranslate"><span class="pre">True</span></code> to plot the curve
+only if the <code class="docutils literal notranslate"><span class="pre">resolve_and_eval</span></code> method is called. Attempts to call either
+<code class="docutils literal notranslate"><span class="pre">resolve</span></code> or <code class="docutils literal notranslate"><span class="pre">evaluate</span></code> method will result in error. Moreover, users should
+take note of the following when setting it to <code class="docutils literal notranslate"><span class="pre">True</span></code>:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>The return value of <code class="docutils literal notranslate"><span class="pre">resolve_and_eval</span></code> will be a tuple of two items with
+the first one being the same as the return when <code class="docutils literal notranslate"><span class="pre">plot_prc</span></code> is <code class="docutils literal notranslate"><span class="pre">False</span></code>
+and the second one being a list of tuples of precision and recall scores
+used to plot the curve.</p></li>
+<li><p>The program will take a significantly longer time to run because the
+precision and recall scores are computed many times. Therefore it is
+highly recommended to store the list of precision and recall scores
+returned by <code class="docutils literal notranslate"><span class="pre">resolve_and_eval</span></code> in case further actions are required.</p></li>
+</ul>
+</div></blockquote>
+</div>
+<div class="section" id="adjust-logging">
+<h3>Adjust Logging<a class="headerlink" href="#adjust-logging" title="Permalink to this headline">¶</a></h3>
+<p>The <code class="docutils literal notranslate"><span class="pre">verbose</span></code> parameter can be set to control console logging information.
+Its default value is 0. Below explains how the value affects the logging
+behavior:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>Any integer less than 1 implies no logging.</p></li>
+<li><p>The integer 1 implies some information about the dataset, built graph,
+evaluation result (if available), and time taken for each step of
+algorithm is logged.</p></li>
+<li><p>Any integer greater than 1 implies <strong>a lot of</strong> information is logged. It
+is primarily used to debug this package.</p></li>
+</ul>
+</div></blockquote>
+</div>
+<div class="section" id="set-seed">
+<h3>Set Seed<a class="headerlink" href="#set-seed" title="Permalink to this headline">¶</a></h3>
+<p>The blocking step of this algorithm is the only random part of this algorithm.
+Therefore the <code class="docutils literal notranslate"><span class="pre">seed</span></code> parameter can be used for replicate purpose. The default
+value is <code class="docutils literal notranslate"><span class="pre">None</span></code>, which implies the current system time is used as seed.</p>
+</div>
+</div>
+<div class="section" id="command-line-tools">
+<h2>Command Line Tools<a class="headerlink" href="#command-line-tools" title="Permalink to this headline">¶</a></h2>
+<p>This package also ships with two command line tools to transform the <a class="reference external" href="https://github.com/Terry1004/EntityResolution_Capstone/tree/master/data/arxiv">arxiv</a> and <a class="reference external" href="https://github.com/Terry1004/EntityResolution_Capstone/tree/master/data/citeseer">citeseer</a> data into the standard
+format described in <a class="reference internal" href="#data-format">Data Format</a>.</p>
+<p>Typing <code class="docutils literal notranslate"><span class="pre">entity-resolver</span> <span class="pre">-h</span></code> in terminal, users should see the help manual as
+follows:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$</span> entity-resolver -h
+<span class="go">usage: entity-resolver [-h] {prep-arxiv,prep-citeseer} ...</span>
+
+<span class="go">positional arguments:</span>
+<span class="go">{prep-arxiv,prep-citeseer}</span>
+<span class="go">   prep-arxiv          Transform the arxiv data into the format expected by</span>
+<span class="go">                        EntityResolver</span>
+<span class="go">   prep-citeseer       Transform the citeseer data into the format expected</span>
+<span class="go">                        by EntityResolver</span>
+
+<span class="go">optional arguments:</span>
+<span class="go">-h, --help            show this help message and exit</span>
+</pre></div>
+</div>
+<p>There are two subcommands that correspond to the arxiv and citeseer dataset
+respectively. For example, the following command will parse the arxiv data on
+path <code class="docutils literal notranslate"><span class="pre">data/arxiv/arxiv-mrdm05.dat</span></code> and output the graph data and ground truth
+data in <code class="docutils literal notranslate"><span class="pre">graph.json</span></code> and <code class="docutils literal notranslate"><span class="pre">ground_truth.json</span></code> files in the current directory
+respectively.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ entity-resolver prep-arxiv\
+&gt; --data data/arxiv/arxiv/arxiv-mrdm05.dat\
+&gt; --graph graph.json\
+&gt; --ground_truth ground_truth.json
+</pre></div>
+</div>
+<p>The values for each option are also their default values if not specified. The
+default values of <code class="docutils literal notranslate"><span class="pre">entity-resolver</span> <span class="pre">prep-citeseer</span></code> command are also the same
+except that the default of <code class="docutils literal notranslate"><span class="pre">--data</span></code> option is
+<code class="docutils literal notranslate"><span class="pre">data/citeseer/citeseer-mrdm05.dat</span></code>.</p>
+<p>To have a more detailed view their help manuals, use the <code class="docutils literal notranslate"><span class="pre">-h</span></code> option as
+follows:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$</span> entity-resolver prep-arxiv -h
+<span class="go">usage: entity-resolver prep-arxiv [-h] [--data DATA] [--graph GRAPH]</span>
+<span class="go">                               [--ground_truth GROUND_TRUTH]</span>
+
+<span class="go">optional arguments:</span>
+<span class="go">-h, --help            show this help message and exit</span>
+<span class="go">--data DATA           The path of the arxiv data to be transformed</span>
+<span class="go">--graph GRAPH         The path of the transformed arxiv graph data</span>
+<span class="go">--ground_truth GROUND_TRUTH</span>
+<span class="go">                        The path of the transformed arxiv ground truth data</span>
+<span class="gp">$</span> entity-resolver prep-citeseer -h
+<span class="go">usage: entity-resolver prep-citeseer [-h] [--data DATA] [--graph GRAPH]</span>
+<span class="go">                                  [--ground_truth GROUND_TRUTH]</span>
+
+<span class="go">optional arguments:</span>
+<span class="go">-h, --help            show this help message and exit</span>
+<span class="go">--data DATA           The input file path of the citeseer data to be</span>
+<span class="go">                        transformed</span>
+<span class="go">--graph GRAPH         The path of the transformed citeseer graph data</span>
+<span class="go">--ground_truth GROUND_TRUTH</span>
+<span class="go">                        The path of the transformed citeseer ground truth data</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="a-complete-example">
+<h2>A Complete Example<a class="headerlink" href="#a-complete-example" title="Permalink to this headline">¶</a></h2>
+<p>Below is a complete usage example. For detailed explanation of each parameters
+of the <a class="reference internal" href="complete_doc/entity_resolver.main.html#entity_resolver.main.EntityResolver" title="entity_resolver.main.EntityResolver"><code class="xref py py-obj docutils literal notranslate"><span class="pre">EntityResolver</span></code></a> class, please refer to
+<a class="reference internal" href="advanced_guide.html"><span class="doc">Advanced Guide</span></a>.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">subprocess</span>
+<span class="kn">from</span> <span class="nn">py_stringmatching.similarity_measure.levenshtein</span> <span class="kn">import</span> <span class="n">Levenshtein</span>
+<span class="kn">from</span> <span class="nn">entity_resolver</span> <span class="kn">import</span> <span class="n">EntityResolver</span>
+
+
+<span class="k">def</span> <span class="nf">edit_distance</span><span class="p">(</span><span class="n">attrs1</span><span class="p">,</span> <span class="n">attrs2</span><span class="p">):</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">f_initial1</span><span class="p">,</span> <span class="n">f_initial2</span> <span class="o">=</span> <span class="n">attrs1</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">][</span><span class="mi">1</span><span class="p">][</span><span class="mi">0</span><span class="p">],</span> <span class="n">attrs2</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">][</span><span class="mi">1</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+    <span class="k">except</span> <span class="ne">IndexError</span><span class="p">:</span>
+        <span class="n">f_initial1</span><span class="p">,</span> <span class="n">f_initial2</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span>
+    <span class="k">if</span> <span class="n">f_initial1</span> <span class="o">!=</span> <span class="n">f_initial2</span><span class="p">:</span>
+        <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="s1">&#39;inf&#39;</span><span class="p">)</span>
+    <span class="n">levenshtein</span> <span class="o">=</span> <span class="n">Levenshtein</span><span class="p">()</span>
+    <span class="n">last_name1</span> <span class="o">=</span> <span class="n">attrs1</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">last_name2</span> <span class="o">=</span> <span class="n">attrs2</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">dist</span> <span class="o">=</span> <span class="n">levenshtein</span><span class="o">.</span><span class="n">get_raw_score</span><span class="p">(</span><span class="n">last_name1</span><span class="p">,</span> <span class="n">last_name2</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">dist</span>
+
+
+<span class="k">def</span> <span class="nf">exact_match</span><span class="p">(</span><span class="n">attrs1</span><span class="p">,</span> <span class="n">attrs2</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">attrs1</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="n">attrs2</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]</span>
+
+
+<span class="n">file_path</span> <span class="o">=</span> <span class="s1">&#39;data/citeseer/citeseer-mrdm05.dat&#39;</span>
+<span class="n">graph_path</span> <span class="o">=</span> <span class="s1">&#39;graph.json&#39;</span>
+<span class="n">ground_truth_path</span> <span class="o">=</span> <span class="s1">&#39;ground_truth.json&#39;</span>
+<span class="n">cmd_args</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;entity-resolver&#39;</span><span class="p">,</span> <span class="s1">&#39;prep-citeseer&#39;</span><span class="p">]</span>
+<span class="n">subprocess</span><span class="o">.</span><span class="n">call</span><span class="p">(</span><span class="n">cmd_args</span><span class="p">)</span>  <span class="c1"># Use the command line tool</span>
+
+<span class="n">entity_resolver</span> <span class="o">=</span> <span class="n">EntityResolver</span><span class="p">(</span>
+    <span class="n">attr_types</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;person_entity&#39;</span><span class="p">},</span> <span class="n">blocking_strategy</span><span class="o">=</span><span class="n">edit_distance</span><span class="p">,</span>
+    <span class="n">raw_blocking</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">attr_strategy</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;jaro_winkler&#39;</span><span class="p">},</span>
+    <span class="n">rel_strategy</span><span class="o">=</span><span class="s1">&#39;jaccard_coef&#39;</span><span class="p">,</span> <span class="n">bootstrap_strategy</span><span class="o">=</span><span class="n">exact_match</span><span class="p">,</span>
+    <span class="n">raw_bootstrap</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">first_attr</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">first_attr_raw</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+    <span class="n">second_attr</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">second_attr_raw</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">linkage</span><span class="o">=</span><span class="s1">&#39;max&#39;</span><span class="p">,</span>
+    <span class="n">similarity_threshold</span><span class="o">=</span><span class="mf">0.8</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">plot_prc</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+    <span class="n">evaluator_strategy</span><span class="o">=</span><span class="s1">&#39;precision_recall&#39;</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">jw_prefix_weight</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span>
+    <span class="n">stfidf_threshold</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">average_method</span><span class="o">=</span><span class="s1">&#39;max&#39;</span>
+<span class="p">)</span>  <span class="c1"># Most parameters are still set to their default values</span>
+<span class="n">entity_resolver</span><span class="o">.</span><span class="n">resolve_and_eval</span><span class="p">(</span><span class="n">ground_truth_path</span><span class="p">,</span> <span class="n">graph_path</span><span class="p">)</span>
+
+<span class="c1"># May remove the following two lines to keep the graph and ground truth files</span>
+<span class="n">os</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">graph_path</span><span class="p">)</span>
+<span class="n">os</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">ground_truth_path</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="references">
+<h2>References<a class="headerlink" href="#references" title="Permalink to this headline">¶</a></h2>
+<dl class="footnote brackets">
+<dt class="label" id="id2"><span class="brackets"><a class="fn-backref" href="#id1">1</a></span></dt>
+<dd><p>Indrajit Bhattacharya and Lise Getoor. 2007. Collective entity
+resolution in relational data. ACM Trans. Knowl. Discov. Data 1, 1, Article
+5 (March 2007). DOI=http://dx.doi.org/10.1145/1217299.1217304</p>
+</dd>
+</dl>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="advanced_guide.html" class="btn btn-neutral float-right" title="Advanced Guide" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="index.html" class="btn btn-neutral float-left" title="Welcome to entity-resolver’s documentation!" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2019, Y. Cao, K. Kang, X. Huang, Y. Huang, Y. Wang
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

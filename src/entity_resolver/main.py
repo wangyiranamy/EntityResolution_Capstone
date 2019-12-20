@@ -7,10 +7,10 @@ to their data.
 Example:
 
     >>> from entity_resolver import EntityResolver
-    >>> entity_resolver = EntityResolver()
+    >>> er = EntityResolver()
     >>> data_path = 'path/to/your/data'
     >>> label_path = 'path/to/your/ground_truth'
-    >>> score = entity_resolver.resolve_and_eval(data_path, label_path)
+    >>> score = er.resolve_and_eval(label_path, data_path)
 
 Tip:
     Although currently the ``attr_types`` argument only support
@@ -28,7 +28,7 @@ Tip:
 See Also:
 
     * Detailed explanation for the above example can be found in
-      :doc:`../quickstart`.
+      :doc:`../tutorial`.
     * A more comprehensive explanation for the input parameters of this class
       can be found in :doc:`../advanced_guide`.
 """
@@ -354,7 +354,7 @@ class EntityResolver(WithLogger):
     @property
     def rel_strategy(self):
         """ `~typing.Optional`\ [`str`\ ]: Omitted.
-        
+
         Raises:
             ValueError: If set to any value other than ``'jaccard_coef'``,
                 ``'jaraccard_coef_fr'``, ``'adar_neighbor'``,
@@ -613,7 +613,7 @@ class EntityResolver(WithLogger):
         Args:
             graph_path: The path to the input data for entity resolution. The
                 data file has to **strictly follow** the format as described in
-                :doc:`../quickstart`.
+                :doc:`../tutorial`.
 
         Returns:
             Mapping reference ids to cluster ids. The dictionary is sorted
@@ -640,7 +640,7 @@ class EntityResolver(WithLogger):
         Args:
             ground_truth_path: The path to ground truth data used for
                 evaluation. The data file has to **strictly follow** the format
-                as described in :doc:`../quickstart`.
+                as described in :doc:`../tutorial`.
             resolved_mapping: Mapping reference id to cluster id. The reference
                 ids must correspond to those in ground truth data, while their
                 cluster ids may differ.
@@ -649,28 +649,39 @@ class EntityResolver(WithLogger):
             * If ``evaluator_strategy`` is set to ``'precision_recall'``, the
               result is a tuple of three numbers representing precision,
               recall, and f1 in the order.
-            * Otherwise, the result is a single number representing the score
-              computed as specified by ``evaluator_strategy``.
+            * If ``strategy`` is set to ``'ami'``, or ``'v_measure'``, the
+              result is a single number representing the score computed as
+              specified by ``evaluator_strategy``.
+            * If ``strategy`` is a user-defined function, the return is the
+              same as that function.
+
+        Raises:
+            ValueError: If ``plot_prc`` is set to ``True``.
 
         See Also:
             It ultimately calls the ``evaluate`` method of an ``Evaluator``
             object in :doc:`entity_resolver.core.evaluator`.
         """
+        if self.plot_prc:
+            raise ValueError(
+                'Cannot plot precision-recall curve when only evaluating the'
+                'performance. Use resolve_and_eval instead.'
+            )
         ground_truth = self._parse_ground_truth(ground_truth_path)
         return self._evaluator.evaluate(ground_truth, resolved_mapping)
 
     def resolve_and_eval(
-        self, graph_path: str, ground_truth_path: str
+        self, ground_truth_path: str, graph_path: str
     ) -> Union[Any, Tuple[Any, List[Tuple[float, float]]]]:
         """ Resolve entities in the given data and evaluate the result.
 
         Args:
-            graph_path: The path to the input data for entity resolution. The
-                data file has to **strictly follow** the format as described in
-                :doc:`../quickstart`.
             ground_truth_path: The path to ground truth data used for
                 evaulation. The data file has to **strictly follow** the format
-                as described in :doc:`../quickstart`.
+                as described in :doc:`../tutorial`.
+            graph_path: The path to the input data for entity resolution. The
+                data file has to **strictly follow** the format as described in
+                :doc:`../tutorial`.
 
         Returns:
             This depends on the values of ``evaluator_strategy`` and
@@ -692,7 +703,8 @@ class EntityResolver(WithLogger):
 
               * If ``plot_prc == False``, the result is a single number
                 representing the score computed as specified by
-                ``evaluator_strategy``.
+                ``evaluator_strategy`` if the strategy is not a user-defined
+                function, or the score returned by the user-defined function.
               * If ``plot_prc == True``, the result is a tuple of two objects:
 
                 * The first one is a single number same as in the
@@ -722,7 +734,7 @@ class EntityResolver(WithLogger):
         Args:
             ground_truth_path: The path to ground truth data. The data file has
                 to **strictly follow** the format as described in
-                :doc:`../quickstart`.
+                :doc:`../tutorial`.
 
         Returns:
             Mapping reference ids to ground truth cluster ids. The dictionary

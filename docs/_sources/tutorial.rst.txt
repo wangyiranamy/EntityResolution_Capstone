@@ -1,0 +1,355 @@
+Tutorial
+========
+
+.. error::
+   Probably due to a bug with sphinx 2.0, the reference to the paper is not
+   properly rendered in html in the `References`_ section. However, the
+   reference content is correct and this effect is purely aesthetic.
+
+Introduction
+------------
+This package implements the collective entity resolution algorithm as described
+in [1]_.
+
+The objective of entity resolution is to identify among a collection of
+references of entities, which are referring to the same actual entity. For
+example, we have a set of names "Jim Doe", "J Doe", "Jason Doe", where "Jason
+Doe" and "J Doe" are actually the same person while "Jim Doe" is a different
+one. The occurrence of each name is called a *reference*, while the person each
+name refers to in real world is called an *entity*.
+
+A *relation* means an co-occurrence in the context of this algorithm, and is
+modeld by a hyper-edge connecting multiple references. For example, if
+"Jim Doe", "Jason Doe", and "C. Wang" co-authored a paper, one may use a
+hyper-edge to connect them. The intuition is that if two references have
+co-authored with the same person, chances are higher that these two references
+are also the same entity. Any relation that is consistent with such intuition
+can be deemed as an appropriate relation.
+
+Installation
+------------
+
+Data Format
+-----------
+This first step to using this package is to transform your data into a format
+that this package can understand. We define the format of the data file
+containing references and their relations as follows:
+
+   #. It should be a json file consisting of a single array of items.
+   #. Each item contains information of one reference:
+      ::
+
+         {
+           "node_id": "<unique identifier of the reference>",
+           "edge_id": "<unique identifier of the relation involving this reference>",
+           "attr_dict": {
+             "<name of the first attribute>": "<value of the first attribute>",
+             "<name of the second attribute>": "<value of the second attribute>",
+             ...
+           }
+         }
+
+      where users should substitute contents of format "<...>" with appropriate
+      values as described in the angled brackets.
+
+Note that each reference should appear in **exactly one** relation. Therefore
+each item in the list must have distinct "node_id". This makes sense in most
+cases since each appearance of an object in data is considered a unique
+reference.
+
+If users wish to use a ground truth dataset to evaluate the performance of the
+entity resolution algorithm, they should convert their ground truth dataset to
+the following format:
+
+   #. It should be a json file consisting of a single array of items.
+   #. Each item contains information about what entity each reference refers
+      to.
+      ::
+
+         {
+           "node_id": "<unique identifier of the reference>",
+           "cluster_id": "<unique identifier of the entity>"
+         }
+
+      Contents of format "<...>" should be replaced similarly.
+
+It is important to keep the "node_id" in this ground truth data consistent with
+that in the reference and relation data.
+
+   .. tip::
+      The person names are best to be normalized names to fully utilize the
+      'person_entity' type as described in both `Define Types`_ and
+      `Define Blocking Strategy`_. A normalized name should consist only of
+      lower case letters and underscores of the format: <last name>_<first
+      name> <middle name>, where there should be no spaces in the last name,
+      and spaces in first name should all be replaced by underscores. Other
+      punctuational marks should be removed. For example, ``'W. W. Wang'``
+      should be transformed to ``'wang_w_w'``.
+
+Startup Guide
+-------------
+
+After converting your data to the specified format(s) above, follow the steps
+below.
+
+Define Types
+>>>>>>>>>>>>
+
+Firstly, you have to input the type of each attribute in your data. It should
+be a dictionary mapping attribute names to their types. For example,
+
+   >>> {'name': 'person_entity'}
+
+where ``'name'`` is the attribute name and ``'person_entity'`` is the attribute
+type. Currently we support ``'text'`` and ``'person_entity'`` as types. This
+type affects expected input arguments of input function parameters including
+``blocking_strategy``, ``bootstrap_strategy``, ``first_attr``, ``second_attr``,
+and values of ``attr_strategy``. The following section explains how it affects
+``blocking_strategy``. The effects on other parameters are similary. Users may
+refer to :doc:`advanced_guide` for further details.
+
+
+Define Blocking Strategy
+>>>>>>>>>>>>>>>>>>>>>>>>
+
+Because it is impossible to calculate pairwise distances of all points during
+clustering even for moderate size data, a pre-screening is done to find out
+groups of references that are potentially the same entities. This process is
+called "blocking".
+
+``blocking_strategy`` is a required argument to specify
+how pre-screening is done. It should be a function that takes in two
+dictionaries and returns the distance between them. The two dictionaries map
+attribute names to values of two references. For example,
+
+   >>> {'name': ('doe', 'jim')}
+
+This function should be fast to compute, and using an appropriate threshold
+specified by the ``blocking_threshold`` parameter (default 3), it is almost
+certain that any pair of references with distance greater than this threshold
+are definitely not the same entity. For example, edit distance of last names
+can be used when resolving paper authors.
+
+   >>> from py_stringmatching.similarity_measure.levenshtein import Levenshtein
+   >>> def edit_distance(attrs1, attrs2):
+   ...     levenshtein = Levenshtein()
+   ...     last_name1 = attrs1['name'][0]
+   ...     last_name2 = attrs2['name'][0]
+   ...     dist = levenshtein.get_raw_score(last_name1, last_name2)
+   ...     return dist
+
+As described in the previsous section, ``attr_types`` affect the expected input
+of ``blocking_strategy``.
+
+   :person_entity: The value corresponding to the attribute name of this type
+    will be a tuple of (last name, first name) parsed from its raw value of
+    normalized name described in the tip of `Data Format`_ section. For
+    example, the normalized name 'doe_jim' will be ``('doe', 'jim')`` in the
+    value.
+   :text: The value corresponding to the attribute name of this type will be a
+    list of tokenized words with any non-alphanumeric characters as breaking
+    points. For example, 'this is a sentence' will be ``['this', 'is', 'a',
+    'sentence']`` in the value.
+   :other: If the specified type is neither of the above two strings, the value
+    will be the same as its value in the input data.
+
+Moreover, users may set ``raw_blocking`` to ``True`` if they want to use
+supported types ('person_entity', 'text') but their raw values as inputs to
+their own ``blocking_strategy`` function.
+
+
+Resolve
+>>>>>>>
+
+Now both ``attr_types`` and ``blocking_strategy`` have been defined. For
+example,
+
+   >>> attr_types = {'name': 'person_entity'}
+   >>> blocking_strategy = edit_distance  # defined in the previsous section
+
+There are three main APIs:
+
+   * If you wish to resolve entities in the reference relation dataset, follow
+     the example below:
+
+        >>> from entity_resolver import EntityResolver
+        >>> er = EntityResolver()  # May pass in different hyperparameters
+        >>> resolved_mapping = er.resolve('path/to/your/data')
+
+     The resulting ``resolved_mapping`` object is an `~collections.OrderedDict`
+     object mapping reference ids to cluster (entity) ids. The reference ids
+     correspond to those in ground truth data, while their cluster ids may
+     differ. This dictionary is sorted (key-value pairs are inserted) in
+     ascending order of reference ids.
+   * If you wish to resolve entities in the reference relation dataset and also
+     use a ground truth dataset to evaluate the performance, follow the example
+     below:
+
+     >>> from entity_resolver import EntityResolver
+     >>> er = EntityResolver()  # May pass in different hyperparameters
+     >>> score = er.resolve_and_eval(
+     ...     'path/to/your/ground_truth',
+     ...     'path/to/your/data'
+     ... )
+
+      Depending on different evaluation strategy, the resulting ``socre`` may
+      differ. The default is a tuple of (precision, recall, f1) scores. Refer
+      to :doc:`advanced_guide` for further information on different
+      evaluation metrics and `Plot Precision-Recall`_ below for how
+      ``plot_prc`` flag might affect the return of this function.
+   * If you wish to do extra work between entity resolution and evaluation, you
+     may follow the example below:
+
+     >>> from entity_resolver import EntityResolver
+     >>> er = EntityResolver() # May pass in different hyperparameters
+     >>> resolved_mapping = er.resolve('path/to/your/data/')
+     >>> do_extra_work(resolved_mapping)
+     >>> score = er.evaluate('path/to/your/ground_truth', resolved_mapping)
+
+     The resulting ``score`` is the same as desribed in the above bullet point
+     as long as it is not altered.
+
+See Also
+>>>>>>>>
+
+And now we are done! If you wish to further customize the resolver's runtime
+behavior, please refer to the next section `Basic Parameter Settings`_. If you
+wish to use command line tools shipped with this package, please refer to the
+section `Command Line Tools`_.  If you wish to understand the details of the
+algorithm and what each of the hyperparameters means, please refer to
+:doc:`advanced_guide`.
+
+Basic Parameter Settings
+------------------------
+
+The following three sections explain three parameters users may set to help
+with different purpose when using this package.
+
+Plot Precision-Recall
+>>>>>>>>>>>>>>>>>>>>>
+
+The ``plot_prc`` parameter is default to ``False``, meaning no precision-recall
+curve will be plotted. This parameter may be set to ``True`` to plot the curve
+only if the ``resolve_and_eval`` method is called. Attempts to call either
+``resolve`` or ``evaluate`` method will result in error. Moreover, users should
+take note of the following when setting it to ``True``:
+
+   * The return value of ``resolve_and_eval`` will be a tuple of two items with
+     the first one being the same as the return when ``plot_prc`` is ``False``
+     and the second one being a list of tuples of precision and recall scores
+     used to plot the curve.
+
+   * The program will take a significantly longer time to run because the
+     precision and recall scores are computed many times. Therefore it is
+     highly recommended to store the list of precision and recall scores
+     returned by ``resolve_and_eval`` in case further actions are required.
+
+Adjust Logging
+>>>>>>>>>>>>>>
+
+The ``verbose`` parameter can be set to control console logging information.
+Its default value is 0. Below explains how the value affects the logging
+behavior:
+
+   * Any integer less than 1 implies no logging.
+   * The integer 1 implies some information about the dataset, built graph,
+     evaluation result (if available), and time taken for each step of
+     algorithm is logged.
+   * Any integer greater than 1 implies **a lot of** information is logged. It
+     is primarily used to debug this package.
+
+
+Set Seed
+>>>>>>>>
+
+The blocking step of this algorithm is the only random part of this algorithm.
+Therefore the ``seed`` parameter can be used for replicate purpose. The default
+value is ``None``, which implies the current system time is used as seed.
+
+Command Line Tools
+------------------
+
+This package also ships with two command line tools to transform the `arxiv
+<https://github.com/Terry1004/EntityResolution_Capstone/
+tree/master/data/arxiv>`_ and `citeseer <https://github.com/Terry1004/
+EntityResolution_Capstone/tree/master/data/citeseer>`_ data into the standard
+format described in `Data Format`_.
+
+Typing ``entity-resolver -h`` in terminal, users should see the help manual as
+follows:
+
+.. code-block:: console
+
+   $ entity-resolver -h
+   usage: entity-resolver [-h] {prep-arxiv,prep-citeseer} ...
+
+   positional arguments:
+   {prep-arxiv,prep-citeseer}
+      prep-arxiv          Transform the arxiv data into the format expected by
+                           EntityResolver
+      prep-citeseer       Transform the citeseer data into the format expected
+                           by EntityResolver
+
+   optional arguments:
+   -h, --help            show this help message and exit
+
+There are two subcommands that correspond to the arxiv and citeseer dataset
+respectively. For example, the following command will parse the arxiv data on
+path ``data/arxiv/arxiv-mrdm05.dat`` and output the graph data and ground truth
+data in ``graph.json`` and ``ground_truth.json`` files in the current directory
+respectively.
+
+.. code-block::
+
+   $ entity-resolver prep-arxiv\
+   > --data data/arxiv/arxiv/arxiv-mrdm05.dat\
+   > --graph graph.json\
+   > --ground_truth ground_truth.json
+
+The values for each option are also their default values if not specified. The
+default values of ``entity-resolver prep-citeseer`` command are also the same
+except that the default of ``--data`` option is
+``data/citeseer/citeseer-mrdm05.dat``.
+
+To have a more detailed view their help manuals, use the ``-h`` option as
+follows:
+
+.. code-block:: console
+
+   $ entity-resolver prep-arxiv -h
+   usage: entity-resolver prep-arxiv [-h] [--data DATA] [--graph GRAPH]
+                                  [--ground_truth GROUND_TRUTH]
+
+   optional arguments:
+   -h, --help            show this help message and exit
+   --data DATA           The path of the arxiv data to be transformed
+   --graph GRAPH         The path of the transformed arxiv graph data
+   --ground_truth GROUND_TRUTH
+                           The path of the transformed arxiv ground truth data
+   $ entity-resolver prep-citeseer -h
+   usage: entity-resolver prep-citeseer [-h] [--data DATA] [--graph GRAPH]
+                                     [--ground_truth GROUND_TRUTH]
+
+   optional arguments:
+   -h, --help            show this help message and exit
+   --data DATA           The input file path of the citeseer data to be
+                           transformed
+   --graph GRAPH         The path of the transformed citeseer graph data
+   --ground_truth GROUND_TRUTH
+                           The path of the transformed citeseer ground truth data
+
+A Complete Example
+------------------
+
+Below is a complete usage example. For detailed explanation of each parameters
+of the `~entity_resolver.main.EntityResolver` class, please refer to
+:doc:`advanced_guide`.
+
+.. literalinclude:: ../../example.py
+
+References
+----------
+
+.. [1] Indrajit Bhattacharya and Lise Getoor. 2007. Collective entity
+   resolution in relational data. ACM Trans. Knowl. Discov. Data 1, 1, Article
+   5 (March 2007). DOI=http://dx.doi.org/10.1145/1217299.1217304

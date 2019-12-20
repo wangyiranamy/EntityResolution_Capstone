@@ -26,7 +26,7 @@ class GroundTruthParser(WithLogger):
         Args:
             data_path: The path to the ground truth data. The data file has to
                 **strictly follow** the format as described in
-                :doc:`../quickstart`.
+                :doc:`../tutorial`.
 
         Returns:
             Mapping reference ids to ground truth cluster ids. The dictionary

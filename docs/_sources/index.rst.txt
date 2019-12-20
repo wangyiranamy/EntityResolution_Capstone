@@ -14,7 +14,7 @@ Welcome to entity-resolver's documentation!
    :maxdepth: 1
    :caption: Table of Contents
 
-   quickstart
+   tutorial
    advanced_guide
    complete_doc
 

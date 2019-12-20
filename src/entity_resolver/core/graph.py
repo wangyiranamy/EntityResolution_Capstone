@@ -80,19 +80,19 @@ class Attribute:
 
         Args:
             doc: string of text string.
-        
+
         Returns:
             A list of tokenized words.
         """
         doc = doc.strip()
-        doc = re.sub("[^a-zA-Z]", " ", doc)
+        doc = re.sub("[^a-zA-Z0-9]", " ", doc)
         doc = doc.lower().split()
         return doc
 
     @staticmethod
     def _clean_person_name(name: str) -> Tuple[str, str]:
         """ Retrieve first and last names from normalized person name.
-        
+
         Args:
             name: A normalized name string. It should consist only of lower
                 case letters and underscores of the format:
@@ -101,7 +101,7 @@ class Attribute:
                 be replaced by underscores. Other punctuational marks should be
                 removed. For example, ``'W. W. Wang'`` should be transformed to
                 ``'wang_w_w'``.
-        
+
         Returns:
             A tuple of (last name, first name).
         """
@@ -112,7 +112,7 @@ class Attribute:
 
 class Node:
     """ Store information about a reference.
-    
+
     Args:
         node_id: A unique identifier for a reference. Distinct node object must
             have distinct ``node_id``.
@@ -121,7 +121,7 @@ class Node:
     Important:
         In order for the whole entity resolution to function as expected, the
         ``node_id`` should also be **comparable** besides being **hashable**.
-    
+
     Attributes:
         _id (`~typing.Hashable`): Same as ``node_id`` in the parameters
             section.
@@ -161,7 +161,7 @@ class Node:
 
     def __eq__(self, other: 'Node') -> bool:
         """ Two nodes are equal if and only if they have the same ``_id``.
-        
+
         Args:
             other: Another node to be compared with.
         """
@@ -174,8 +174,7 @@ class Edge:
     Args:
         edge_id: A unique identifier for a hyper-edge. Distinct edge object
             must have distinct ``edge_id``.
-        
-    
+
     Attributes:
         _id (`~typing.Hashable`): Same as in the ``edge_id`` in the parameters
             section.
@@ -199,7 +198,7 @@ class Edge:
 
     def add_node(self, node: Node) -> None:
         """ Add a reference to this hyper-edge.
-        
+
         Args:
             node: The reference to be added to the ``_nodes`` attribute.
         """
@@ -222,7 +221,7 @@ class Graph:
         that each reference only appears in one hyper-edge. Should the
         assumption fail, unexpected errors could occur. Refer to
         :doc:`../advanced_guide` for more details.
-    
+
     Attributes:
         _nodes (`~typing.List`\ [`Node`]): A list of references contained in
             the graph.
@@ -288,10 +287,10 @@ class Graph:
 
     def get_neighbors(self, node: Node) -> List[Node]:
         """ Retrive the neighboring references of a given reference.
-        
+
         Args:
             node: To find the neighboring references of this reference.
-        
+
         Returns:
             A list of neighboring references. Note that this list will contain
             the input ``node`` as well.
@@ -319,7 +318,7 @@ class Graph:
                 computation.
             is_raw2: Indicate whether the input attribute value dictionaries
                 into ``f2`` consist of unprocessed values.
-        
+
         Returns:
             Mapping references to their ambiguity scores.
         """
