@@ -118,3 +118,10 @@ class TestEntityResolver:
         assert entity_resolver._resolver.weights == {1: 1}
         assert entity_resolver._resolver.linkage == 'min'
         assert entity_resolver._resolver.rel_strategy == 'adar_neighbor'
+
+    def test_plot_exception(self):
+        entity_resolver = EntityResolver(None, None, plot_prc=True)
+        with pytest.raises(ValueError):
+            entity_resolver.resolve('')
+        with pytest.raises(ValueError):
+            entity_resolver.evaluate('', dict())
