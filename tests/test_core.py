@@ -36,10 +36,10 @@ class TestEvaluator:
         assert round(precision_recall_score[0], 2) == 0.33
         assert round(precision_recall_score[1], 2) == 0.5
         assert round(precision_recall_score[2], 2) == 0.4
-    
+
     def test_evaluator_func(self, ground_truth, resolved_mapping):
         evaluator = Evaluator(
-            strategy=lambda labels, preds: len(labels)+ len(preds)
+            strategy=lambda labels, preds: len(labels) + len(preds)
         )
         score = evaluator.evaluate(ground_truth, resolved_mapping)
         assert score == 10
@@ -195,7 +195,7 @@ class TestResolver:
         assert jaccard_coef_resolver._calc_rel_sim(1, 2) == 0.5
         assert jaccard_coef_fr_resolver._calc_rel_sim(1, 2) == 0.25
         assert round(adar_neighbor_resolver._calc_rel_sim(1, 2), 2) == 0.45
-        assert round(adar_neighbor_fr_resolver._calc_rel_sim(1, 2), 2) == 0.23
+        assert round(adar_neighbor_fr_resolver._calc_rel_sim(1, 2), 3) == 0.233
         round(adar_attr_resolver._calc_rel_sim(1, 2), 2) == 1.00
         round(adar_attr_fr_resolver._calc_rel_sim(1, 2), 2) == 1.00
         cleanup()
@@ -218,8 +218,8 @@ class TestResolver:
             attr_strategy={
                 'text1': 'stfidf',
                 'text2': lambda l1, l2: len(l1)*10 + len(l2)*10
-                }
-            )
+            }
+        )
         resolver._init_cache(graph)
         node1 = [node for node in graph.nodes if node.id == 1][0]
         node2 = [node for node in graph.nodes if node.id == 2][0]

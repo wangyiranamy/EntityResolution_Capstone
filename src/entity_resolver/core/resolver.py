@@ -928,9 +928,9 @@ class Resolver(WithLogger):
             rel_strategy = self.rel_strategy
         rel_sim_producer = self._sim_func_producers[rel_strategy]
         if rel_strategy.endswith('fr'):
-            self._use_nbr_cache = True
-        else:
             self._use_nbr_cache = False
+        else:
+            self._use_nbr_cache = True
         if rel_strategy.startswith('adar_neighbor'):
             self._use_amb_type = 'neighbor'
             self._use_ambiguities = False
@@ -1068,7 +1068,7 @@ class Resolver(WithLogger):
         if self._use_amb_type == 'neighbor':
             def get_uniqueness(cluster):
                 neighbors = self._get_cluster_neighbors(cluster)
-                if type(neighbors) is not set:
+                if self._use_nbr_cache and type(neighbors) is not set:
                     num_neighbors = len(set(neighbors))
                 else:
                     num_neighbors = len(neighbors)
