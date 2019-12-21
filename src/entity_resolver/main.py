@@ -113,8 +113,9 @@ class EntityResolver(WithLogger):
             ``'precision_recall'``, ``'ami'``, and ``'v_measure'``, or a
             callable that follows the signatures of class methods in
             `~entity_resolver.core.utils.ClusteringMetrics` (two
-            `~collections.OrderedDict` as inputs and any performance indicator
-            as output). Refer to :doc:`../advanced_guide` for more details.
+            `~collections.OrderedDict` and ``**kwargs**`` as inputs and any
+            performance indicator as output). Refer to :doc:`../advanced_guide`
+            for more details.
         seed: The random seed to be used in blocking, which is the only source
             of randomness in this algorithm. If it is ``None`` (default), the
             current system time is used as the seed.
