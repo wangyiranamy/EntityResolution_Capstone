@@ -8,6 +8,7 @@ setup(
     version='0.2.2',
     author='Yijie Cao, Kai Kang, Xinxin Huang, Yiming Huang, Yiran Wang',
     author_email='hym961004@gmail.com',
+    license='MIT',
     description='A python package for collective entity resolution',
     long_description=long_description,
     long_description_content_type='text/markdown',
