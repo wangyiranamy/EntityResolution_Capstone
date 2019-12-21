@@ -5,13 +5,13 @@ with open('README.md', 'r') as fh:
 
 setup(
     name='entity-resolver',
-    version='0.2.1',
+    version='0.2.2',
     author='Yijie Cao, Kai Kang, Xinxin Huang, Yiming Huang, Yiran Wang',
-    author_email='yw3201@columbia.edu',
+    author_email='hym961004@gmail.com',
     description='A python package for collective entity resolution',
     long_description=long_description,
     long_description_content_type='text/markdown',
-    url='https://github.com/wangyiranamy/EntityResolution_Capstone',
+    url='https://github.com/Terry1004/EntityResolution_Capstone',
     package_dir={'': 'src'},
     packages=[
         'entity_resolver', 'entity_resolver.core', 'entity_resolver.parser'
