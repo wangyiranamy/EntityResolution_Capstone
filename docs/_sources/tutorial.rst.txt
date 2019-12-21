@@ -32,6 +32,12 @@ can be deemed as an appropriate relation.
 Installation
 ------------
 
+This package is available on pip.
+
+.. code-block::
+
+   $ pip install entity-resolver
+
 Data Format
 -----------
 This first step to using this package is to transform your data into a format
