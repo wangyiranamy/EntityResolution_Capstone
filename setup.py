@@ -5,7 +5,7 @@ with open('README.md', 'r') as fh:
 
 setup(
     name='entity-resolver',
-    version='0.2.2',
+    version='0.3.1',
     author='Yijie Cao, Kai Kang, Xinxin Huang, Yiming Huang, Yiran Wang',
     author_email='hym961004@gmail.com',
     license='MIT',
