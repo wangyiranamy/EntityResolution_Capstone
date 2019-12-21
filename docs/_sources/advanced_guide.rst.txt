@@ -1,6 +1,11 @@
 Advanced Guide
 ==============
 
+.. error::
+   Probably due to a bug with sphinx 2.0, the reference to the paper is not
+   properly rendered in html in the `References`_ section. However, the
+   reference content is correct and this effect is purely aesthetic.
+
 This guide explains the algorithm used in this package and each parameter in
 the `~entity_resolver.main.EntityResolver` class in great details. This
 algorithm is the same as described in [1]_.
