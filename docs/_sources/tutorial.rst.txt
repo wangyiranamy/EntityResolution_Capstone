@@ -22,7 +22,7 @@ one. The occurrence of each name is called a *reference*, while the person each
 name refers to in real world is called an *entity*.
 
 A *relation* means an co-occurrence in the context of this algorithm, and is
-modeld by a hyper-edge connecting multiple references. For example, if
+modeled by a hyper-edge connecting multiple references. For example, if
 "Jim Doe", "Jason Doe", and "C. Wang" co-authored a paper, one may use a
 hyper-edge to connect them. The intuition is that if two references have
 co-authored with the same person, chances are higher that these two references

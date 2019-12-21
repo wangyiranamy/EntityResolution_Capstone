@@ -104,7 +104,19 @@
 <li class="toctree-l2"><a class="reference internal" href="#references">References</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="advanced_guide.html">Advanced Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="advanced_guide.html">Advanced Guide</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="advanced_guide.html#algorithm">Algorithm</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="advanced_guide.html#overview">Overview</a></li>
+<li class="toctree-l3"><a class="reference internal" href="advanced_guide.html#attribute-similarity-functions">Attribute Similarity Functions</a></li>
+<li class="toctree-l3"><a class="reference internal" href="advanced_guide.html#relational-similarity-functions">Relational Similarity Functions</a></li>
+<li class="toctree-l3"><a class="reference internal" href="advanced_guide.html#uniqueness">Uniqueness</a></li>
+<li class="toctree-l3"><a class="reference internal" href="advanced_guide.html#evaluation-metrics">Evaluation Metrics</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="advanced_guide.html#parameters">Parameters</a></li>
+<li class="toctree-l2"><a class="reference internal" href="advanced_guide.html#references">References</a></li>
+</ul>
+</li>
 <li class="toctree-l1"><a class="reference internal" href="complete_doc.html">Complete Documentation</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="complete_doc/entity_resolver.html">entity_resolver package</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="complete_doc/entity_resolver.html#subpackages">Subpackages</a><ul>
@@ -208,7 +220,7 @@ Doe” and “J Doe” are actually the same person while “Jim Doe” is a dif
 one. The occurrence of each name is called a <em>reference</em>, while the person each
 name refers to in real world is called an <em>entity</em>.</p>
 <p>A <em>relation</em> means an co-occurrence in the context of this algorithm, and is
-modeld by a hyper-edge connecting multiple references. For example, if
+modeled by a hyper-edge connecting multiple references. For example, if
 “Jim Doe”, “Jason Doe”, and “C. Wang” co-authored a paper, one may use a
 hyper-edge to connect them. The intuition is that if two references have
 co-authored with the same person, chances are higher that these two references

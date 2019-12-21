@@ -25,6 +25,7 @@
         <script type="text/javascript" src="../_static/underscore.js"></script>
         <script type="text/javascript" src="../_static/doctools.js"></script>
         <script type="text/javascript" src="../_static/language_data.js"></script>
+        <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
     
     <script type="text/javascript" src="../_static/js/theme.js"></script>
 
@@ -104,7 +105,19 @@
 <li class="toctree-l2"><a class="reference internal" href="../tutorial.html#references">References</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="../advanced_guide.html">Advanced Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../advanced_guide.html">Advanced Guide</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../advanced_guide.html#algorithm">Algorithm</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../advanced_guide.html#overview">Overview</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../advanced_guide.html#attribute-similarity-functions">Attribute Similarity Functions</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../advanced_guide.html#relational-similarity-functions">Relational Similarity Functions</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../advanced_guide.html#uniqueness">Uniqueness</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../advanced_guide.html#evaluation-metrics">Evaluation Metrics</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../advanced_guide.html#parameters">Parameters</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../advanced_guide.html#references">References</a></li>
+</ul>
+</li>
 <li class="toctree-l1 current"><a class="reference internal" href="../complete_doc.html">Complete Documentation</a><ul class="current">
 <li class="toctree-l2 current"><a class="reference internal" href="entity_resolver.html">entity_resolver package</a><ul class="current">
 <li class="toctree-l3 current"><a class="reference internal" href="entity_resolver.html#subpackages">Subpackages</a><ul class="current">
@@ -211,7 +224,7 @@ hyperparameters, please refer to <a class="reference internal" href="../advanced
 </div>
 <dl class="class">
 <dt id="entity_resolver.core.resolver.Resolver">
-<em class="property">class </em><code class="sig-prename descclassname">entity_resolver.core.resolver.</code><code class="sig-name descname">Resolver</code><span class="sig-paren">(</span><em class="sig-param">blocking_strategy</em>, <em class="sig-param">raw_blocking=False</em>, <em class="sig-param">alpha=0</em>, <em class="sig-param">weights=None</em>, <em class="sig-param">attr_strategy={}</em>, <em class="sig-param">rel_strategy=None</em>, <em class="sig-param">blocking_threshold=3</em>, <em class="sig-param">bootstrap_strategy=None</em>, <em class="sig-param">raw_bootstrap=False</em>, <em class="sig-param">edge_match_threshold=1</em>, <em class="sig-param">first_attr=None</em>, <em class="sig-param">first_attr_raw=False</em>, <em class="sig-param">second_attr=None</em>, <em class="sig-param">second_attr_raw=False</em>, <em class="sig-param">linkage='max'</em>, <em class="sig-param">similarity_threshold=0.935</em>, <em class="sig-param">seed=None</em>, <em class="sig-param">plot_prc=False</em>, <em class="sig-param">verbose=0</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/Terry1004/EntityResolution_Capstone/blob/master/src/entity_resolver/core/resolver.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#entity_resolver.core.resolver.Resolver" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">entity_resolver.core.resolver.</code><code class="sig-name descname">Resolver</code><span class="sig-paren">(</span><em class="sig-param">blocking_strategy</em>, <em class="sig-param">raw_blocking=False</em>, <em class="sig-param">alpha=0</em>, <em class="sig-param">weights=None</em>, <em class="sig-param">attr_strategy={}</em>, <em class="sig-param">rel_strategy='jaccard_coef'</em>, <em class="sig-param">blocking_threshold=3</em>, <em class="sig-param">bootstrap_strategy=None</em>, <em class="sig-param">raw_bootstrap=False</em>, <em class="sig-param">edge_match_threshold=1</em>, <em class="sig-param">first_attr=None</em>, <em class="sig-param">first_attr_raw=False</em>, <em class="sig-param">second_attr=None</em>, <em class="sig-param">second_attr_raw=False</em>, <em class="sig-param">linkage='max'</em>, <em class="sig-param">similarity_threshold=0.935</em>, <em class="sig-param">seed=None</em>, <em class="sig-param">plot_prc=False</em>, <em class="sig-param">verbose=0</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/Terry1004/EntityResolution_Capstone/blob/master/src/entity_resolver/core/resolver.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#entity_resolver.core.resolver.Resolver" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="entity_resolver.core.utils.html#entity_resolver.core.utils.WithLogger" title="entity_resolver.core.utils.WithLogger"><code class="xref py py-class docutils literal notranslate"><span class="pre">entity_resolver.core.utils.WithLogger</span></code></a></p>
 <p>Execute the core entity resolution program.</p>
 <p>Most of the arguments and paramters are duplicates of those in
@@ -239,7 +252,7 @@ specified, a default strategy will be employed depending on the
 attribute type: <code class="docutils literal notranslate"><span class="pre">'text'</span></code> for soft-tfidf, and <code class="docutils literal notranslate"><span class="pre">person_entity</span></code>
 for Jaro-Winkler. Refer to <a class="reference internal" href="../advanced_guide.html"><span class="doc">Advanced Guide</span></a> for more
 details.</p></li>
-<li><p><strong>rel_strategy</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/typing.html#typing.Union" title="(in Python v3.6)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code></a>[<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>, <a class="reference external" href="https://docs.python.org/3.6/library/typing.html#typing.Callable" title="(in Python v3.6)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Callable</span></code></a>, <code class="docutils literal notranslate"><span class="pre">None</span></code>]) – Name of the strategy to compute relational similarity.
+<li><p><strong>rel_strategy</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>) – Name of the strategy to compute relational similarity.
 Valid values are <code class="docutils literal notranslate"><span class="pre">'jaccard_coef'</span></code>, <code class="docutils literal notranslate"><span class="pre">'jaraccard_coef_fr'</span></code>,
 <code class="docutils literal notranslate"><span class="pre">'adar_neighbor'</span></code>, <code class="docutils literal notranslate"><span class="pre">'adar_neighbor_fr'</span></code>, <code class="docutils literal notranslate"><span class="pre">'adar_attr'</span></code>, and
 <code class="docutils literal notranslate"><span class="pre">'adar_attr_fr'</span></code>. If it is <code class="docutils literal notranslate"><span class="pre">None</span></code>, <code class="docutils literal notranslate"><span class="pre">'jaccard_coef'</span></code> for
@@ -397,7 +410,7 @@ this module’s documentation</p></li>
 <dd><p>Omitted.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.6/library/typing.html#typing.Optional" title="(in Python v3.6)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Optional</span></code></a>[<a class="reference external" href="https://docs.python.org/3.6/library/typing.html#typing.Union" title="(in Python v3.6)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Union</span></code></a>[<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">str</span></code></a>, <a class="reference external" href="https://docs.python.org/3.6/library/typing.html#typing.Callable" title="(in Python v3.6)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Callable</span></code></a>]]</p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">str</span></code></a></p>
 </dd>
 </dl>
 </dd></dl>
